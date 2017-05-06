@@ -20,7 +20,10 @@
         "topthink/framework": "^5.0",
         "topthink/think-captcha": "^1.0",
         "topthink/think-image": "^1.0",
-        "topthink/think-helper": "^1.0"
+        "topthink/think-helper": "^1.0",
+        "workerman/gateway-worker-for-win" : ">=3.0.0",
+        "workerman/gatewayclient" : ">=3.0.0",
+        "zoujingli/wechat-php-sdk" : "dev-master"
     },  
     "repositories": {
       "packagist": {

@@ -414,13 +414,14 @@ class App
     public static function initCommon()
     {
         if (empty(self::$init)) {
-            // 注册应用命名空间
+            if (defined('APP_NAMESPACE')) {
+                self::$namespace = APP_NAMESPACE;
+            }
             Loader::addNamespace(self::$namespace, APP_PATH);
 
             // 初始化应用
             $config       = self::init();
             self::$suffix = $config['class_suffix'];
-            Route::initInfo();
 
             // 应用调试模式
             self::$debug = Env::get('app_debug', Config::get('app_debug'));

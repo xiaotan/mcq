@@ -13,17 +13,16 @@ namespace app\cms\admin;
 
 use app\admin\controller\Admin;
 use app\common\builder\ZBuilder;
-use app\cms\model\Slider as SliderModel;
 use app\cms\model\SliderType as SliderTypeModel;
 
 /**
- * 滚动图片控制器
+ * 广告分类控制器
  * @package app\cms\admin
  */
-class Slider extends Admin
+class SliderType extends Admin
 {
     /**
-     * 滚动图片列表
+     * 广告列表
      * @author 蔡伟明 <314013107@qq.com>
      * @return mixed
      */
@@ -32,40 +31,28 @@ class Slider extends Admin
         // 查询
         $map = $this->getMap();
         // 排序
-        $order = $this->getOrder();
+        $order = $this->getOrder('update_time desc');
         // 数据列表
-        $data_list = SliderModel::where($map)->order($order)->paginate();
-
-        $btnType = [
-            'class' => 'btn btn-info',
-            'title' => '滚动图片分类',
-            'icon'  => 'fa fa-fw fa-sitemap',
-            'href'  => url('slider_type/index')
-        ];
-
-        $list_type = SliderTypeModel::where('status', 1)->column('id,name');
-        array_unshift($list_type, '默认分类');
+        $data_list = SliderTypeModel::where($map)->order($order)->paginate();
 
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
-            ->setSearch(['title' => '标题']) // 设置搜索框
+            ->setSearch(['name' => '分类名称']) // 设置搜索框
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
-                ['cover', '图片', 'picture'],
-                ['title', '标题', 'text.edit'],
-                ['typeid', '分类', 'select', $list_type],
-                ['url', '链接', 'text.edit'],
+                ['name', '分类名称', 'text.edit'],
                 ['create_time', '创建时间', 'datetime'],
-                ['sort', '排序', 'text.edit'],
+                ['update_time', '更新时间', 'datetime'],
                 ['status', '状态', 'switch'],
                 ['right_button', '操作', 'btn']
             ])
+            ->setTableName('cms_slider_type')
+            ->addTopButton('back', ['href' => url('slider/index')]) // 批量添加顶部按钮
             ->addTopButtons('add,enable,disable,delete') // 批量添加顶部按钮
-            ->addTopButton('custom', $btnType) // 添加顶部按钮
             ->addRightButtons(['edit', 'delete' => ['data-tips' => '删除后无法恢复。']]) // 批量添加右侧按钮
-            ->addOrder('id,title,create_time')
+            ->addOrder('id,name,create_time,update_time')
             ->setRowList($data_list) // 设置表格数据
-            ->addValidate('Slider', 'title,url')
+            ->addValidate('SliderType', 'name')
             ->fetch(); // 渲染模板
     }
 
@@ -82,29 +69,23 @@ class Slider extends Admin
             $data = $this->request->post();
 
             // 验证
-            $result = $this->validate($data, 'Slider');
+            $result = $this->validate($data, 'SliderType');
             if(true !== $result) $this->error($result);
 
-            if ($slider = SliderModel::create($data)) {
+            if ($type = SliderTypeModel::create($data)) {
                 // 记录行为
-                action_log('slider_add', 'cms_slider', $slider['id'], UID, $data['title']);
+                action_log('slider_type_add', 'cms_slider_type', $type['id'], UID, $data['name']);
                 $this->success('新增成功', 'index');
             } else {
                 $this->error('新增失败');
             }
         }
 
-        $list_type = SliderTypeModel::where('status', 1)->column('id,name');
-        array_unshift($list_type, '默认分类');
-
         // 显示添加页面
         return ZBuilder::make('form')
+            ->setPageTips('如果出现无法添加的情况，可能由于浏览器将本页面当成了广告，请尝试关闭浏览器的广告过滤功能再试。', 'warning')
             ->addFormItems([
-                ['select', 'typeid', '分类', '', $list_type, 0],
-                ['text', 'title', '标题'],
-                ['image', 'cover', '图片'],
-                ['text', 'url', '链接'],
-                ['text', 'sort', '排序', '', 100],
+                ['text', 'name', '分类名称'],
                 ['radio', 'status', '立即启用', '', ['否', '是'], 1]
             ])
             ->fetch();
@@ -112,9 +93,8 @@ class Slider extends Admin
 
     /**
      * 编辑
-     * @param null $id 滚动图片id
+     * @param null $id 广告分类id
      * @author 蔡伟明 <314013107@qq.com>
-     * @return mixed
      */
     public function edit($id = null)
     {
@@ -126,40 +106,34 @@ class Slider extends Admin
             $data = $this->request->post();
 
             // 验证
-            $result = $this->validate($data, 'Slider');
+            $result = $this->validate($data, 'SliderType');
             if(true !== $result) $this->error($result);
 
-            if (SliderModel::update($data)) {
+            if (SliderTypeModel::update($data)) {
                 // 记录行为
-                action_log('slider_add', 'cms_slider', $id, UID, $data['title']);
+                action_log('slider_type_edit', 'cms_slider_type', $id, UID, $data['name']);
                 $this->success('编辑成功', 'index');
             } else {
                 $this->error('编辑失败');
             }
         }
 
-        $list_type = SliderTypeModel::where('status', 1)->column('id,name');
-        array_unshift($list_type, '默认分类');
-
-        $info = SliderModel::get($id);
+        $info = SliderTypeModel::get($id);
 
         // 显示编辑页面
         return ZBuilder::make('form')
+            ->setPageTips('如果出现无法编辑的情况，可能由于浏览器将本页面当成了广告，请尝试关闭浏览器的广告过滤功能再试。', 'warning')
             ->addFormItems([
                 ['hidden', 'id'],
-                ['text', 'title', '标题'],
-                ['select', 'typeid', '分类', '', $list_type],
-                ['image', 'cover', '图片'],
-                ['text', 'url', '链接'],
-                ['text', 'sort', '排序'],
+                ['text', 'name', '分类名称'],
                 ['radio', 'status', '立即启用', '', ['否', '是']]
             ])
-            ->setFormData($info)
+            ->setFormdata($info)
             ->fetch();
     }
 
     /**
-     * 删除单页
+     * 删除广告分类
      * @param array $record 行为日志
      * @author 蔡伟明 <314013107@qq.com>
      * @return mixed
@@ -170,7 +144,7 @@ class Slider extends Admin
     }
 
     /**
-     * 启用单页
+     * 启用广告分类
      * @param array $record 行为日志
      * @author 蔡伟明 <314013107@qq.com>
      * @return mixed
@@ -181,7 +155,7 @@ class Slider extends Admin
     }
 
     /**
-     * 禁用单页
+     * 禁用广告分类
      * @param array $record 行为日志
      * @author 蔡伟明 <314013107@qq.com>
      * @return mixed
@@ -192,17 +166,17 @@ class Slider extends Admin
     }
 
     /**
-     * 设置单页状态：删除、禁用、启用
+     * 设置广告分类状态：删除、禁用、启用
      * @param string $type 类型：delete/enable/disable
-     * @param array $record
+     * @param array $record 日志记录
      * @author 蔡伟明 <314013107@qq.com>
      * @return mixed
      */
     public function setStatus($type = '', $record = [])
     {
-        $ids          = $this->request->isPost() ? input('post.ids/a') : input('param.ids');
-        $slider_title = SliderModel::where('id', 'in', $ids)->column('title');
-        return parent::setStatus($type, ['slider_'.$type, 'cms_slider', 0, UID, implode('、', $slider_title)]);
+        $ids       = $this->request->isPost() ? input('post.ids/a') : input('param.ids');
+        $type_name = SliderTypeModel::where('id', 'in', $ids)->column('name');
+        return parent::setStatus($type, ['slider_type_'.$type, 'cms_slider_type', 0, UID, implode('、', $type_name)]);
     }
 
     /**
@@ -216,8 +190,8 @@ class Slider extends Admin
         $id      = input('post.pk', '');
         $field   = input('post.name', '');
         $value   = input('post.value', '');
-        $slider  = SliderModel::where('id', $id)->value($field);
-        $details = '字段(' . $field . ')，原值(' . $slider . ')，新值：(' . $value . ')';
-        return parent::quickEdit(['slider_edit', 'cms_slider', $id, UID, $details]);
+        $type    = SliderTypeModel::where('id', $id)->value($field);
+        $details = '字段(' . $field . ')，原值(' . $type . ')，新值：(' . $value . ')';
+        return parent::quickEdit(['slider_type_edit', 'cms_slider_type', $id, UID, $details]);
     }
 }

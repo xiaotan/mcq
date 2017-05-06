@@ -107,11 +107,12 @@ class System extends Admin
                     ->order('sort asc,id asc')
                     ->column('name,title,tips,type,value,options,ajax_url,next_items,param,table,level,key,option,ak,format');
 
-                foreach ($data_list as &$value) {
+                foreach ($data_list as $k=>&$value) {
                     // 解析options
                     if ($value['options'] != '') {
                         $value['options'] = parse_attr($value['options']);
                     }
+                    $data_list[$k]['title'] = $value['title']." [".$value['name']."]";
                 }
 
                 // 默认模块列表

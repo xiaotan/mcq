@@ -9,21 +9,24 @@
 // | 开源协议 ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
 
-namespace app\business\home;
-
 /**
- * 前台首页控制器
- * @package app\business\admin
+ * 模块信息
  */
-class Index extends Common
-{
-    /**
-     * 首页
-     * @author 蔡伟明 <314013107@qq.com>
-     * @return mixed
-     */
-    public function index()
-    {
-        return $this->fetch(); // 渲染模板
-    }
-}
+return [
+  'name' => 'pet',
+  'title' => '萌宠圈',
+  'identifier' => 'pet.jian.module',
+  'author' => 'TanJian',
+  'version' => '1.0.0',
+  'description' => '萌宠圈模块',
+  'config' => [
+    [
+      'text',
+      'baidu_map_ak',
+      '百度地图密钥',
+      '请到百度开发者官网获取密钥',
+      '',
+    ],
+  ],
+  'database_prefix' => 'mc_',
+];
