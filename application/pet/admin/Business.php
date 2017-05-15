@@ -117,25 +117,60 @@ class Business extends Admin
                     ['image', 'avatar', '头像'],
                     ['radio', 'status', '状态', '', ['禁用', '启用'], 1]
                 ],
-                    
-                /*['select', 'typeid', '广告分类', '', $list_type, 0],
-                ['text', 'tagname', '广告位标识', '由小写字母、数字或下划线组成，不能以数字开头'],
-                ['text', 'name', '广告位名称'],
-                ['radio', 'timeset', '时间限制', '', ['永不过期', '在设内时间内有效'], 0],
-                ['daterange', 'start_time,end_time', '开始时间-结束时间'],
-                ['radio', 'ad_type', '广告类型', '', ['代码', '文字', '图片', 'flash'], 0],
-                ['textarea', 'code', '代码', '<code>必填</code>，支持html代码'],
-                ['image', 'src', '图片', '<code>必须</code>'],
-                ['text', 'title', '文字内容', '<code>必填</code>'],
-                ['text', 'link', '链接', '<code>必填</code>'],
-                ['colorpicker', 'color', '文字颜色', '', '', 'rgb'],
-                ['text', 'size', '文字大小', '只需填写数字，例如:12，表示12px', '',  ['', 'px']],
-                ['text', 'width', '宽度', '不用填写单位，只需填写具体数字'],
-                ['text', 'height', '高度', '不用填写单位，只需填写具体数字'],
-                ['text', 'alt', '图片描述', '即图片alt的值'],
-                ['radio', 'status', '立即启用', '', ['否', '是'], 1]*/
             ])
             ->layout(['name' => 6, 'tel' => 6])
             ->fetch();
+    }
+
+    /**
+     * 编辑
+     * @param null $id id
+     * @author 蔡伟明 <314013107@qq.com>
+     * @return mixed
+     */
+    public function edit($id = null)
+    {
+        if ($id === null) $this->error('缺少参数');
+
+        // 保存数据
+        if ($this->request->isPost()) {
+            // 表单数据
+            $data = $this->request->post();
+
+            // 验证
+            $result = $this->validate($data, 'Business');
+            // 验证失败 输出错误信息
+            if(true !== $result) return $this->error($result);
+            //分别存储经纬度
+            $map = explode(",", $data['map']);
+            $data['lng'] = $map[0];
+            $data['lat'] = $map[1];
+            //默认为商家用户分组
+            $data['role'] = 2;
+            //详细地址
+            $data['address'] = $data['map_address'];
+            //保存数据
+            $business = BusinessModel::create($data);
+            $user = UserModel::create($data);
+            
+            if ($business && $user) {
+                // 记录行为
+                action_log('advert_add', 'business', $business['id'], UID, $data['name']);
+                action_log('user_add', 'admin_user', $user['id'], UID);
+                $this->success('新增成功', 'index');
+            } else {
+                BusinessModel::destroy($business['id']);
+                UserModel::destroy($user['id']);
+                $this->error('新增失败');
+            }
+
+            if (AdvertModel::update($data)) {
+                // 记录行为
+                action_log('advert_edit', 'cms_advert', $id, UID, $data['name']);
+                $this->success('编辑成功', 'index');
+            } else {
+                $this->error('编辑失败');
+            }
+        }
     }
 }
