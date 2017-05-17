@@ -1,0 +1,143 @@
+/*星星样式*/
+.stars {
+    display: inline-block;
+    color: #f90;
+}
+.stars i {
+    vertical-align: 0rem;
+}
+.stars em {
+    font-style: normal;
+    margin-left: .4em;
+    vertical-align: middle;
+}
+.icon-star-gray {
+    position: relative;
+}
+.icon-star-half {
+    position: absolute;
+    left: 0;
+    width: .55em;
+    overflow: hidden;
+}
+.icon-star-gray:before{
+	color: #E2E2E2;
+}
+
+/*头部导航*/
+.navbar {
+    height: 2.5rem;
+    color: #fff;
+    background: #f8b319;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    position: fixed;
+    top:0;
+    left:0;
+    z-index:10;
+    width:100%;
+}
+.nav-wrap-left {
+    height: 2.5rem;
+    line-height: 2.5rem;
+} 
+.navbar .nav-wrap-right {
+    height: 100%;
+}
+.nav-wrap-right a:last-child {
+    margin-right: .04rem;
+}
+.nav-wrap a {
+    display: inline-block;
+    height: 100%;
+    line-height: 2.5rem;
+    text-align: center;
+    width: 1.8rem;
+}
+.nav-wrap a:last-child{
+    margin-right:.5rem;
+}
+.nav-wrap-left a{
+    width: 3.5rem;
+}
+.nav-btn {
+    display: inline-block;
+    font-size: .6rem;
+    line-height: 1;
+    vertical-align: middle;
+}
+.nav-btn .icon {
+    display: block;
+    margin: auto;
+    margin-bottom: .3rem;
+    font-size: 1.2rem;
+}
+.navbar .box-search {
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    border-radius: .9rem;
+    background: #e69300;
+    height: 1.8rem;
+    line-height: 1.8rem;
+    -webkit-box-sizing: border-box;
+    position: relative;
+    margin-top: .35rem;
+    margin-right: 2rem;
+}
+.navbar .icon-search {
+    position: absolute;
+    left: .2rem;
+    font-size: .15rem;
+    color: #fff;
+}
+.navbar .box-search input {
+    height:1.8rem;
+    line-height:1.8rem;
+    font-size: .7rem;
+    color: #fff;
+    padding-left: 2rem;
+    padding-right: 1rem;
+    box-sizing: border-box;
+    width: 100%;
+    display: block;
+    border:none;
+    background: none;
+}
+.box-search .icon-search{
+    position: absolute;
+    left: .8rem;
+    font-size: 1rem;
+    color: #fff;
+}
+.nav-wrap-left img {
+    height:1.8rem;
+    margin:.35rem;
+    border-radius: .9rem;
+}
+.nav-wrap-title{
+    height:2.5rem;
+    line-height:2.5rem;
+    text-align:center;
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    font-size:1rem;
+}
+.box-search input {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+
+
+/*轮播图*/
+.banner{
+    position: relative;
+}
+.swiper-container{
+    padding-bottom:0;
+}
+.swiper-pagination-bullet-active {
+    background: #fff;
+}

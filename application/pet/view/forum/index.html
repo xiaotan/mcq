@@ -1,0 +1,141 @@
+{extend name="public:layout" /}
+
+{block name="style"}
+    <link rel="stylesheet" href="__MODULE_CSS__/forum.css">
+{/block}
+
+{block name="main"}
+    <div class="page-group">
+        <div class="page">
+
+            <header class="navbar">
+                <div class="nav-wrap nav-wrap-left">
+                    <a class="react" rel="nofollow" href="">
+                        <img class="avatar" src="__MODULE_IMG__/img1.jpg" alt="">
+                    </a>
+                </div>
+                <div class="nav-wrap-title">萌宠圈</div>
+                <div class="nav-wrap nav-wrap-right">
+                    <a class="react" rel="nofollow" href="">
+                        <span class="nav-btn">
+                            <i class="icon icon-home"></i>
+                        </span>
+                    </a>
+                </div>
+            </header>
+            <div class="header-box"></div>
+
+
+            <div class="content banner">
+                <div class="swiper-container" data-autoplay="5000">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide"><img width="100%" src="__MODULE_IMG__/img2.jpg" alt=""></div>
+                        <div class="swiper-slide"><img width="100%" src="__MODULE_IMG__/img2.jpg" alt=""></div>
+                        <div class="swiper-slide"><img width="100%" src="__MODULE_IMG__/img2.jpg" alt=""></div>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+
+
+            <!-- 添加 class infinite-scroll 和 data-distaance -->
+            <div class="scroll-box">
+                <div class="content infinite-scroll" data-distance="100">
+                    <div class="list-block content-list">
+                        <ul class="list-container">
+                            <li>
+                                <div class="item-top">
+                                    <img src="__MODULE_IMG__/img3.jpg" alt="">
+                                    <div class="item-top-box">
+                                        <p class="name">豆豆</p>
+                                        <p><span>金毛犬</span> | <span>3个月</span></p>
+                                    </div>
+                                    <span class="time">20分钟前</span>
+                                </div>
+                                <div class="con">萌宠圈萌宠圈萌宠圈萌宠圈萌宠圈萌宠圈萌宠圈萌宠圈萌宠圈萌宠圈</div>
+                                <div class="images">
+                                    <div class="img-item" style="background-image:url(__MODULE_IMG__/img.jpg);"></div>
+                                    <div class="img-item" style="background-image:url(__MODULE_IMG__/img4.jpg)"></div>
+                                    <div class="img-item" style="background-image:url(__MODULE_IMG__/img4.jpg)"></div>
+                                </div>
+                                <div class="item-bottom">
+                                    <span class="site">南宁.凤岭</span>
+                                    <p class="enjoy"><i class="icon icon-star"></i><span>100</span></p>
+                                    <p class="comment"><i class="icon icon-star"></i><span>100</span></p>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-top">
+                                    <img src="__MODULE_IMG__/img3.jpg" alt="">
+                                    <div class="item-top-box">
+                                        <p class="name">豆豆</p>
+                                        <p><span>金毛犬</span> | <span>3个月</span></p>
+                                    </div>
+                                    <span class="time">20分钟前</span>
+                                </div>
+                                <div class="con">萌宠圈萌宠圈萌宠圈萌宠圈萌宠圈萌宠圈萌宠圈萌宠圈萌宠圈萌宠圈</div>
+                                <div class="images">
+                                    <div class="img-item" style="background-image:url(__MODULE_IMG__/img.jpg);"></div>
+                                    <div class="img-item" style="background-image:url(__MODULE_IMG__/img4.jpg)"></div>
+                                    <div class="img-item" style="background-image:url(__MODULE_IMG__/img4.jpg)"></div>
+                                </div>
+                                <div class="item-bottom">
+                                    <span class="site">南宁.凤岭</span>
+                                    <p class="enjoy"><i class="icon icon-star"></i><span>100</span></p>
+                                    <p class="comment"><i class="icon icon-star"></i><span>100</span></p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="infinite-scroll-preloader">
+                        <div class="preloader"></div>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="bar bar-tab">
+                <a class="tab-item active" href="#">
+                    <span class="icon icon-home"></span>
+                    <span class="tab-label">萌宠圈</span>
+                </a>
+                <a class="tab-item" href="#">
+                    <span class="icon icon-me"></span>
+                    <span class="tab-label">服务</span>
+                    <!-- <span class="badge">2</span> -->
+                </a>
+                <a class="tab-item" href="#">
+                    <span class="icon icon-star"></span>
+                    <span class="tab-label">遛狗</span>
+                </a>
+                <a class="tab-item" href="#">
+                    <span class="icon icon-cart"></span>
+                    <span class="tab-label">我的</span>
+                </a>
+            </nav>
+
+        </div>
+    </div>
+{/block}
+
+{block name="script"}
+    <script>
+        //初始化
+        $.init()
+
+        $(document).on('refresh', '.pull-to-refresh-content',function(e) {
+            location.reload();
+        });
+
+        $(function(){
+            //底部导航默认选中
+            $(".bar-tab .tab-item").eq(1).trigger("click");
+
+            //设置图片div等高
+            var w_width = $(".images").width();
+            $(".images .img-item").css("height",w_width*0.3);
+        })
+        $(document).on('infinite', '.infinite-scroll',function() {
+            
+        });
+    </script>
+{/block}

@@ -1,0 +1,74 @@
+body, .page, .page-group, .page-group.page-current, .page.page-current{
+    background: #efefef;
+}
+#nav-top{
+    background:#fff ;
+}
+#nav-top .button-link{
+    color:#f9b831;
+}
+.order-show{
+    margin-top:2.2rem;
+}
+.order-show img{
+    display:block;
+}
+.order-show-box{
+    padding:.5rem 1rem;
+    background: #fff;
+    margin-bottom:.5rem;
+}
+.order-show-box p{
+    color:#221814;
+    font-size:.7rem;
+    margin-bottom:.2rem;
+}
+.order-show-box .tel{
+    font-size:1.8rem;
+    top:0;
+    right:.5rem;
+}
+.order-show-box:last-child{
+    margin-bottom:5.5rem;
+}
+.order-footer{
+    height:5rem;
+    background: #fff;
+    padding:.5rem 1rem 0 0;
+    position: fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    border-top: 1px solid #e7e7e7;
+}
+.order-footer p{
+    text-align:right;
+    color:#221815;
+    font-size:.6rem;
+}
+.order-footer p span{
+    color:#eb666a;
+}
+.order-footer p span i{
+    font-size:1rem;
+    font-weight: bold;
+}
+.order-footer-button span{
+    width:4.5rem;
+    height:1.4rem;
+    line-height:1.4rem;
+    text-align:center;
+    float:right;
+    display:inline-block;
+    border-radius: 2.25rem;
+    margin-left:1rem;
+    margin-top:.3rem;
+}
+.order-footer-button .cancel_order{
+    border:1px solid #888;
+    color:#888;
+}
+.order-footer-button .payment{
+    border:1px solid #f9b700;
+    color:#f9b700;
+}

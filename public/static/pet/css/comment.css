@@ -1,0 +1,125 @@
+#nav-top{
+    background:#fff ;
+}
+#nav-top .button-link{
+    color:#f9b831;
+}
+
+.order-content{
+    background: #efefef;
+    margin-top:2.2rem;
+    padding-top:.5rem;
+}
+.order-content .list-item{
+    padding:0;
+    background: #fff;
+}
+.order-content .list-item .list-item-content{
+    padding:.8rem 1rem;
+    position: relative;
+}
+.order-content .list-item .list-item-content img{
+    width:7rem;
+    height:5rem;
+    margin-right:.8rem;
+    float:left;
+}
+.list-item-content-right p{
+    color:#A4A4A4;
+}
+.list-item-content-right .order-content-title{
+    font-size:1rem;
+    margin:.2rem 0;
+    color:#231815;
+}
+.list-item-content .price{
+    position: absolute;
+    font-size:.6rem;
+    color:#221815;
+    bottom:-.3rem;
+    right: 0;
+}
+.list-item-content .price span{
+    font-size:1rem;
+    color:#ec666a;
+    font-weight: bold;
+}
+.comment-content{
+    margin-top:.5rem;
+    background: #fff;
+    padding:0 1rem;
+}
+.comment-content .comment-content-tap{
+    font-size:.8rem;
+    margin-bottom:.3rem;
+}
+.comment-content textarea{
+    width:100%;
+    height:5rem;
+    border:1px solid #cacacb;
+    border-radius: .3rem;
+    padding:.1rem .2rem;
+    font-size:.8rem;
+}
+.comment-content .comment-content-tap{
+    padding-top:.8rem;
+}
+
+.comment-submit{
+    /*position: fixed;*/
+    /*bottom:1rem;*/
+    /*left:0;*/
+    width:80%;
+    margin:1rem auto;
+}
+.comment-submit .button.button-fill{
+    height:2rem;
+    line-height: 2rem;
+    background: #eb666a;
+}
+label.label-checkbox input[type="checkbox"]:checked + .item-media i.icon-form-checkbox, label.label-checkbox input[type="radio"]:checked + .item-media i.icon-form-checkbox{
+    background-color:#f9b831; 
+}
+
+.comment-stars{
+    text-align:center;
+}
+.comment-stars .stars i{
+    font-size:2rem;
+}
+.comment-stars p{
+    font-size:.7rem;
+    color:#A4A4A4;
+}
+
+.upload-images ul li{
+    display:inline-block;
+    margin-right:.2rem;
+    position: relative;
+}
+.upload-images ul li .img-delete{
+    position: absolute;
+    font-size:1rem;
+    top:-.5rem;
+    right:-.3rem;
+}
+.upload-images ul li img{
+    width:3rem;
+    height:3rem;
+}
+.upload-images ul li:last-child{
+    width:3rem;
+    height:3rem;
+    background: url("../img/jia.jpg") center center no-repeat;
+    background-size:1.5rem 1.5rem;
+    border:2px dashed #b5b5b6;
+}
+.bottom-placeholder{
+    height:4rem;
+}
+.webuploader-pick {
+    width:3rem;
+    height:3rem;
+    background: none;
+    padding:0;
+}

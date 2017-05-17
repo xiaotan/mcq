@@ -1,0 +1,59 @@
+{extend name="public:layout" /}
+
+{block name="style"}
+    <link rel="stylesheet" href="__MODULE_CSS__/payment.css">
+{/block}
+
+{block name="main"}
+    <div class="page-group">
+        <div class="page">
+
+            <header class="bar bar-nav bn" id="nav-top">
+                <button class="button button-link button-nav pull-left">
+                    <span class="icon icon-left"></span> 在线支付
+                </button>
+            </header>
+            
+            <div class="payment-show">
+                <img width="100%" src="__MODULE_IMG__/img6.jpg" alt="">
+                <div class="payment-box pr">
+                    <p>订单编号：20170510252365236</p>
+                    <p>订单金额：<span>￥<i>49.9</i></span></p>
+                    <p>商家地址：东葛葛村路口东葛葛村路口东葛葛村路口东葛葛村路口</p>
+                </div>
+            </div>
+            <div class="list-block payment-list">
+                <div class="payment-list-title">支付方式</div>
+                <ul>
+                    <li>
+                        <label class="label-checkbox item-content">
+                            <input type="radio" name="my-radio" checked>
+                            <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
+                            <div class="item-inner">
+                                <i class="icon icon-home"></i>
+                                <span>微信支付</span>
+                            </div>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="label-checkbox item-content">
+                            <input type="radio" name="my-radio">
+                            <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
+                            <div class="item-inner">
+                                <i class="icon icon-home"></i>
+                                <span>支付宝支付</span>
+                            </div>
+                        </label>
+                    </li>
+                </ul>
+                <p class="payment-submit"><a href="#" class="button button-fill">立即支付</a></p>
+            </div>
+        </div>
+    </div>
+{/block}
+
+{block name="script"}
+    <script>
+
+    </script>
+{/block}

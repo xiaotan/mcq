@@ -1,0 +1,32 @@
+{extend name="public:layout" /}
+
+{block name="style"}
+    <link rel="stylesheet" href="__MODULE_CSS__/refunded.css">
+{/block}
+
+{block name="main"}
+    <div class="page-group">
+        <div class="page">
+
+            <header class="bar bar-nav bn" id="nav-top">
+                <button class="button button-link button-nav pull-left">
+                    <span class="icon icon-left"></span> 退款
+                </button>
+            </header>
+            
+            <div class="refund-show">
+                <img width="100%" src="__MODULE_IMG__/refund.jpg" alt="">
+                <div class="refund-box pr">
+                    <p>订单金额：<span>￥<i>49.9</i></span></p>
+                    <p>申请时间：2017-05-15</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}
+
+{block name="script"}
+    <script>
+
+    </script>
+{/block}

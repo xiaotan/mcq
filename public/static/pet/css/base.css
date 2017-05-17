@@ -1,0 +1,166 @@
+body,
+.page,
+.page-group,
+.page-group.page-current,
+.page.page-current {
+    background: #fff;
+    overflow: visible;
+    font-size: .6rem;
+}
+
+
+/* 定位 */
+.bn{
+    border:none;
+}
+.tl {
+    text-align: left
+}
+
+.tc {
+    text-align: center
+}
+
+.tr {
+    text-align: right
+}
+
+.bc {
+    margin-left: auto;
+    margin-right: auto
+}
+
+.fl {
+    float: left;
+    display: inline
+}
+
+.fr {
+    float: right;
+    display: inline
+}
+
+.cb {
+    clear: both
+}
+
+.cl {
+    clear: left
+}
+
+.cr {
+    clear: right
+}
+
+.vm {
+    vertical-align: middle
+}
+
+.pr {
+    position: relative
+}
+
+.pa {
+    position: absolute
+}
+
+.abs-right {
+    position: absolute;
+    right: 0
+}
+
+.zoom {
+    zoom: 1
+}
+
+.hidden {
+    visibility: hidden
+}
+
+.none {
+    display: none
+}
+
+a {
+    color: #06c1ae;
+    text-decoration: none;
+    outline: 0;
+}
+
+a.react,
+label.react {
+    display: block;
+    color: inherit;
+    height: 100%;
+}
+
+li {
+    list-style: none;
+}
+
+ul,p {
+    padding: 0;
+    margin: 0;
+}
+
+
+/* clearfix */
+
+.clearfix:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+}
+
+* html .clearfix {
+    zoom: 1;
+}
+
+
+/* IE6 */
+
+*:first-child+html .clearfix {
+    zoom: 1;
+}
+
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+    color: #fff;
+}
+
+input:-moz-placeholder,
+textarea:-moz-placeholder {
+    color: #fff;
+}
+
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+    color: #fff;
+}
+
+input:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+    color: #fff;
+}
+
+
+/* IE7 */
+
+.bar {
+    position: fixed;
+}
+
+.my-icon {
+    font-family: "iconfont-sm" !important;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-stroke-width: .2px;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.header-box {
+    height: 2.5rem;
+}

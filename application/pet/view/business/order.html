@@ -1,0 +1,141 @@
+{extend name="public:layout" /}
+
+{block name="style"}
+    <link rel="stylesheet" href="__MODULE_CSS__/order.css">
+{/block}
+
+{block name="main"}
+    <div class="page-group">
+        <div class="page">
+
+            <header class="bar bar-nav bn" id="nav-top">
+                <button class="button button-link button-nav pull-left">
+                    <span class="icon icon-left"></span> 我的订单
+                </button>
+            </header>
+            
+            <div class="content">
+                <div class="buttons-tab bn">
+                    <a href="#tab1" class="tab-link active button">待付款</a>
+                    <a href="#tab2" class="tab-link button">已付款</a>
+                    <a href="#tab3" class="tab-link button">待评价</a>
+                </div>
+                <div class="content-block order-content">
+                    <div class="tabs">
+                        <div id="tab1" class="tab active">
+                            <div class="content-block list-item">
+                                <div class="list-item-top">
+                                    <i class="icon icon-home"></i>
+                                    <span>萌宠宠物店</span>
+                                </div>
+                                <div class="list-item-content">
+                                    <img src="__MODULE_IMG__/img.jpg" alt="">
+                                    <div class="list-item-content-right">
+                                        <p>项目：宠物洗澡</p>
+                                        <p>类型：狗狗</p>
+                                        <p>品种：金毛犬</p>
+                                        <p>年龄：大于6个月</p>
+                                        <p>订单编号：20170510523613213</p>
+                                    </div>
+                                    <div class="price">49.9</div>
+                                    <div class="amount">59.9</div>
+                                    <div class="clearfix"></div>
+                                    <div class="order-button-list">
+                                        <span class="payment">立即付款</span>
+                                        <span class="cancel_order">取消订单</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="tab2" class="tab">
+                            <div class="content-block list-item">
+                                <div class="list-item-top">
+                                    <i class="icon icon-home"></i>
+                                    <span>萌宠宠物店</span>
+                                </div>
+                                <div class="list-item-content">
+                                    <img src="__MODULE_IMG__/img.jpg" alt="">
+                                    <div class="list-item-content-right">
+                                        <p>项目：宠物洗澡</p>
+                                        <p>类型：狗狗</p>
+                                        <p>品种：金毛犬</p>
+                                        <p>年龄：大于6个月</p>
+                                        <p>订单编号：20170510523613213</p>
+                                    </div>
+                                    <div class="price">49.9</div>
+                                    <div class="amount">59.9</div>
+                                    <div class="clearfix"></div>
+                                    <div class="order-button-list">
+                                        <span class="refund">申请退款</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="tab3" class="tab">
+                            <!-- <div class="content-block list-item">
+                                <div class="list-item-top">
+                                    <i class="icon icon-home"></i>
+                                    <span>萌宠宠物店</span>
+                                </div>
+                                <div class="list-item-content">
+                                    <img src="__MODULE_IMG__/img.jpg" alt="">
+                                    <div class="list-item-content-right">
+                                        <p>项目：宠物洗澡</p>
+                                        <p>类型：狗狗</p>
+                                        <p>品种：金毛犬</p>
+                                        <p>年龄：大于6个月</p>
+                                        <p>订单编号：20170510523613213</p>
+                                    </div>
+                                    <div class="price">49.9</div>
+                                    <div class="amount">59.9</div>
+                                    <div class="clearfix"></div>
+                                    <div class="order-button-list">
+                                        <span class="comment">我要评价</span>
+                                    </div>
+                                </div>
+                            </div> -->
+                            <div class="no-data">
+                                <img src="__MODULE_IMG__/no_data.jpg" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-box">
+                <div id="basic-modal-content">
+                    <p class="cancel-img">
+                        <img src="__MODULE_IMG__/cancel.jpg" alt="">
+                    </p>
+                    <p>您确定要取消订单吗？</p>
+                    <div class="content-block">
+                        <div class="row">
+                            <div class="col-50"><a href="#" class="button button-big modal-cancel-button">取消</a></div>
+                            <div class="col-50"><a href="#" class="button button-big button-fill modal-success-button">确定</a></div>
+                        </div>
+                    </div>
+
+                </div>
+                <span style='display:none' class="icon icon-home"></span>
+            </div>
+                
+        </div>
+    </div>
+{/block}
+
+{block name="script"}
+    <script>
+        $(function(){
+            // $('.tab-link').click(function (e) {
+                $('#basic-modal-content').modal({onOpen: function (dialog) {
+                    dialog.overlay.fadeIn('fast', function () {
+                        dialog.container.slideDown('fast', function () {
+                            dialog.data.fadeIn('fast');
+                        });
+                    });
+                }});
+                return false;
+            // });
+        })
+    </script>
+{/block}

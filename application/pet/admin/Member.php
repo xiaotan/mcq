@@ -13,8 +13,8 @@ namespace app\pet\admin;
 
 use app\admin\controller\Admin;
 use app\common\builder\ZBuilder;
-use app\pet\model\Business as BusinessModel;
-use app\user\model\User as UserModel;
+use app\pet\model\Member as MemberModel;
+// use app\user\model\User as UserModel;
 use think\Validate;
 use think\Config;
 use think\Db;
@@ -23,10 +23,11 @@ use think\Db;
  * 仪表盘控制器
  * @package app\pet\admin
  */
-class Business extends Admin
+class Member extends Admin
 {
     /**
      * 首页
+     * @author 蔡伟明 <314013107@qq.com>
      * @return mixed
      */
     public function index()
@@ -36,14 +37,14 @@ class Business extends Admin
         // 排序
         $order = $this->getOrder('update_time desc');
         // 数据列表
-        $data_list = BusinessModel::where($map)->order($order)->paginate();
+        $data_list = MemberModel::where($map)->order($order)->paginate();
 
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
             ->setSearch(['name' => '商家名称']) // 设置搜索框
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
-                ['name', '商家名称', 'text'],
+                ['name', '商家名称', 'text.edit'],
                 ['tel', '商家电话', 'text'],
                 ['create_time', '入驻时间', 'datetime'],
                 ['status', '状态', 'switch'],
@@ -59,6 +60,7 @@ class Business extends Admin
 
     /**
      * 新增
+     * @author 蔡伟明 <314013107@qq.com>
      * @return mixed
      */
     public function add()
@@ -69,34 +71,29 @@ class Business extends Admin
             $data = $this->request->post();
             // 验证
             $result = $this->validate($data, 'Business');
-            // $result = $this->validate('Business.add')->save($data);
             // 验证失败 输出错误信息
             if(true !== $result) return $this->error($result);
             //分别存储经纬度
-            if($data['map']){
-                $map = explode(",", $data['map']);
-                $data['lng'] = $map[0];
-                $data['lat'] = $map[1];
-                //详细地址
-                $data['address'] = $data['map_address'];
-            }
+            $map = explode(",", $data['map']);
+            $data['lng'] = $map[0];
+            $data['lat'] = $map[1];
             //默认为商家用户分组
             $data['role'] = 2;
+            //详细地址
+            $data['address'] = $data['map_address'];
             //保存数据
             $business = BusinessModel::create($data);
-            if($business){
-                $data['bid'] = $business['id'];
-                $user = UserModel::create($data);
-                if ($user) {
-                    // 记录行为
-                    action_log('business_add', 'business', $business['id'], UID, $data['name']);
-                    action_log('user_add', 'admin_user', $user['id'], UID, $data['nickname']);
-                    $this->success('新增成功', 'index');
-                } else {
-                    BusinessModel::destroy($business['id']);
-                    UserModel::destroy($user['id']);
-                    $this->error('新增失败');
-                }
+            $user = UserModel::create($data);
+            
+            if ($business && $user) {
+                // 记录行为
+                action_log('advert_add', 'business', $business['id'], UID, $data['name']);
+                action_log('user_add', 'admin_user', $user['id'], UID);
+                $this->success('新增成功', 'index');
+            } else {
+                BusinessModel::destroy($business['id']);
+                UserModel::destroy($user['id']);
+                $this->error('新增失败');
             }
         }
 
@@ -128,6 +125,7 @@ class Business extends Admin
     /**
      * 编辑
      * @param null $id id
+     * @author 蔡伟明 <314013107@qq.com>
      * @return mixed
      */
     public function edit($id = null)
@@ -140,57 +138,39 @@ class Business extends Admin
             $data = $this->request->post();
 
             // 验证
-            $result = $this->validate($data, 'Business.edit');
+            $result = $this->validate($data, 'Business');
             // 验证失败 输出错误信息
             if(true !== $result) return $this->error($result);
-
             //分别存储经纬度
             $map = explode(",", $data['map']);
             $data['lng'] = $map[0];
             $data['lat'] = $map[1];
+            //默认为商家用户分组
+            $data['role'] = 2;
             //详细地址
             $data['address'] = $data['map_address'];
             //保存数据
-            if (BusinessModel::update($data)) {
+            $business = BusinessModel::create($data);
+            $user = UserModel::create($data);
+            
+            if ($business && $user) {
                 // 记录行为
-                action_log('business_edit', 'business', $id, UID, $data['name']);
+                action_log('advert_add', 'business', $business['id'], UID, $data['name']);
+                action_log('user_add', 'admin_user', $user['id'], UID);
+                $this->success('新增成功', 'index');
+            } else {
+                BusinessModel::destroy($business['id']);
+                UserModel::destroy($user['id']);
+                $this->error('新增失败');
+            }
+
+            if (AdvertModel::update($data)) {
+                // 记录行为
+                action_log('advert_edit', 'cms_advert', $id, UID, $data['name']);
                 $this->success('编辑成功', 'index');
             } else {
                 $this->error('编辑失败');
             }
         }
-
-        $info = BusinessModel::get($id);
-        $info['map'] = $info['lng'].",".$info['lat'];
-        // 显示编辑页面
-        return ZBuilder::make('form')
-            ->setPageTips('如果出现无法添加的情况，可能由于浏览器将本页面当成了广告，请尝试关闭浏览器的广告过滤功能再试。', 'warning')
-            ->addFormItems([
-                ['hidden', 'id'],
-                ['text', 'name', '商家名称', '必填，请填写商家全称'],
-                ['text', 'tel', '商家电话', '可以填手机号或座机号，座机记得加上区号，例：0771-1234567'],
-                ['image', 'thumb', '缩略图'],
-                ['images', 'banner', '商家banner（多图）','最多上传5张图,每张图最大4m','','4096'],
-                ['bmap', 'map', '商家位置', config('baidu_map_ak')],
-            ])
-            ->layout(['name' => 6, 'tel' => 6])
-            ->setFormData($info)
-            ->fetch();
-    }
-
-    /**
-     * 快速编辑
-     * @param array $record 行为日志
-     * @author 蔡伟明 <314013107@qq.com>
-     * @return mixed
-     */
-    public function quickEdit($record = [])
-    {
-        $id      = input('post.pk', '');
-        $field   = input('post.name', '');
-        $value   = input('post.value', '');
-        $business  = BusinessModel::where('id', $id)->value($field);
-        $details = '字段(' . $field . ')，原值(' . $business . ')，新值：(' . $value . ')';
-        return parent::quickEdit(['business_edit', 'business', $id, UID, $details]);
     }
 }

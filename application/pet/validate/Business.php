@@ -23,6 +23,9 @@ class Business extends Validate
     //定义验证规则
     protected $rule = [
         'name|商家名称'   => 'require|unique:business',
+        'tel|商家电话'   => 'require',
+        'thumb|缩略图'   => 'require',
+
         'username|用户名' => 'require|alphaNum|unique:admin_user',
         'nickname|昵称'  => 'require|unique:admin_user',
         'email|邮箱'     => 'email|unique:admin_user',
@@ -34,11 +37,18 @@ class Business extends Validate
     protected $message = [
         // 'name.regex' => '行为标识由字母和下划线组成',
         'username.require' => '请输入用户名',
+        'tel.require' => '请输入商家电话',
+        'thumb.require' => '请上传缩略图',
         'email.require'    => '邮箱不能为空',
         'email.email'      => '邮箱格式不正确',
         'email.unique'     => '该邮箱已存在',
         'password.require' => '密码不能为空',
         'password.length'  => '密码长度6-20位',
         'mobile.regex'     => '手机号不正确',
+    ];
+
+    protected $scene = [
+        'edit'  =>  ['name', 'tel', 'thumb'],
+        'name'  =>  ['name'],
     ];
 }

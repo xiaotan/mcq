@@ -1,0 +1,82 @@
+.content-list{
+	margin-bottom:2.5rem;
+}
+.content-list ul{
+	margin:0;
+	padding:0;
+}
+
+.content-list ul li{
+	margin:.8rem .5rem;
+	border-bottom:1px solid #efefef;
+	position: relative;
+	padding-bottom:.8rem;
+}
+.content-list ul li:last-child{
+	margin-bottom:0;
+}
+
+
+.scroll-box{
+	position:relative;
+	height:100%;
+	top:0;
+	left:0;
+}
+.list-block{
+	margin-top:0;
+}
+.item-top{
+    position: relative;
+    height:2.5rem;
+}
+.item-top .time{
+    position: absolute;
+    right:0;
+    bottom:0;
+    font-size:.6rem;
+    color:#888;
+}
+.item-top img{
+    width:2.5rem;
+    height:2.5rem;
+    float:left;
+    margin-right:.5rem;
+    border-radius: .5rem;
+}
+.item-top-box .name{
+    font-size:1rem;
+    color:#873520;
+}
+.item-top-box p{
+    font-size:.6rem;
+    color:#333;
+}
+.content-list .con{
+    font-size:1rem;
+    margin:.5rem 0;
+}
+.images{
+    margin-bottom:.5rem;
+}
+.images .img-item{
+    width:30%;
+    display:inline-block;
+    margin-right:1%;
+    background-size:100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+.item-bottom .site{
+    font-size:.6rem;
+    color:#873520;
+}
+.item-bottom .enjoy, .item-bottom .comment{
+    float:right;
+    display:inline-block;
+    margin-left:.5rem;
+}
+.item-bottom .enjoy span, .item-bottom .comment span{
+    vertical-align: middle;
+    margin-left:.1rem;
+}

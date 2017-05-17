@@ -1,0 +1,93 @@
+.content-list{
+	margin-bottom:2.5rem;
+}
+.content-list ul{
+	margin:0;
+	padding:0;
+}
+.content-list ul li{
+	margin:.8rem .5rem;
+	border-bottom:1px solid #efefef;
+	position: relative;
+	padding-bottom:.8rem;
+}
+.content-list ul li:last-child{
+	margin-bottom:0;
+}
+.content-list ul li img{
+	width:35%;
+	float:left;
+}
+.item-box{
+	position: relative;
+	margin-left:38%;
+	color:#231815;
+}
+.item-box .item-title{
+	font-size:1rem;
+	width:80%;
+	overflow: hidden;
+	height:1.2rem;
+	line-height:1.2rem;
+}
+.item-box .distance{
+	font-size:.5rem;
+	position: absolute;
+	right:0;
+	top:0;
+}
+.item-box .coupon span{
+	font-size:.6rem;
+	vertical-align: middle;
+	font-style: normal;
+    margin-left: .4em;
+}
+
+.scroll-box{
+	position:relative;
+	height:100%;
+	top:0;
+	left:0;
+	bottom:0;
+	right:0;
+}
+.list-block{
+	margin-top:0;
+}
+
+
+
+
+.bar-tab{
+	/*border:none;*/
+	border-top:1px solid #efefef;
+	background: #fff;
+}
+.bar-tab .tab-item.active, .bar-tab .tab-item:active {
+    color: #F9B900;
+}
+
+.content-list a.react {
+    color: #f9b900;
+    padding:.8rem .5rem;
+}
+.content-list .more {
+    position: relative;
+    padding-right: .3rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+.content-list .more:after {
+    position: absolute;
+    right: .05rem;
+    top: 50%;
+    display: block;
+    content: '';
+    width: .6em;
+    height: .6em;
+    border-left: .04rem solid #f9b900;
+    border-bottom: .04rem solid #f9b900;
+    -webkit-transform: translateY(-50%) scaleY(0.7) rotateZ(-135deg);
+    -moz-transform: translateY(-50%) scaleY(0.7) rotateZ(-135deg);
+    -ms-transform: translateY(-50%) scaleY(0.7) rotateZ(-135deg);
+}

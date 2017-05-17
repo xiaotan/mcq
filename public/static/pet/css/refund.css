@@ -1,0 +1,89 @@
+#nav-top{
+    background:#fff ;
+}
+#nav-top .button-link{
+    color:#f9b831;
+}
+
+.order-content{
+    background: #efefef;
+    margin-top:2.2rem;
+    padding-top:.5rem;
+}
+.order-content .list-item{
+    height:9rem;
+    padding:0;
+    background: #fff;
+}
+.order-content .list-item .list-item-top{
+    height:2rem;
+    line-height:2rem;
+    border-bottom: 1px solid #e7e7e7;
+    padding-left:1rem;
+    padding-right: 1.5rem;
+    /* background-image: url(../images/i-list-chevron-right.png);
+    background-repeat: no-repeat;
+    background-position: 97% center;
+    background-position: -webkit-calc(100% - .5rem) center;
+    background-position: calc(100% - .5rem) center;
+    background-size: .7rem; */
+}
+.order-content .list-item .list-item-top span{
+    font-size:.8rem;
+    vertical-align: middle;
+}
+.order-content .list-item .list-item-content{
+    margin:.8rem 1rem;
+    position: relative;
+}
+.order-content .list-item .list-item-content img{
+    width:7rem;
+    height:5rem;
+    margin-right:.5rem;
+    float:left;
+}
+.list-item-content .price{
+    position: absolute;
+    font-size:.6rem;
+    color:#221815;
+    bottom:-.3rem;
+    right: 0;
+}
+.list-item-content .price span{
+    font-size:1rem;
+    color:#ec666a;
+    font-weight: bold;
+}
+.refund-content{
+    margin-top:.5rem;
+    background: #fff;
+    padding:.5rem 1rem;
+}
+.refund-content p{
+    font-size:.8rem;
+    margin-bottom:.3rem;
+}
+.refund-content textarea{
+    width:100%;
+    height:5rem;
+    border:1px solid #cacacb;
+    border-radius: .3rem;
+    padding:.1rem .2rem;
+    font-size:.8rem;
+}
+
+.refund-submit{
+    position: fixed;
+    bottom:1rem;
+    left:0;
+    width:80%;
+    margin:0 10%;
+}
+.refund-submit .button.button-fill{
+    height:2rem;
+    line-height: 2rem;
+    background: #eb666a;
+}
+label.label-checkbox input[type="checkbox"]:checked + .item-media i.icon-form-checkbox, label.label-checkbox input[type="radio"]:checked + .item-media i.icon-form-checkbox{
+    background-color:#f9b831; 
+}

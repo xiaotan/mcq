@@ -1,0 +1,165 @@
+body, .page, .page-group, .page-group.page-current, .page.page-current{
+    background: #efefef;
+}
+#nav-top{
+    background:#fff ;
+}
+#nav-top .button-link{
+    color:#f9b831;
+}
+.buttons-tab{
+    padding:0 2rem;
+}
+.buttons-tab a{
+    margin:0 .5rem;
+}
+.buttons-tab .button.active{
+    color:#f9b831;
+    border-color: #f9b831;
+}
+.buttons-tab .button{
+    border-bottom: 3px solid transparent;
+}
+.content-block{
+    margin:0;
+}
+.order-content{
+    background: #efefef;
+    margin-top:.5rem;
+    padding:0;
+}
+.order-content .list-item{
+    height:10.5rem;
+    padding:0;
+    margin-bottom:.5rem;
+    background: #fff;
+}
+.order-content .list-item .list-item-top{
+    height:2rem;
+    line-height:2rem;
+    border-bottom: 1px solid #e7e7e7;
+    padding-left:1rem;
+    padding-right: 1.5rem;
+    background-image: url(../img/i-list-chevron-right.png);
+    background-repeat: no-repeat;
+    background-position: 97% center;
+    background-position: -webkit-calc(100% - .5rem) center;
+    background-position: calc(100% - .5rem) center;
+    background-size: .7rem;
+}
+.order-content .list-item .list-item-top i{
+    font-size:1rem;
+    margin-right:.3rem;
+}
+.order-content .list-item .list-item-top span{
+    font-size:1rem;
+    vertical-align: middle;
+}
+.order-content .list-item .list-item-content{
+    margin:.8rem 1rem;
+    position: relative;
+}
+.order-content .list-item .list-item-content img{
+    width:7rem;
+    height:5rem;
+    margin-right:.5rem;
+    float:left;
+}
+.list-item-content .amount{
+    position: absolute;
+    text-decoration:line-through;
+    font-size:.8rem;
+    font-weight: bold;
+    color:#898889;
+    top:1.5rem;
+    right: 0;
+}
+.list-item-content .price{
+    position: absolute;
+    font-size:1.2rem;
+    color:#ec666a;
+    font-weight: bold;
+    top:0;
+    right: 0;
+}
+.order-button-list{
+    margin-top:.5rem;
+}
+.order-button-list span{
+    width:4.5rem;
+    height:1.4rem;
+    line-height:1.4rem;
+    text-align:center;
+    float:right;
+    display:inline-block;
+    border-radius: 2.25rem;
+    margin-left:1rem;
+}
+.order-button-list .cancel_order{
+    border:1px solid #888;
+    color:#888;
+}
+.order-button-list .payment, .order-button-list .refund, .order-button-list .comment{
+    border:1px solid #f9b700;
+    color:#f9b700;
+}
+
+#basic-modal-content {
+    display:none;
+}
+#basic-modal-content .cancel-img{
+    width:8rem;
+    margin:.5rem auto;
+}
+#basic-modal-content .cancel-img img{
+    width:100%;
+    border:none;
+}
+#basic-modal-content p{
+    font-size:1rem;
+    margin-bottom:.5rem;
+    text-align:center;
+    color:#898989;
+}
+
+/* Overlay */
+#simplemodal-overlay {background-color:#000;}
+
+/* Container */
+#simplemodal-container {height:17rem; width:80%; color:#f7b218; background-color:#fff; padding:.5rem;border-radius: .3rem;}
+#simplemodal-container a {color:#ddd;}
+#simplemodal-container a.modalCloseImg {
+    font-family: "iconfont-sm" !important;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-stroke-width: .2px;
+    -moz-osx-font-smoothing: grayscale;
+    font-size:1rem; 
+    display:inline; 
+    z-index:3200; 
+    position:absolute; 
+    top:-15px; 
+    right:-16px; 
+    cursor:pointer;
+}
+#simplemodal-container a.modalCloseImg:before{
+    content: "\e602";
+}
+#simplemodal-container h3 {color:#84b8d9;}
+
+#basic-modal-content .button{
+    border:1px solid #f8b319;
+    font-size:1rem;
+}
+#basic-modal-content .modal-success-button{
+    background: #f8b319;
+    color:#fff;
+}
+#basic-modal-content .modal-cancel-button{
+    color:#f8b319;
+}
+
+.no-data img{
+    width:40%;
+    margin:5rem 30%;
+}

@@ -1,0 +1,155 @@
+.navbar{
+    background: #fff;
+    color:#EB9F34;
+}
+.my-info{
+    width:100%;
+    height:9rem;   
+    background:#EB9F34;
+    background:-moz-linear-gradient(top, #EB9F34, #D7842A);  
+    background:-webkit-gradient(linear, 0 0, 0 bottom, from(#EB9F34), to(#D7842A)); 
+    color:#fff;
+    background-size:100% 100%;
+    background-repeat: no-repeat;
+    background-position: center center; 
+    position: relative;  
+    margin-bottom:1rem;
+}
+.info-box{
+    position: absolute;
+    bottom:0;
+    left:0;
+    right:0;
+}
+.my-info .avatar{
+    width:4rem;
+    height:4rem;
+    border-radius: 2rem;
+    margin-right:1rem;
+    position: absolute;
+    bottom:-1rem;
+    left:.5rem;
+}
+.info-box .like{
+    position: absolute;
+    bottom:.2rem;
+    right:0;
+    font-size:.6rem;
+}
+.info-box .username{
+    margin-left:5rem;
+    float:left;
+}
+.info-box .like span{
+    margin-right:.5rem;
+}
+.info-box .name{
+    font-size:1.2rem;
+    vertical-align: middle;
+}
+.info-box .level{
+    margin-left:.5rem;
+}
+.info-box .level i{
+    font-size:1.2rem;
+}
+
+
+
+
+.content-list{
+    margin-bottom:2.5rem;
+}
+.content-list ul{
+    margin:0;
+    padding:0;
+}
+.content-list .list-left{
+    width:2rem;
+    float:left;
+}
+.content-list .list-left p:first-child{
+    font-size:1.2rem;
+}
+.content-list .list-left p:last-child{
+    font-size:.8rem;
+}
+.content-list .list-right{
+    margin-left:2.5rem;
+}
+.content-list ul li{
+    margin:.8rem .5rem;
+    border-bottom:1px solid #efefef;
+    position: relative;
+    padding-bottom:.8rem;
+}
+.content-list ul li:last-child{
+    margin-bottom:0;
+}
+
+.scroll-box{
+    position:relative;
+    height:100%;
+    top:0;
+    left:0;
+}
+.list-block{
+    margin-top:1rem;
+}
+.list-block ul{
+    border-top: none;
+}
+.item-top{
+    position: relative;
+    height:2.5rem;
+}
+.item-top .time{
+    position: absolute;
+    right:0;
+    bottom:0;
+    font-size:.6rem;
+    color:#888;
+}
+.item-top img{
+    width:2.5rem;
+    height:2.5rem;
+    float:left;
+    margin-right:.5rem;
+    border-radius: .5rem;
+}
+.item-top-box .name{
+    font-size:1rem;
+    color:#873520;
+}
+.item-top-box p{
+    font-size:.6rem;
+    color:#333;
+}
+.content-list .con{
+    font-size:1rem;
+    margin:.5rem 0;
+}
+.images{
+    margin-bottom:.5rem;
+}
+.images .img-item{
+    width:30%;
+    display:inline-block;
+    margin-right:1%;
+    background-size:100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+.item-bottom .site{
+    font-size:.6rem;
+    color:#873520;
+}
+.item-bottom .enjoy, .item-bottom .comment{
+    float:right;
+    display:inline-block;
+    margin-left:.5rem;
+}
+.item-bottom .enjoy span, .item-bottom .comment span{
+    vertical-align: middle;
+    margin-left:.1rem;
+}

@@ -1,0 +1,115 @@
+body, .page, .page-group, .page-group.page-current, .page.page-current{
+    background: #efefef;
+}
+.content{
+    background: #fff;
+}
+.my-info{
+    width:100%;
+    height:9rem;   
+    background:#f7b216;
+    background:-moz-linear-gradient(top, #f7b216, #e69400);  
+    background:-webkit-gradient(linear, 0 0, 0 bottom, from(#f7b216), to(#e69400)); 
+    color:#fff;
+}
+.info-box{
+    padding:2.5rem 2rem 0 2rem;
+}
+.my-info .avatar{
+    width:4rem;
+    height:4rem;
+    border-radius: 2rem;
+    float:left;
+    margin-right:1rem;
+}
+.info-box .info .p1{
+    margin:.1rem 0;
+}
+.info-box .info .name{
+    font-size:1.2rem;
+    vertical-align: middle;
+}
+.info-box .info .level{
+    margin-left:.5rem;
+}
+.info-box .info .level i{
+    font-size:1.2rem;
+}
+.list-block .item-a{
+    display:block;
+    border-bottom: 1px solid #e7e7e7;
+    color:#221814;
+}
+.list-block ul{
+    border:none;
+}
+.order-type .col-33{
+    text-align:center;
+}
+.my-roder{
+    margin:.5rem 0;
+}
+.my-roder .item-after{
+    font-size:.6rem;
+}
+
+/* .order-type {
+  bottom: 0;
+  z-index: 9000;
+  width: 100%;
+  height: 2.5rem;
+  padding: 0;
+  table-layout: fixed;
+  border-top: 1px solid #e7e7e7;
+  border-bottom: 0;
+  border-left: 0;
+  -webkit-transition-duration: 400ms;
+       -o-transition-duration: 400ms;
+          transition-duration: 400ms;
+} */
+.order-type .tab-item {
+  position: relative;
+  display: table-cell;
+  width: 1%;
+  height: 3rem;
+  color: #929292;
+  text-align: center;
+  vertical-align: middle;
+}
+.order-type .tab-item.active,
+.order-type .tab-item:active {
+  color: #0894ec;
+}
+.order-type .tab-item .badge {
+  position: absolute;
+  top: .1rem;
+  left: 50%;
+  z-index: 100;
+  min-width: .8rem;
+  height: .8rem;
+  padding: 0 .2rem;
+  margin-left: .1rem;
+  font-size: .6rem;
+  line-height: .8rem;
+  color: white;
+  vertical-align: top;
+  background: red;
+  border-radius: .5rem;
+}
+.order-type .tab-item .icon {
+  top: .15rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 1.5rem;
+  line-height: 1.2rem;
+}
+.order-type .tab-item .icon ~ .tab-label {
+  position: relative;
+  top: .15rem;
+  display: block;
+  font-size: .6rem;
+  margin-top:.2rem;
+  color:#221814;
+}

@@ -1,0 +1,48 @@
+{extend name="public:layout" /}
+
+{block name="style"}
+    <link rel="stylesheet" href="__MODULE_CSS__/refund.css">
+{/block}
+
+{block name="main"}
+    <div class="page-group">
+        <div class="page">
+
+            <header class="bar bar-nav bn" id="nav-top">
+                <button class="button button-link button-nav pull-left">
+                    <span class="icon icon-left"></span> 申请退款
+                </button>
+            </header>
+            
+            <div class="order-content">
+                <div class="list-item">
+                    <div class="list-item-top">
+                        <span>订单编号：20170510523613213</span>
+                    </div>
+                    <div class="list-item-content">
+                        <img src="__MODULE_IMG__/img.jpg" alt="">
+                        <div class="list-item-content-right">
+                            <p>项目：宠物洗澡</p>
+                            <p>类型：狗狗</p>
+                            <p>品种：金毛犬</p>
+                            <p>年龄：大于6个月</p>
+                        </div>
+                        <div class="price">应退款：<span>49.9</span></div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+                <div class="refund-content">
+                    <p>退款原因：</p>
+                    <textarea>请输入您的退款理由</textarea>
+                </div>
+
+                <p class="refund-submit"><a href="#" class="button button-fill">提交申请</a></p>
+            </div>
+
+        </div>
+    </div>
+{/block}
+
+{block name="script"}
+
+{/block}

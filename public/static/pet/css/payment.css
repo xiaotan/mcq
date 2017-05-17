@@ -1,0 +1,65 @@
+#nav-top .button-link{
+    color:#f9b831;
+}
+.payment-show{
+    margin-top:2.2rem;
+}
+.payment-show img{
+    display:block;
+}
+.payment-box{
+    padding:.8rem 1rem;
+    border-bottom: 1px solid #e7e7e7;
+}
+.payment-box p{
+    color:#221814;
+    font-size:.7rem;
+    margin-bottom:.2rem;
+}
+.payment-box p span{
+    color:#eb666a;
+}
+.payment-box p span i{
+    font-size:1rem;
+    font-weight: bold;
+}
+.payment-list{
+    padding:1rem;
+    margin-top:0;
+}
+.payment-list-title{
+
+}
+.payment-list .item-inner span{
+    font-size:.8rem;
+    margin-left:.5rem;
+    vertical-align: middle;
+    padding-top: .1rem;
+}
+.payment-list .item-inner{
+    justify-content:flex-start;
+    border:none;
+    padding-top: .35rem;
+}
+.payment-list .item-content{
+    padding-left:0;
+}
+.payment-list ul{
+    border:none;
+    margin-bottom:2.2rem;
+}
+.payment-submit{
+    position: fixed;
+    bottom:1rem;
+    left:0;
+    width:80%;
+    margin:0 10%;
+}
+.payment-submit .button.button-fill{
+    height:2rem;
+    line-height: 2rem;
+    background: #eb666a;
+}
+label.label-checkbox input[type="checkbox"]:checked + .item-media i.icon-form-checkbox, label.label-checkbox input[type="radio"]:checked + .item-media i.icon-form-checkbox{
+    background-color:#f9b831; 
+}
