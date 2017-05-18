@@ -20,7 +20,7 @@ use think\Model as ThinkModel;
 class Business extends ThinkModel
 {
     // 设置当前模型对应的完整数据表名称
-    protected $table = '__BUSINESS__';
+    protected $table = '__PET_BUSINESS__';
 
     // 自动写入时间戳
     protected $autoWriteTimestamp = true;
