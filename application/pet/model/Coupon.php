@@ -24,22 +24,4 @@ class Coupon extends ThinkModel
 
     // 自动写入时间戳
     protected $autoWriteTimestamp = true;
-
-    /*// 定义修改器
-    public function setStartTimeAttr($value)
-    {
-        return $value != '' ? strtotime($value) : 0;
-    }
-    public function setEndTimeAttr($value)
-    {
-        return $value != '' ? strtotime($value) : 0;
-    }
-    public function getStartTimeAttr($value)
-    {
-        return $value != 0 ? date('Y-m-d', $value) : '';
-    }
-    public function getEndTimeAttr($value)
-    {
-        return $value != 0 ? date('Y-m-d', $value) : '';
-    }*/
 }

@@ -23,7 +23,7 @@ use think\Db;
  * 仪表盘控制器
  * @package app\pet\admin
  */
-class Coupon extends Admin
+class BusinessCoupon extends Admin
 {
     /**
      * 首页
@@ -44,17 +44,18 @@ class Coupon extends Admin
             ->setSearch(['name' => '商家名称']) // 设置搜索框
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
-                ['name', '商家名称', 'text.edit'],
-                ['tel', '商家电话', 'text'],
-                ['create_time', '入驻时间', 'datetime'],
+                ['title', '优惠名称', 'text.edit'],
+                ['type', '优惠类型', 'select', config('coupon_type')],
+                ['amount', '优惠金额', 'text'],
+                ['unique', '优惠限制', 'switch'],
                 ['status', '状态', 'switch'],
+                ['create_time', '发布时间', 'datetime'],
                 ['right_button', '操作', 'btn']
             ])
             ->addTopButtons('add,enable,disable,delete') // 批量添加顶部按钮
             ->addRightButtons(['edit', 'delete' => ['data-tips' => '删除后无法恢复。']]) // 批量添加右侧按钮
             ->addOrder('id,name,create_time')
             ->setRowList($data_list) // 设置表格数据
-            ->addValidate('Business', 'name')
             ->fetch(); // 渲染模板
     }
 
@@ -69,30 +70,23 @@ class Coupon extends Admin
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
+            $data['status'] = isset($data['status']) ? 1 : 0;
+            $data['unique'] = isset($data['unique']) ? 1 : 0;
+            $data['begin_time'] = $data['begin_time'] ? strtotime($data['begin_time']) : 0;
+            $data['end_time'] = $data['end_time'] ? strtotime($data['end_time']) : 0;
             // 验证
-            $result = $this->validate($data, 'Business');
+            $result = $this->validate($data, 'Coupon');
             // 验证失败 输出错误信息
             if(true !== $result) return $this->error($result);
-            //分别存储经纬度
-            $map = explode(",", $data['map']);
-            $data['lng'] = $map[0];
-            $data['lat'] = $map[1];
-            //默认为商家用户分组
-            $data['role'] = 2;
-            //详细地址
-            $data['address'] = $data['map_address'];
+
             //保存数据
-            $business = BusinessModel::create($data);
-            $user = UserModel::create($data);
+            $coupon = CouponModel::create($data);
             
-            if ($business && $user) {
+            if ($coupon) {
                 // 记录行为
-                action_log('advert_add', 'business', $business['id'], UID, $data['name']);
-                action_log('user_add', 'admin_user', $user['id'], UID);
+                action_log('coupon_add', 'coupon', $coupon['id'], UID, $data['title']);
                 $this->success('新增成功', 'index');
             } else {
-                BusinessModel::destroy($business['id']);
-                UserModel::destroy($user['id']);
                 $this->error('新增失败');
             }
         }
@@ -100,25 +94,17 @@ class Coupon extends Admin
         // 显示添加页面
         return ZBuilder::make('form')
             ->setPageTips('如果出现无法添加的情况，可能由于浏览器将本页面当成了广告，请尝试关闭浏览器的广告过滤功能再试。', 'warning')
-            ->addGroup([
-                '商家基本信息' => [
-                    ['text', 'name', '商家名称', '必填，请填写商家全称'],
-                    ['text', 'tel', '商家电话', '可以填手机号或座机号，座机记得加上区号，例：0771-1234567'],
-                    ['image', 'thumb', '缩略图'],
-                    ['images', 'banner', '商家banner（多图）','最多上传5张图,每张图最大4m','','4096'],
-                    ['bmap', 'map', '商家位置', config('baidu_map_ak')],
-                ],
-                '商家账户信息' => [
-                    ['text', 'username', '用户名', '必填，可由英文字母、数字组成'],
-                    ['text', 'nickname', '昵称', '可以是中文'],
-                    ['password', 'password', '密码', '必填，6-20位'],
-                    ['text', 'email', '邮箱', ''],
-                    ['text', 'mobile', '手机号'],
-                    ['image', 'avatar', '头像'],
-                    ['radio', 'status', '状态', '', ['禁用', '启用'], 1]
-                ],
+            ->addFormItems([
+                ['text', 'title', '优惠名称'],
+                ['select', 'type', '优惠类型', '', config('coupon_type')],
+                ['number', 'amount', '优惠金额'],
+                ['number', 'limit_amount', '满减需要填写，满xx金额可以减'],
+                ['switch', 'unique', '优惠限制', '优惠是否一个用户只能用一次'],
+                ['datetime', 'begin_time', '优惠开始时间', ''],
+                ['datetime', 'end_time', '优惠结束时间', ''],
+                ['switch', 'status', '状态', '', 1],
             ])
-            ->layout(['name' => 6, 'tel' => 6])
+            ->setTrigger('type', 1, 'limit_amount')
             ->fetch();
     }
 
@@ -136,41 +122,44 @@ class Coupon extends Admin
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
-
+            $data['status'] = isset($data['status']) ? 1 : 0;
+            $data['unique'] = isset($data['unique']) ? 1 : 0;
+            $data['begin_time'] = $data['begin_time'] ? strtotime($data['begin_time']) : 0;
+            $data['end_time'] = $data['end_time'] ? strtotime($data['end_time']) : 0;
             // 验证
-            $result = $this->validate($data, 'Business');
+            $result = $this->validate($data, 'Coupon');
             // 验证失败 输出错误信息
             if(true !== $result) return $this->error($result);
-            //分别存储经纬度
-            $map = explode(",", $data['map']);
-            $data['lng'] = $map[0];
-            $data['lat'] = $map[1];
-            //默认为商家用户分组
-            $data['role'] = 2;
-            //详细地址
-            $data['address'] = $data['map_address'];
-            //保存数据
-            $business = BusinessModel::create($data);
-            $user = UserModel::create($data);
-            
-            if ($business && $user) {
-                // 记录行为
-                action_log('advert_add', 'business', $business['id'], UID, $data['name']);
-                action_log('user_add', 'admin_user', $user['id'], UID);
-                $this->success('新增成功', 'index');
-            } else {
-                BusinessModel::destroy($business['id']);
-                UserModel::destroy($user['id']);
-                $this->error('新增失败');
-            }
 
-            if (AdvertModel::update($data)) {
+            //保存数据
+            if (CouponModel::update($data)) {
                 // 记录行为
-                action_log('advert_edit', 'cms_advert', $id, UID, $data['name']);
+                action_log('coupon_edit', 'coupon', $id, UID, $data['title']);
                 $this->success('编辑成功', 'index');
             } else {
                 $this->error('编辑失败');
             }
         }
+
+        $info = CouponModel::get($id);
+        $info['begin_time'] = $info['begin_time'] ? date('Y:m:d H:i:s', $info['begin_time']) : '';
+        $info['end_time'] = $info['end_time'] ? date('Y:m:d H:i:s', $info['end_time']) : '';
+        // 显示添加页面
+        return ZBuilder::make('form')
+            ->setPageTips('如果出现无法添加的情况，可能由于浏览器将本页面当成了广告，请尝试关闭浏览器的广告过滤功能再试。', 'warning')
+            ->addFormItems([
+                ['hidden', 'id'],
+                ['text', 'title', '优惠名称'],
+                ['select', 'type', '优惠类型', '', config('coupon_type')],
+                ['number', 'amount', '优惠金额'],
+                ['number', 'limit_amount', '满减需要填写，满xx金额可以减'],
+                ['switch', 'unique', '优惠限制', '优惠是否一个用户只能用一次'],
+                ['datetime', 'begin_time', '优惠开始时间', ''],
+                ['datetime', 'end_time', '优惠结束时间', ''],
+                ['switch', 'status', '状态', '', 1],
+            ])
+            ->setFormData($info)
+            ->setTrigger('type', 1, 'limit_amount')
+            ->fetch();
     }
 }

@@ -45,16 +45,13 @@ class BusinessService extends Admin
             'href'  => url('business_service_config/index')
         ];
 
-        // $list_type = ServiceConfigModel::where(array('status'=>1, '')'', 1)->column('id,name');
-        // array_unshift($list_type, '服务配置');
-
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
-            ->setSearch(['name' => '商家名称']) // 设置搜索框
+            ->setSearch(['name' => '服务名称']) // 设置搜索框
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
                 ['name', '商家名称', 'text'],
-                // ['cid', '服务配置', 'select', $list_type],
+                // ['type', '服务项目', 'select', $type_list],
                 ['tel', '商家电话', 'text'],
                 ['create_time', '入驻时间', 'datetime'],
                 ['status', '状态', 'switch'],
@@ -79,6 +76,7 @@ class BusinessService extends Admin
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
+            print_r($data);exit;
             // 验证
             $result = $this->validate($data, 'Business');
             // $result = $this->validate('Business.add')->save($data);
@@ -92,8 +90,7 @@ class BusinessService extends Admin
                 //详细地址
                 $data['address'] = $data['map_address'];
             }
-            //默认为商家用户分组
-            $data['role'] = 2;
+
             //保存数据
             $business = BusinessModel::create($data);
             if($business){
@@ -112,28 +109,23 @@ class BusinessService extends Admin
             }
         }
 
+        $type_list = ServiceConfigModel::where(array('status'=>1, 'config_id'=> 1))->column('id,name');
+
+        $pet_list = ServiceConfigModel::where(array('status'=>1, 'config_id'=> 2))->column('id,name');
+
+        $breed_list = ServiceConfigModel::where(array('status'=>1, 'config_id'=> 3))->column('id,name');
+
         // 显示添加页面
         return ZBuilder::make('form')
             ->setPageTips('如果出现无法添加的情况，可能由于浏览器将本页面当成了广告，请尝试关闭浏览器的广告过滤功能再试。', 'warning')
-            ->addGroup([
-                '商家基本信息' => [
-                    ['text', 'name', '商家名称', '必填，请填写商家全称'],
-                    ['text', 'tel', '商家电话', '可以填手机号或座机号，座机记得加上区号，例：0771-1234567'],
-                    ['image', 'thumb', '缩略图'],
-                    ['images', 'banner', '商家banner（多图）','最多上传5张图,每张图最大4m','','4096'],
-                    ['bmap', 'map', '商家位置', config('baidu_map_ak')],
-                ],
-                '商家账户信息' => [
-                    ['text', 'username', '用户名', '必填，可由英文字母、数字组成'],
-                    ['text', 'nickname', '昵称', '可以是中文'],
-                    ['password', 'password', '密码', '必填，6-20位'],
-                    ['text', 'email', '邮箱', ''],
-                    ['text', 'mobile', '手机号'],
-                    ['image', 'avatar', '头像'],
-                    ['radio', 'status', '状态', '', ['禁用', '启用'], 1]
-                ],
+            ->addFormItems([
+                ['select', 'type', '服务项目', '', $type_list],
+                ['number', 'price', '服务价格'],
+                // ['select', 'pet', '宠物', '服务项目支持的宠物', $pet_list, array_keys($pet_list), 'multiple'],
+                ['checkbox', 'pet', '宠物', '服务项目支持的宠物分类', $pet_list, array_keys($pet_list)],
+                ['select', 'breed', '品种', '服务项目支持的宠物品种', $breed_list, array_keys($breed_list)],
+                ['switch', 'is_coin', '金币支付', '', 1, '', 'disabled'],
             ])
-            ->layout(['name' => 6, 'tel' => 6])
             ->fetch();
     }
 

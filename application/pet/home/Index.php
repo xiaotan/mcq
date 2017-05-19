@@ -82,7 +82,7 @@ class Index extends Common
         	$business = session('business'.$page);
         }else{
         	// 根据用户经纬度获取最接近用户的商家
-	        $business = Db::query("SELECT id,name,score,thumb, ROUND(6378.138*2*ASIN(SQRT(POW(SIN((".$lat."*PI()/180-lat*PI()/180)/2),2)+COS(".$lat."*PI()/180)*COS(lat*PI()/180)*POW(SIN((".$lng."*PI()/180-lng*PI()/180)/2),2)))*1000) AS distance FROM ".config("database.prefix")."business ORDER BY distance ASC LIMIT ".($page-1)*$pageSize.",".$pageSize);
+	        $business = Db::query("SELECT id,name,score,thumb, ROUND(6378.138*2*ASIN(SQRT(POW(SIN((".$lat."*PI()/180-lat*PI()/180)/2),2)+COS(".$lat."*PI()/180)*COS(lat*PI()/180)*POW(SIN((".$lng."*PI()/180-lng*PI()/180)/2),2)))*1000) AS distance FROM ".config("database.prefix")."pet_business ORDER BY distance ASC LIMIT ".($page-1)*$pageSize.",".$pageSize);
 	        if($business){
 	        	//获取缩略图url
 		        foreach($business as $k=>$v){

@@ -37,9 +37,6 @@ class BusinessServiceConfig extends Admin
         // 数据列表
         $data_list = ServiceConfigModel::where($map)->order($order)->paginate();
 
-        $list_type = config('service_config');
-        // print_r($list_type);exit;
-
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
             ->setSearch(['name' => '配置名称']) // 设置搜索框
@@ -47,7 +44,7 @@ class BusinessServiceConfig extends Admin
                 ['id', 'ID'],
                 ['name', '配置名称', 'text.edit'],
                 ['icon', '配置图标', 'picture'],
-                ['config_id', '服务配置', 'select', $list_type],
+                ['config_id', '服务配置', 'select', config('service_config')],
                 ['create_time', '创建时间', 'datetime'],
                 ['status', '状态', 'switch'],
                 ['right_button', '操作', 'btn']
@@ -128,9 +125,6 @@ class BusinessServiceConfig extends Admin
             }
         }
 
-        //服务配置列表
-        $list_type = config('service_config');
-
         $info = ServiceConfigModel::get($id);
         // 显示添加页面
         return ZBuilder::make('form')
@@ -138,7 +132,7 @@ class BusinessServiceConfig extends Admin
             ->addFormItems([
                 ['hidden', 'id'],
                 ['text', 'name', '配置名称'],
-                ['select', 'config_id', '服务配置', '', $list_type],
+                ['select', 'config_id', '服务配置', '', config('service_config')],
                 ['image', 'icon', '配置图标'],
                 ['switch', 'status', '状态', '', 1],
             ])

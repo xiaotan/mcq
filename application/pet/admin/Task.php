@@ -14,7 +14,6 @@ namespace app\pet\admin;
 use app\admin\controller\Admin;
 use app\common\builder\ZBuilder;
 use app\pet\model\Task as TaskModel;
-// use app\user\model\User as UserModel;
 use think\Validate;
 use think\Config;
 use think\Db;
@@ -41,20 +40,20 @@ class Task extends Admin
 
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
-            ->setSearch(['name' => '商家名称']) // 设置搜索框
+            ->setSearch(['title' => '任务名称']) // 设置搜索框
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
-                ['name', '商家名称', 'text.edit'],
-                ['tel', '商家电话', 'text'],
-                ['create_time', '入驻时间', 'datetime'],
+                ['title', '任务名称', 'text.edit'],
+                ['type', '任务类型', 'select', config('task_type')],
+                ['intro', '任务简介', 'text'],
+                ['amount', '任务积分', 'number'],
                 ['status', '状态', 'switch'],
                 ['right_button', '操作', 'btn']
             ])
             ->addTopButtons('add,enable,disable,delete') // 批量添加顶部按钮
             ->addRightButtons(['edit', 'delete' => ['data-tips' => '删除后无法恢复。']]) // 批量添加右侧按钮
-            ->addOrder('id,name,create_time')
+            ->addOrder('id,amount,create_time')
             ->setRowList($data_list) // 设置表格数据
-            ->addValidate('Business', 'name')
             ->fetch(); // 渲染模板
     }
 
@@ -69,30 +68,20 @@ class Task extends Admin
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
+            $data['status'] = $data['status'] ? 1 : 0;
             // 验证
-            $result = $this->validate($data, 'Business');
+            $result = $this->validate($data, 'Task');
             // 验证失败 输出错误信息
             if(true !== $result) return $this->error($result);
-            //分别存储经纬度
-            $map = explode(",", $data['map']);
-            $data['lng'] = $map[0];
-            $data['lat'] = $map[1];
-            //默认为商家用户分组
-            $data['role'] = 2;
-            //详细地址
-            $data['address'] = $data['map_address'];
+
             //保存数据
-            $business = BusinessModel::create($data);
-            $user = UserModel::create($data);
+            $task = TaskModel::create($data);
             
-            if ($business && $user) {
+            if ($task) {
                 // 记录行为
-                action_log('advert_add', 'business', $business['id'], UID, $data['name']);
-                action_log('user_add', 'admin_user', $user['id'], UID);
+                action_log('task_add', 'task', $task['id'], UID, $data['title']);
                 $this->success('新增成功', 'index');
             } else {
-                BusinessModel::destroy($business['id']);
-                UserModel::destroy($user['id']);
                 $this->error('新增失败');
             }
         }
@@ -100,25 +89,16 @@ class Task extends Admin
         // 显示添加页面
         return ZBuilder::make('form')
             ->setPageTips('如果出现无法添加的情况，可能由于浏览器将本页面当成了广告，请尝试关闭浏览器的广告过滤功能再试。', 'warning')
-            ->addGroup([
-                '商家基本信息' => [
-                    ['text', 'name', '商家名称', '必填，请填写商家全称'],
-                    ['text', 'tel', '商家电话', '可以填手机号或座机号，座机记得加上区号，例：0771-1234567'],
-                    ['image', 'thumb', '缩略图'],
-                    ['images', 'banner', '商家banner（多图）','最多上传5张图,每张图最大4m','','4096'],
-                    ['bmap', 'map', '商家位置', config('baidu_map_ak')],
-                ],
-                '商家账户信息' => [
-                    ['text', 'username', '用户名', '必填，可由英文字母、数字组成'],
-                    ['text', 'nickname', '昵称', '可以是中文'],
-                    ['password', 'password', '密码', '必填，6-20位'],
-                    ['text', 'email', '邮箱', ''],
-                    ['text', 'mobile', '手机号'],
-                    ['image', 'avatar', '头像'],
-                    ['radio', 'status', '状态', '', ['禁用', '启用'], 1]
-                ],
+            ->addFormItems([
+                ['text', 'title', '任务名称'],
+                ['select', 'type', '任务类型', '唯一任务需要填写任务开始时间和结束时间', config('task_type')],
+                ['datetime', 'begin_time', '任务开始时间', ''],
+                ['datetime', 'end_time', '任务结束时间', ''],
+                ['text', 'intro', '任务简介'],
+                ['number', 'amount', '奖励积分'],
+                ['switch', 'status', '状态', '', 1],
             ])
-            ->layout(['name' => 6, 'tel' => 6])
+            ->setTrigger('type', 1, 'begin_time,end_time')
             ->fetch();
     }
 
@@ -136,41 +116,38 @@ class Task extends Admin
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
-
+            $data['status'] = $data['status'] ? 1 : 0;
             // 验证
-            $result = $this->validate($data, 'Business');
+            $result = $this->validate($data, 'Task');
             // 验证失败 输出错误信息
             if(true !== $result) return $this->error($result);
-            //分别存储经纬度
-            $map = explode(",", $data['map']);
-            $data['lng'] = $map[0];
-            $data['lat'] = $map[1];
-            //默认为商家用户分组
-            $data['role'] = 2;
-            //详细地址
-            $data['address'] = $data['map_address'];
-            //保存数据
-            $business = BusinessModel::create($data);
-            $user = UserModel::create($data);
             
-            if ($business && $user) {
+            if (TaskModel::update($data)) {
                 // 记录行为
-                action_log('advert_add', 'business', $business['id'], UID, $data['name']);
-                action_log('user_add', 'admin_user', $user['id'], UID);
-                $this->success('新增成功', 'index');
-            } else {
-                BusinessModel::destroy($business['id']);
-                UserModel::destroy($user['id']);
-                $this->error('新增失败');
-            }
-
-            if (AdvertModel::update($data)) {
-                // 记录行为
-                action_log('advert_edit', 'cms_advert', $id, UID, $data['name']);
+                action_log('task_edit', 'task', $id, UID, $data['title']);
                 $this->success('编辑成功', 'index');
             } else {
                 $this->error('编辑失败');
             }
         }
+
+        $info = TaskModel::get($id);
+
+        // 显示添加页面
+        return ZBuilder::make('form')
+            ->setPageTips('如果出现无法添加的情况，可能由于浏览器将本页面当成了广告，请尝试关闭浏览器的广告过滤功能再试。', 'warning')
+            ->addFormItems([
+                ['hidden', 'id'],
+                ['text', 'title', '任务名称'],
+                ['select', 'type', '任务类型', '唯一任务需要填写任务开始时间和结束时间', config('task_type')],
+                ['datetime', 'begin_time', '任务开始时间', ''],
+                ['datetime', 'end_time', '任务结束时间', ''],
+                ['text', 'intro', '任务简介'],
+                ['number', 'amount', '奖励积分'],
+                ['switch', 'status', '状态', '', 1],
+            ])
+            ->setTrigger('type', 1, 'begin_time,end_time')
+            ->setFormData($info)
+            ->fetch();
     }
 }
