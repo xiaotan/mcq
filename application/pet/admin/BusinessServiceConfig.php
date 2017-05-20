@@ -13,7 +13,7 @@ namespace app\pet\admin;
 
 use app\admin\controller\Admin;
 use app\common\builder\ZBuilder;
-use app\pet\model\ServiceConfig as ServiceConfigModel;
+use app\pet\model\BusinessServiceConfig as BusinessServiceConfigModel;
 use think\Validate;
 use think\Config;
 use think\Db;
@@ -35,7 +35,9 @@ class BusinessServiceConfig extends Admin
         // 排序
         $order = $this->getOrder('update_time desc');
         // 数据列表
-        $data_list = ServiceConfigModel::where($map)->order($order)->paginate();
+        $data_list = BusinessServiceConfigModel::where($map)->order($order)->paginate();
+
+        $pets = BusinessServiceConfigModel::where(array('status'=>1, 'config_id'=>2))->column('id,name');
 
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
@@ -44,6 +46,7 @@ class BusinessServiceConfig extends Admin
                 ['id', 'ID'],
                 ['name', '配置名称', 'text.edit'],
                 ['icon', '配置图标', 'picture'],
+                ['pid', '父类配置', 'select', $pets],
                 ['config_id', '服务配置', 'select', config('service_config')],
                 ['create_time', '创建时间', 'datetime'],
                 ['status', '状态', 'switch'],
@@ -72,7 +75,7 @@ class BusinessServiceConfig extends Admin
             // 验证失败 输出错误信息
             if(true !== $result) return $this->error($result);
             //保存数据
-            $service_config = ServiceConfigModel::create($data);
+            $service_config = BusinessServiceConfigModel::create($data);
             if($service_config){
                 // 记录行为
                 action_log('service_config_add', 'service_config', $service_config['id'], UID, $data['name']);
@@ -85,11 +88,14 @@ class BusinessServiceConfig extends Admin
         //服务配置列表
         $list_type = config('service_config');
 
+        $pets = BusinessServiceConfigModel::where(array('status'=>1, 'config_id'=>2))->column('id,name');
+
         // 显示添加页面
         return ZBuilder::make('form')
             ->setPageTips('如果出现无法添加的情况，可能由于浏览器将本页面当成了广告，请尝试关闭浏览器的广告过滤功能再试。', 'warning')
             ->addFormItems([
                 ['text', 'name', '配置名称'],
+                ['select', 'pid', '父类配置', '', $pets],
                 ['select', 'config_id', '服务配置', '', $list_type],
                 ['image', 'icon', '配置图标'],
                 ['switch', 'status', '状态', '', 1],
@@ -116,7 +122,7 @@ class BusinessServiceConfig extends Admin
             // 验证失败 输出错误信息
             if(true !== $result) return $this->error($result);
             //保存数据
-            if (ServiceConfigModel::update($data)) {
+            if (BusinessServiceConfigModel::update($data)) {
                 // 记录行为
                 action_log('service_config_edit', 'service_config', $id, UID, $data['name']);
                 $this->success('编辑成功', 'index');
@@ -124,77 +130,22 @@ class BusinessServiceConfig extends Admin
                 $this->error('编辑失败');
             }
         }
+        
+        $pets = BusinessServiceConfigModel::where(array('status'=>1, 'config_id'=>2))->column('id,name');
 
-        $info = ServiceConfigModel::get($id);
+        $info = BusinessServiceConfigModel::get($id);
         // 显示添加页面
         return ZBuilder::make('form')
             ->setPageTips('如果出现无法添加的情况，可能由于浏览器将本页面当成了广告，请尝试关闭浏览器的广告过滤功能再试。', 'warning')
             ->addFormItems([
                 ['hidden', 'id'],
                 ['text', 'name', '配置名称'],
+                ['select', 'pid', '父类配置', '', $pets],
                 ['select', 'config_id', '服务配置', '', config('service_config')],
                 ['image', 'icon', '配置图标'],
                 ['switch', 'status', '状态', '', 1],
             ])
             ->setFormData($info)
             ->fetch();
-    }
-
-    /**
-     * 删除
-     * @param array $record 行为日志
-     * @return mixed
-     */
-    public function delete($record = [])
-    {
-        return $this->setStatus('delete');
-    }
-
-    /**
-     * 启用
-     * @param array $record 行为日志
-     * @return mixed
-     */
-    public function enable($record = [])
-    {
-        return $this->setStatus('enable');
-    }
-
-    /**
-     * 禁用
-     * @param array $record 行为日志
-     * @return mixed
-     */
-    public function disable($record = [])
-    {
-        return $this->setStatus('disable');
-    }
-
-    /**
-     * 设置状态：删除、禁用、启用
-     * @param string $type 类型：delete/enable/disable
-     * @param array $record
-     * @return mixed
-     */
-    public function setStatus($type = '', $record = [])
-    {
-        $ids         = $this->request->isPost() ? input('post.ids/a') : input('param.ids');
-        $service_config_name = ServiceConfigModel::where('id', 'in', $ids)->column('name');
-        return parent::setStatus($type, ['service_config_'.$type, 'business_service_config', 0, UID, implode('、', $service_config_name)]);
-    }
-
-    /**
-     * 快速编辑
-     * @param array $record 行为日志
-     * @return mixed
-     */
-    public function quickEdit($record = [])
-    {
-        $id      = input('post.pk', '');
-        $field   = input('post.name', '');
-        $value   = input('post.value', '');
-        $business  = ServiceConfigModel::where('id', $id)->value($field);
-        $details = '字段(' . $field . ')，原值(' . $business . ')，新值：(' . $value . ')';
-        return parent::quickEdit(['service_config_edit', 'service_config', $id, UID, $details]);
     }
 }

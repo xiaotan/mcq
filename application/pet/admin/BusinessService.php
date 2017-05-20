@@ -13,8 +13,8 @@ namespace app\pet\admin;
 
 use app\admin\controller\Admin;
 use app\common\builder\ZBuilder;
-use app\pet\model\Service as ServiceModel;
-use app\pet\model\ServiceConfig as ServiceConfigModel;
+use app\pet\model\BusinessService as BusinessServiceModel;
+use app\pet\model\BusinessServiceConfig as BusinessServiceConfigModel;
 use think\Validate;
 use think\Config;
 use think\Db;
@@ -36,7 +36,7 @@ class BusinessService extends Admin
         // 排序
         $order = $this->getOrder('update_time desc');
         // 数据列表
-        $data_list = ServiceModel::where($map)->order($order)->paginate();
+        $data_list = BusinessServiceModel::where($map)->order($order)->paginate();
 
         $btnType = [
             'class' => 'btn btn-info',
@@ -109,11 +109,40 @@ class BusinessService extends Admin
             }
         }
 
-        $type_list = ServiceConfigModel::where(array('status'=>1, 'config_id'=> 1))->column('id,name');
+        $type_list = BusinessServiceConfigModel::where(array('status'=>1, 'config_id'=> 1))->column('id,name');
+        $pet_list = BusinessServiceConfigModel::where(array('status'=>1, 'config_id'=> 2))->column('id,name');
+        $breed_list = BusinessServiceConfigModel::where(array('status'=>1, 'config_id'=> 3))->column('id,name');
 
-        $pet_list = ServiceConfigModel::where(array('status'=>1, 'config_id'=> 2))->column('id,name');
-
-        $breed_list = ServiceConfigModel::where(array('status'=>1, 'config_id'=> 3))->column('id,name');
+        $js_str = '';
+        foreach($pet_list as $k=>$v){
+            $item = BusinessServiceConfigModel::where(array('status'=>1, 'config_id'=> 3, 'pid'=>$k))->column('id,name');
+            $item_str = '';
+            if($item){
+                foreach($item as $kk=>$vv){
+                    $item_str .= "#breed".$kk.",";
+                }
+                $js_str .= '$("#pet'.$k.'").change(function(){
+                    if($("#pet'.$k.'").is(":checked")){
+                        $("'.trim($item_str,',').'").prop("checked","checked");
+                    }else{
+                        $("'.trim($item_str,',').'").prop("checked",false);
+                    }
+                })
+                $("'.trim($item_str,',').'").change(function(){
+                    if($("'.trim($item_str,',').'").is(":checked")){
+                        $("#pet'.$k.'").prop("checked","checked");
+                    }
+                })
+                ';
+            }
+        }
+        $js = <<<EOF
+            <script type="text/javascript">
+                $(function(){
+                    $js_str
+                });
+            </script>
+EOF;
 
         // 显示添加页面
         return ZBuilder::make('form')
@@ -121,11 +150,11 @@ class BusinessService extends Admin
             ->addFormItems([
                 ['select', 'type', '服务项目', '', $type_list],
                 ['number', 'price', '服务价格'],
-                // ['select', 'pet', '宠物', '服务项目支持的宠物', $pet_list, array_keys($pet_list), 'multiple'],
                 ['checkbox', 'pet', '宠物', '服务项目支持的宠物分类', $pet_list, array_keys($pet_list)],
-                ['select', 'breed', '品种', '服务项目支持的宠物品种', $breed_list, array_keys($breed_list)],
+                ['checkbox', 'breed', '品种', '服务项目支持的宠物品种', $breed_list, array_keys($breed_list)],
                 ['switch', 'is_coin', '金币支付', '', 1, '', 'disabled'],
             ])
+            ->setExtraJs($js)
             ->fetch();
     }
 
