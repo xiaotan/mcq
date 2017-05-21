@@ -279,4 +279,6 @@ return [
         'var_page'  => 'page',
         'list_rows' => 15,
     ],
+
+    'business_role_id' => 2,
 ];

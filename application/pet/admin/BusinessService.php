@@ -1,18 +1,12 @@
 <?php
-// +----------------------------------------------------------------------
-// | 海豚PHP框架 [ DolphinPHP ]
-// +----------------------------------------------------------------------
-// | 版权所有 2016~2017 河源市卓锐科技有限公司 [ http://www.zrthink.com ]
-// +----------------------------------------------------------------------
-// | 官方网站: http://dolphinphp.com
-// +----------------------------------------------------------------------
-// | 开源协议 ( http://www.apache.org/licenses/LICENSE-2.0 )
-// +----------------------------------------------------------------------
 
 namespace app\pet\admin;
 
 use app\admin\controller\Admin;
 use app\common\builder\ZBuilder;
+use app\pet\model\Business as BusinessModel;
+use app\pet\model\BusinessDoctor as BusinessDoctorModel;
+use app\pet\model\BusinessCoupon as BusinessCouponModel;
 use app\pet\model\BusinessService as BusinessServiceModel;
 use app\pet\model\BusinessServiceConfig as BusinessServiceConfigModel;
 use think\Validate;
@@ -35,6 +29,10 @@ class BusinessService extends Admin
         $map = $this->getMap();
         // 排序
         $order = $this->getOrder('update_time desc');
+        //如果为商家登录，则筛选加上商家id
+        if(defined('BID')) {
+            $map['bid'] = BID;
+        }
         // 数据列表
         $data_list = BusinessServiceModel::where($map)->order($order)->paginate();
 
@@ -45,24 +43,31 @@ class BusinessService extends Admin
             'href'  => url('business_service_config/index')
         ];
 
+        //如果为管理员查看，则增加所属商家
+        $column = [['id', 'ID']];
+        if(!defined('BID')) {
+            $business = BusinessModel::where(array('status'=>1))->column('id,name');
+            $column[] = ['bid', '所属商家', $business];
+        }
+
+        //基础表单
+        $column_base = [ // 批量添加数据列
+            ['name', '服务项目', 'text'],
+            ['price', '服务价格', 'text'],
+            ['create_time', '发布时间', 'datetime'],
+            ['status', '状态', 'switch'],
+            ['right_button', '操作', 'btn']
+        ];
+
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
             ->setSearch(['name' => '服务名称']) // 设置搜索框
-            ->addColumns([ // 批量添加数据列
-                ['id', 'ID'],
-                ['name', '商家名称', 'text'],
-                // ['type', '服务项目', 'select', $type_list],
-                ['tel', '商家电话', 'text'],
-                ['create_time', '入驻时间', 'datetime'],
-                ['status', '状态', 'switch'],
-                ['right_button', '操作', 'btn']
-            ])
+            ->addColumns(array_merge($column, $column_base))
             ->addTopButtons('add,enable,disable,delete') // 批量添加顶部按钮
             ->addTopButton('custom', $btnType) // 添加顶部按钮
             ->addRightButtons(['edit', 'delete' => ['data-tips' => '删除后无法恢复。']]) // 批量添加右侧按钮
-            ->addOrder('id,name,create_time')
+            ->addOrder('id,create_time')
             ->setRowList($data_list) // 设置表格数据
-            ->addValidate('Business', 'name')
             ->fetch(); // 渲染模板
     }
 
@@ -72,46 +77,42 @@ class BusinessService extends Admin
      */
     public function add()
     {
-        // 保存数据
-        if ($this->request->isPost()) {
-            // 表单数据
-            $data = $this->request->post();
-            print_r($data);exit;
-            // 验证
-            $result = $this->validate($data, 'Business');
-            // $result = $this->validate('Business.add')->save($data);
-            // 验证失败 输出错误信息
-            if(true !== $result) return $this->error($result);
-            //分别存储经纬度
-            if($data['map']){
-                $map = explode(",", $data['map']);
-                $data['lng'] = $map[0];
-                $data['lat'] = $map[1];
-                //详细地址
-                $data['address'] = $data['map_address'];
-            }
-
-            //保存数据
-            $business = BusinessModel::create($data);
-            if($business){
-                $data['bid'] = $business['id'];
-                $user = UserModel::create($data);
-                if ($user) {
-                    // 记录行为
-                    action_log('business_add', 'business', $business['id'], UID, $data['name']);
-                    action_log('user_add', 'admin_user', $user['id'], UID, $data['nickname']);
-                    $this->success('新增成功', 'index');
-                } else {
-                    BusinessModel::destroy($business['id']);
-                    UserModel::destroy($user['id']);
-                    $this->error('新增失败');
-                }
-            }
+        //判断是否商家添加
+        if(!defined('BID')) {
+            $this->error("您不是商家账号，无法添加服务！");
         }
 
         $type_list = BusinessServiceConfigModel::where(array('status'=>1, 'config_id'=> 1))->column('id,name');
         $pet_list = BusinessServiceConfigModel::where(array('status'=>1, 'config_id'=> 2))->column('id,name');
         $breed_list = BusinessServiceConfigModel::where(array('status'=>1, 'config_id'=> 3))->column('id,name');
+
+        // 保存数据
+        if ($this->request->isPost()) {
+            // 表单数据
+            $data = $this->request->post();
+            // 商家id
+            $data['bid'] = BID;
+            // 验证
+            $result = $this->validate($data, 'BusinessService');
+            // 验证失败 输出错误信息
+            if(true !== $result) return $this->error($result);
+            //处理数据
+            $data['pet'] = implode(',',$data['pet']);
+            $data['breed'] = implode(',',$data['breed']);
+            $data['time'] = implode(',',$data['time']);
+            $data['coupon'] = isset($data['coupon']) ? implode(',',$data['coupon']) : '';
+            $data['doctor'] = isset($data['doctor']) ? implode(',',$data['doctor']) : '';
+            $data['name'] = $type_list[$data['type']];
+            //保存数据
+            $business_service = BusinessServiceModel::create($data);
+            if($business_service){
+                // 记录行为
+                action_log('business_service_add', 'pet_business_service', $business_service['id'], UID, $data['name']);
+                $this->success('新增成功', 'index');
+            } else {
+                $this->error('新增失败');
+            }
+        }
 
         $js_str = '';
         foreach($pet_list as $k=>$v){
@@ -143,6 +144,8 @@ class BusinessService extends Admin
                 });
             </script>
 EOF;
+        $doctor = BusinessDoctorModel::where(array('status'=>1,'bid'=>BID))->column('id,name');
+        $coupon = BusinessCouponModel::where(array('status'=>1,'bid'=>BID,'begin_time'=>['<',time()],'end_time'=>['>',time()]))->column('id,title');
 
         // 显示添加页面
         return ZBuilder::make('form')
@@ -152,7 +155,10 @@ EOF;
                 ['number', 'price', '服务价格'],
                 ['checkbox', 'pet', '宠物', '服务项目支持的宠物分类', $pet_list, array_keys($pet_list)],
                 ['checkbox', 'breed', '品种', '服务项目支持的宠物品种', $breed_list, array_keys($breed_list)],
-                ['switch', 'is_coin', '金币支付', '', 1, '', 'disabled'],
+                ['checkbox', 'doctor', '医生', '选择负责该项服务的医生', $doctor],
+                ['checkbox', 'coupon', '商家优惠', '选择该项服务支持的优惠（只显示启用的未过期的优惠）', $coupon],
+                ['checkbox', 'time', '服务时间段', '选择服务时间段', config('forenoon')+config('afternoon')+config('night')],
+                // ['switch', 'is_coin', '金币支付', '', 1, '', 'disabled'],
             ])
             ->setExtraJs($js)
             ->fetch();
@@ -167,54 +173,153 @@ EOF;
     {
         if ($id === null) $this->error('缺少参数');
 
+        //判断是否商家添加
+        if(!defined('BID')) {
+            $this->error("您不是商家账号，无法添加服务！");
+        }else{
+            $data = BusinessServiceModel::where(array('id'=>$id, 'bid'=>BID))->value('id');
+            if(!$data){
+                $this->error('非法操作');
+            }
+        }
+
+        $type_list = BusinessServiceConfigModel::where(array('status'=>1, 'config_id'=> 1))->column('id,name');
+        $pet_list = BusinessServiceConfigModel::where(array('status'=>1, 'config_id'=> 2))->column('id,name');
+        $breed_list = BusinessServiceConfigModel::where(array('status'=>1, 'config_id'=> 3))->column('id,name');
+
         // 保存数据
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
-
+            // 商家id
+            $data['bid'] = BID;
             // 验证
-            $result = $this->validate($data, 'Business.edit');
+            $result = $this->validate($data, 'BusinessService');
             // 验证失败 输出错误信息
             if(true !== $result) return $this->error($result);
-
-            //分别存储经纬度
-            $map = explode(",", $data['map']);
-            $data['lng'] = $map[0];
-            $data['lat'] = $map[1];
-            //详细地址
-            $data['address'] = $data['map_address'];
+            //处理数据
+            $data['pet'] = implode(',',$data['pet']);
+            $data['breed'] = implode(',',$data['breed']);
+            $data['time'] = implode(',',$data['time']);
+            $data['coupon'] = isset($data['coupon']) ? implode(',',$data['coupon']) : '';
+            $data['doctor'] = isset($data['doctor']) ? implode(',',$data['doctor']) : '';
+            $data['name'] = $type_list[$data['type']];
             //保存数据
-            if (BusinessModel::update($data)) {
+            if (BusinessServiceModel::update($data)) {
                 // 记录行为
-                action_log('business_edit', 'business', $id, UID, $data['name']);
+                action_log('business_service_edit', 'pet_business_service', $id, UID, $data['name']);
                 $this->success('编辑成功', 'index');
             } else {
                 $this->error('编辑失败');
             }
         }
 
-        $info = BusinessModel::get($id);
-        $info['map'] = $info['lng'].",".$info['lat'];
-        // 显示编辑页面
+        $js_str = '';
+        foreach($pet_list as $k=>$v){
+            $item = BusinessServiceConfigModel::where(array('status'=>1, 'config_id'=> 3, 'pid'=>$k))->column('id,name');
+            $item_str = '';
+            if($item){
+                foreach($item as $kk=>$vv){
+                    $item_str .= "#breed".$kk.",";
+                }
+                $js_str .= '$("#pet'.$k.'").change(function(){
+                    if($("#pet'.$k.'").is(":checked")){
+                        $("'.trim($item_str,',').'").prop("checked","checked");
+                    }else{
+                        $("'.trim($item_str,',').'").prop("checked",false);
+                    }
+                })
+                $("'.trim($item_str,',').'").change(function(){
+                    if($("'.trim($item_str,',').'").is(":checked")){
+                        $("#pet'.$k.'").prop("checked","checked");
+                    }
+                })
+                ';
+            }
+        }
+        $js = <<<EOF
+            <script type="text/javascript">
+                $(function(){
+                    $js_str
+                });
+            </script>
+EOF;
+        $doctor = BusinessDoctorModel::where(array('status'=>1,'bid'=>BID))->column('id,name');
+        $coupon = BusinessCouponModel::where(array('status'=>1,'bid'=>BID,'begin_time'=>['<',time()],'end_time'=>['>',time()]))->column('id,title');
+
+        $info = BusinessServiceModel::get($id);
+        //处理数据
+        $info['pet'] = explode(',',$info['pet']);
+        $info['breed'] = explode(',',$info['breed']);
+        $info['time'] = explode(',',$info['time']);
+        $info['coupon'] = isset($info['coupon']) ? explode(',',$info['coupon']) : '';
+        $info['doctor'] = isset($info['doctor']) ? explode(',',$info['doctor']) : '';
+
+        // 显示添加页面
         return ZBuilder::make('form')
             ->setPageTips('如果出现无法添加的情况，可能由于浏览器将本页面当成了广告，请尝试关闭浏览器的广告过滤功能再试。', 'warning')
             ->addFormItems([
                 ['hidden', 'id'],
-                ['text', 'name', '商家名称', '必填，请填写商家全称'],
-                ['text', 'tel', '商家电话', '可以填手机号或座机号，座机记得加上区号，例：0771-1234567'],
-                ['image', 'thumb', '缩略图'],
-                ['images', 'banner', '商家banner（多图）','最多上传5张图,每张图最大4m','','4096'],
-                ['bmap', 'map', '商家位置', config('baidu_map_ak')],
+                ['select', 'type', '服务项目', '', $type_list],
+                ['number', 'price', '服务价格'],
+                ['checkbox', 'pet', '宠物', '服务项目支持的宠物分类', $pet_list, array_keys($pet_list)],
+                ['checkbox', 'breed', '品种', '服务项目支持的宠物品种', $breed_list, array_keys($breed_list)],
+                ['checkbox', 'doctor', '医生', '选择负责该项服务的医生', $doctor],
+                ['checkbox', 'coupon', '商家优惠', '选择该项服务支持的优惠（只显示启用的未过期的优惠）', $coupon],
+                ['checkbox', 'time', '服务时间段', '选择服务时间段', config('forenoon')+config('afternoon')+config('night')],
+                // ['switch', 'is_coin', '金币支付', '', 1, '', 'disabled'],
             ])
-            ->layout(['name' => 6, 'tel' => 6])
+            ->setExtraJs($js)
             ->setFormData($info)
             ->fetch();
     }
 
     /**
+     * 删除
+     * @param array $record 行为日志
+     * @return mixed
+     */
+    public function delete($record = [])
+    {
+        return $this->setStatus('delete');
+    }
+
+    /**
+     * 启用
+     * @param array $record 行为日志
+     * @return mixed
+     */
+    public function enable($record = [])
+    {
+        return $this->setStatus('enable');
+    }
+
+    /**
+     * 禁用
+     * @param array $record 行为日志
+     * @return mixed
+     */
+    public function disable($record = [])
+    {
+        return $this->setStatus('disable');
+    }
+
+    /**
+     * 设置状态：删除、禁用、启用
+     * @param string $type 类型：delete/enable/disable
+     * @param array $record
+     * @return mixed
+     */
+    public function setStatus($type = '', $record = [])
+    {
+        $ids         = $this->request->isPost() ? input('post.ids/a') : input('param.ids');
+        $service_name = BusinessServiceModel::where('id', 'in', $ids)->column('name');
+        return parent::setStatus($type, ['business_service_'.$type, 'pet_business_service', 0, UID, implode('、', $service_name)]);
+    }
+
+    /**
      * 快速编辑
      * @param array $record 行为日志
-     * @author 蔡伟明 <314013107@qq.com>
      * @return mixed
      */
     public function quickEdit($record = [])
@@ -222,8 +327,8 @@ EOF;
         $id      = input('post.pk', '');
         $field   = input('post.name', '');
         $value   = input('post.value', '');
-        $business  = BusinessModel::where('id', $id)->value($field);
-        $details = '字段(' . $field . ')，原值(' . $business . ')，新值：(' . $value . ')';
-        return parent::quickEdit(['business_edit', 'business', $id, UID, $details]);
+        $business_service  = BusinessServiceModel::where('id', $id)->value($field);
+        $details = '字段(' . $field . ')，原值(' . $business_service . ')，新值：(' . $value . ')';
+        return parent::quickEdit(['business_service_edit', 'pet_business_service', $id, UID, $details]);
     }
 }

@@ -16,6 +16,7 @@ use app\common\builder\ZBuilder;
 use app\admin\model\Menu as MenuModel;
 use app\admin\model\Module as ModuleModel;
 use app\user\model\Role as RoleModel;
+use app\user\model\User as UserModel;
 use think\Cache;
 use think\Db;
 use think\helper\Hash;
@@ -34,6 +35,13 @@ class Admin extends Common
     {
         // 判断是否登录，并定义用户ID常量
         defined('UID') or define('UID', $this->isLogin());
+
+        // 判断是否商家登录，并定义用户BID常量
+        $user = UserModel::get(UID);
+        $user = $user->toArray();
+        if($user['role'] == config('business_role_id') && $user['bid']){
+            defined('BID') or define('BID', $user['bid']);
+        }
 
         // 检查权限
         if (!RoleModel::checkAuth()) return $this->error('权限不足！');
@@ -57,7 +65,7 @@ class Admin extends Common
             // 获取面包屑导航
             $this->assign('_location', MenuModel::getLocation('', true));
             // 构建侧栏
-            $settings = [
+            /*$settings = [
                 [
                     'title'   => '站点开关',
                     'tips'    => '站点关闭后将不能访问',
@@ -68,7 +76,7 @@ class Admin extends Common
                 ]
             ];
             ZBuilder::make('aside')
-                ->addBlock('switch', '系统设置', $settings);
+                ->addBlock('switch', '系统设置', $settings);*/
         }
     }
 

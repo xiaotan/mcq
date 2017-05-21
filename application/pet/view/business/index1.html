@@ -111,9 +111,9 @@
                                 </div>
                                 <div class="col-80 breed-right">
                                     <ul>
-                                        <template v-for="(item, index) in ages">
-                                            <li @click="chooseAge(index)" :class="current_age == index ? 'on' : ''">{{item}}</li>
-                                        </template>
+                                        <li class="on">小于3个月</li>
+                                        <li>3至6个月</li>
+                                        <li>大于6个月</li>
                                     </ul>
                                 </div>
                             </div>
@@ -123,9 +123,13 @@
                             <div class="order-box-title">预约时间</div>
                             <div class="date-list">
                                 <ul>
-                                    <template v-for="(item, index) in dates">
-                                        <li @click="chooseDate(index)" :class="item.info.date == current_date ? 'on' : ''">{{item.info.name}}</li>
-                                    </template>
+                                    <li class="on">今天</li>
+                                    <li>明天</li>
+                                    <li>4/10</li>
+                                    <li>4/10</li>
+                                    <li>4/10</li>
+                                    <li>4/10</li>
+                                    <li>4/10</li>
                                 </ul>
                             </div>
                             <div class="row time-item">
@@ -134,9 +138,10 @@
                                 </div>
                                 <div class="col-80 time-right">
                                     <ul>
-                                        <template v-for="item in times.forenoon">
-                                            <li @click="chooseTime(item.id, $event)" :class="item.status==0 ? 'off' : ''">{{item.name}}</li>
-                                        </template>
+                                        <li class="on">10:00-11:00</li>
+                                        <li>10:00-11:00</li>
+                                        <li>10:00-11:00</li>
+                                        <li>10:00-11:00</li>
                                     </ul>
                                 </div>
                             </div>
@@ -146,9 +151,12 @@
                                 </div>
                                 <div class="col-80 time-right">
                                     <ul>
-                                        <template v-for="item in times.afternoon">
-                                            <li @click="chooseTime(item.id, $event)" :class="item.status==0 ? 'off' : ''">{{item.name}}</li>
-                                        </template>
+                                        <li class="on">10:00-11:00</li>
+                                        <li class="off">10:00-11:00</li>
+                                        <li>10:00-11:00</li>
+                                        <li>10:00-11:00</li>
+                                        <li>10:00-11:00</li>
+                                        <li>10:00-11:00</li>
                                     </ul>
                                 </div>
                             </div>
@@ -158,9 +166,10 @@
                                 </div>
                                 <div class="col-80 time-right">
                                     <ul>
-                                        <template v-for="item in times.night">
-                                            <li @click="chooseTime(item.id, $event)" :class="item.status==0 ? 'off' : ''">{{item.name}}</li>
-                                        </template>
+                                        <li class="on">10:00-11:00</li>
+                                        <li>10:00-11:00</li>
+                                        <li>10:00-11:00</li>
+                                        <li>10:00-11:00</li>
                                     </ul>
                                 </div>
                             </div>
@@ -170,26 +179,39 @@
                             <div class="order-box-title">预约医生</div>
                             <div class="list-block media-list">
                                 <ul>
-                                    <template v-for="item in doctor">
-                                        <li @click="chooseDoctor(item.id)">
-                                            <label class="label-checkbox item-content">
-                                                <input type="radio" name="my-radio">
-                                                <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
-                                                <img class="avatar" :src="item.avatar" alt="">
-                                                <div class="doctor-box">
-                                                    <div class="doctor-box-top">
-                                                        <div class="doctor-box-title"><span class="name">{{item.name}}</span><span class="position">{{item.position}}</span><!-- <span class="auth">已认证</span> --></div>
-                                                        <div class="doctor-num">{{item.score}}</div>
-                                                    </div>
-                                                    <div class="doctor-subtitle">{{item.intro}}</div>
-                                                    <div class="doctor-text">主修：{{item.major}}</div>
+                                    <li>
+                                        <label class="label-checkbox item-content">
+                                            <input type="radio" name="my-radio">
+                                            <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
+                                            <img class="avatar" src="__MODULE_IMG__/img7.jpg" alt="">
+                                            <div class="doctor-box">
+                                                <div class="doctor-box-top">
+                                                    <div class="doctor-box-title"><span class="name">陈医生</span><span class="position">主治医生</span><span class="auth">已认证</span></div>
+                                                    <div class="doctor-num">4.5分</div>
                                                 </div>
-                                            </label>
-                                        </li>
-                                    </template>
+                                                <div class="doctor-subtitle">预约医生预约医生预约医生预约医生预预约医生预约医生预约医生预约医生预</div>
+                                                <div class="doctor-text">主要研究方向：预约医生</div>
+                                            </div>
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label class="label-checkbox item-content">
+                                            <input type="radio" name="my-radio">
+                                            <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
+                                            <img class="avatar" src="__MODULE_IMG__/img7.jpg" alt="">
+                                            <div class="doctor-box">
+                                                <div class="doctor-box-top">
+                                                    <div class="doctor-box-title"><span class="name">陈医生</span><span class="position">主治医生</span><span class="auth">已认证</span></div>
+                                                    <div class="doctor-num">4.5分</div>
+                                                </div>
+                                                <div class="doctor-subtitle">预约医生预约医生预约医生预约医生预预约医生预约医生预约医生预约医生预</div>
+                                                <div class="doctor-text">主要研究方向：预约医生</div>
+                                            </div>
+                                        </label>
+                                    </li>
                                 </ul>
                             </div>
-                            <!-- <p class="more">查看更多 >></p> -->
+                            <p class="more">查看更多 >></p>
                         </div>
                         <div class="addr order-box">
                             <div class="order-box-title">您的地址<span>新增地址 +</span></div>
@@ -200,6 +222,13 @@
                                             <input type="radio" name="my-radio">
                                             <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
                                             <div class="address">预约医生预约医生预约医生预约医生</div>
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label class="label-checkbox item-content">
+                                            <input type="radio" name="my-radio">
+                                            <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
+                                            <div class="address">预约医生预约医生预约医生预约医生预预约医生预约医生预约医生预约医生预</div>
                                         </label>
                                     </li>
                                 </ul>
@@ -371,6 +400,121 @@
                         <a class="submit">确定</a>
                     </div>
                 </div>
+
+                <!-- <div class="modal-box">
+                    <div id="basic-modal-content" class="pet-box">
+                        <div class="list-block pets">
+                            <ul>
+                                <template v-for="item in breeds">
+                                    <li>
+                                        <label class="label-checkbox item-content">
+                                            <input type="radio" name="breed">
+                                            <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
+                                            <img :src="item.icon" alt="">
+                                            <p class="pets-name">{{item.name}}</p>
+                                        </label>
+                                    </li>
+                                </template>
+                            </ul>
+                        </div>
+                        <a class="submit">确定</a>
+                        <div class="pet-img"><p><img :src="pet_icon" alt=""></p></div>
+                    </div>
+                </div> -->
+
+                <!-- <div class="modal-box">
+                    <div id="basic-modal-content" class="add-addr">
+                        <div class="list-block address-box">
+                            <p class="addr-title">新增地址</p>
+                            <ul>
+                                <li>
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <div class="item-title label">姓名</div>
+                                            <div class="item-input">
+                                                <input type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <div class="item-title label">性别</div>
+                                            <div class="item-input">
+                                                <select>
+                                                    <option>男</option>
+                                                    <option>女</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                
+                                <li>
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <div class="item-title label">电话</div>
+                                            <div class="item-input">
+                                                <input type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                
+                                <li>
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <div class="item-title label">地址</div>
+                                            <div class="item-input">
+                                                <input type="text" value="南宁市" readonly="readonly">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <div class="item-title label"></div>
+                                            <div class="item-input">
+                                                <select>
+                                                    <option>青秀区</option>
+                                                    <option>江南区</option>
+                                                    <option>兴宁区</option>
+                                                    <option>邕宁区</option>
+                                                    <option>五象新区</option>
+                                                    <option>西乡塘区</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <div class="item-title label"></div>
+                                            <div class="item-input">
+                                                <input type="text" placeholder="道路">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <div class="item-title label"></div>
+                                            <div class="item-input">
+                                                <input type="text" placeholder="楼号/门牌号">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <input type="text" id='city-picker' value="浙江 杭州 拱墅区" />
+                        </div>
+                        <a class="submit">确定</a>
+                    </div>
+                </div> -->
             </div>
 
             <nav class="bar bar-tab">
@@ -406,25 +550,18 @@
             el: '#service', 
             data: {
                 current: {$current},
-                current_date: {$current_date},
-                current_time: '',
-                current_age: '',
                 pet_current: 0,
                 pet_icon: '',
                 breeds: {},
-                times: {$times},
-                dates: {$dates},
-                ages: {$ages},
-                doctor: {$doctor},
                 service: {$service},
             },
             methods: {
-                changeProject: function(id){
-                    this.current = id;
+                changeProject: function($id){
+                    this.current = $id;
                     this.pet_current = 0;
                 },
-                changePet: function(id){
-                    this.pet_current = id;
+                changePet: function($id){
+                    this.pet_current = $id;
                     this.pet_icon = this.service[this.current].pets[this.pet_current].pet_icon;
                     this.breeds = this.service[this.current].pets[this.pet_current].breed;
                 },
@@ -435,28 +572,58 @@
                     }
                     var inst = $('[data-remodal-id=modal]').remodal();
                     inst.open();
-                },
-                chooseDoctor: function(id){
-
-                },
-                chooseTime: function(id, event){
-                    console.log(event.target)
-                    if($(event.target).hasClass("off")){
-                        alert("该时间段不可选");
-                        return false;
-                    }
-                    this.current_time = id;
-                    $(".time-item ul li").removeClass("on");
-                    $(event.target).addClass("on");
-                },
-                chooseDate: function(id){
-                    this.current_date = id;
-                    this.times = this.service[this.current].times[id];
-                },
-                chooseAge: function(id){
-                    this.current_age = id;
+                    /*$('.pet-box').modal({onOpen: function (dialog) {
+                        dialog.overlay.fadeIn('fast', function () {
+                            dialog.container.slideDown('fast', function () {
+                                dialog.data.fadeIn('fast');
+                            });
+                        });
+                    }});*/
                 },
             }
+        })
+
+        $(function(){
+            // $.alert('请先选择宠物');
+            /*$('.tel').click(function (e) {
+                $('.cat-box').modal({onOpen: function (dialog) {
+                    dialog.overlay.fadeIn('fast', function () {
+                        dialog.container.slideDown('fast', function () {
+                            dialog.data.fadeIn('fast');
+                        });
+                    });
+                }});
+                return false;
+            });
+
+            $('.addr').click(function (e) {
+                $('.dog-box').modal({onOpen: function (dialog) {
+                    dialog.overlay.fadeIn('fast', function () {
+                        dialog.container.slideDown('fast', function () {
+                            dialog.data.fadeIn('fast');
+                        });
+                    });
+                }});
+                return false;
+            });*/
+
+            /*$('.stars').click(function (e) {
+                $('.add-addr').modal({onOpen: function (dialog) {
+                    dialog.overlay.fadeIn('fast', function () {
+                        dialog.container.slideDown('fast', function () {
+                            dialog.data.fadeIn('fast');
+                        });
+                    });
+                }});
+                return false;
+            });*/
+
+            /*$("#city-picker").cityPicker({
+                toolbarTemplate: '<header class="bar bar-nav">\
+                <button class="button button-link pull-right close-picker">OK</button>\
+                <h1 class="title">choose address</h1>\
+                </header>'
+            });*/
         })
 
         $(function(){

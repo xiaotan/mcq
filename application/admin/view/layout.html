@@ -194,17 +194,18 @@
                         </ul>
                     </div>
                     <a class="h5 text-white" href="{:url('admin/index/index')}">
-                        {notempty name="Think.config.web_site_logo"}
+                        <p style="padding-left:15px;">{$Think.config.web_site_title}</p>
+                        <!-- {notempty name="Think.config.web_site_logo"}
                         <img src="{$Think.config.web_site_logo|get_file_path}" class="logo" alt="{$Think.config.web_site_title|default='Dolphin PHP'}">
                         {else/}
                         <img src="{$Think.config.public_static_path}admin/img/logo.png" class="logo" alt="Dolphin PHP">
                         {/notempty}
-
+                        
                         {notempty name="Think.config.web_site_logo_text"}
                         <img src="{$Think.config.web_site_logo_text|get_file_path}" class="logo-text sidebar-mini-hide" alt="{$Think.config.web_site_title|default='Dolphin PHP'}">
                         {else/}
                         <img src="{$Think.config.public_static_path}admin/img/logo-text.png" class="logo-text sidebar-mini-hide" alt="Dolphin PHP">
-                        {/notempty}
+                        {/notempty} -->
                     </a>
                 </div>
                 <!-- END Side Header -->
@@ -282,12 +283,12 @@
                     <i class="fa fa-external-link-square"></i>
                 </a>
             </li>
-            <li>
-                <!-- Layout API, functionality initialized in App() -> uiLayoutApi() -->
+            <!-- <li>
+                Layout API, functionality initialized in App() -> uiLayoutApi()
                 <button class="btn btn-default" data-toggle="layout" data-action="side_overlay_toggle" title="侧边栏" type="button">
                     <i class="fa fa-tasks"></i>
                 </button>
-            </li>
+            </li> -->
         </ul>
         <!-- END Header Navigation Right -->
 
@@ -364,14 +365,14 @@
 
     <!-- Footer -->
     {empty name="Think.get._pop"}
-    <footer id="page-footer" class="content-mini content-mini-full font-s12 bg-gray-lighter clearfix">
+    <!-- <footer id="page-footer" class="content-mini content-mini-full font-s12 bg-gray-lighter clearfix">
         <div class="pull-right">
             Crafted with <i class="fa fa-heart text-city"></i> by <a class="font-w600" href="{:config('dolphin.company_website')}" target="_blank">{:config('dolphin.company_name')}</a>
         </div>
         <div class="pull-left">
             <a class="font-w600" href="{:config('dolphin.product_website')}" target="_blank">{:config('dolphin.product_name')} {:config('dolphin.product_version')}</a> &copy; <span class="js-year-copy"></span>
         </div>
-    </footer>
+    </footer> -->
     {/empty}
     <!-- END Footer -->
 </div>

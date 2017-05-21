@@ -1,13 +1,4 @@
 <?php
-// +----------------------------------------------------------------------
-// | 海豚PHP框架 [ DolphinPHP ]
-// +----------------------------------------------------------------------
-// | 版权所有 2016~2017 河源市卓锐科技有限公司 [ http://www.zrthink.com ]
-// +----------------------------------------------------------------------
-// | 官方网站: http://dolphinphp.com
-// +----------------------------------------------------------------------
-// | 开源协议 ( http://www.apache.org/licenses/LICENSE-2.0 )
-// +----------------------------------------------------------------------
 
 namespace app\pet\validate;
 
@@ -16,15 +7,16 @@ use think\Validate;
 /**
  * 行为验证器
  * @package app\pet\validate
- * @author 蔡伟明 <314013107@qq.com>
  */
 class Business extends Validate
 {
     //定义验证规则
     protected $rule = [
-        'name|商家名称'   => 'require|unique:business',
+        'name|商家名称'   => 'require|unique:pet_business',
         'tel|商家电话'   => 'require',
         'thumb|缩略图'   => 'require',
+        'map|商家位置信息'   => 'require',
+        'map_address|商家位置信息'   => 'require',
 
         'username|用户名' => 'require|alphaNum|unique:admin_user',
         'nickname|昵称'  => 'require|unique:admin_user',
@@ -35,11 +27,17 @@ class Business extends Validate
 
     //定义验证提示
     protected $message = [
-        // 'name.regex' => '行为标识由字母和下划线组成',
-        'username.require' => '请输入用户名',
+        'name.require' => '请输入商家名称',
+        'name.unique' => '该商家名称已存在',
         'tel.require' => '请输入商家电话',
         'thumb.require' => '请上传缩略图',
-        'email.require'    => '邮箱不能为空',
+        'map.require' => '请定位商家位置信息',
+
+        'username.require' => '请输入用户名',
+        'username.unique' => '该用户名已存在',
+        'username.alphaNum' => '用户名只能为字母和数字',
+        'nickname.require' => '请输入昵称',
+        'nickname.unique' => '该昵称已存在',
         'email.email'      => '邮箱格式不正确',
         'email.unique'     => '该邮箱已存在',
         'password.require' => '密码不能为空',
@@ -48,7 +46,8 @@ class Business extends Validate
     ];
 
     protected $scene = [
-        'edit'  =>  ['name', 'tel', 'thumb'],
-        'name'  =>  ['name'],
+        'add'   =>  ['name', 'username', 'nickname', 'email', 'password', 'mobile'],
+        'edit'  =>  ['name'],
+        'my'    =>  ['name', 'tel', 'thumb', 'map'],
     ];
 }

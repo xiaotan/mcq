@@ -44,7 +44,7 @@
                     <div class="list-block content-list">
                         <ul class="list-container">
                             <template v-for="item in items">
-                                <a style="display:block;" href="{:url('business/index')}" external>
+                                <a style="display:block;" :href="item.url" external>
                                     <li>
                                         <img :src="item.thumb" alt="">
                                         <div class="item-box">
@@ -59,7 +59,7 @@
                                                     <em class="star-text">{{item.score}}</em>
                                                 </span>
                                             </div>
-                                            <div class="coupon"><i class="icon icon-star"></i><span>入店购物满100减20</span></div>
+                                            <div class="coupon"><i class="icon icon-star"></i><span>{{item.coupon}}</span></div>
                                         </div>
                                         <div class="clearfix"></div>
                                     </li>

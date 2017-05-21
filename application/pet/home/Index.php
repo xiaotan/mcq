@@ -1,17 +1,9 @@
 <?php
-// +----------------------------------------------------------------------
-// | 海豚PHP框架 [ DolphinPHP ]
-// +----------------------------------------------------------------------
-// | 版权所有 2016~2017 河源市卓锐科技有限公司 [ http://www.zrthink.com ]
-// +----------------------------------------------------------------------
-// | 官方网站: http://dolphinphp.com
-// +----------------------------------------------------------------------
-// | 开源协议 ( http://www.apache.org/licenses/LICENSE-2.0 )
-// +----------------------------------------------------------------------
 
 namespace app\pet\home;
 
 use app\pet\model\Business as BusinessModel;
+use app\pet\model\BusinessCoupon as BusinessCouponModel;
 use app\cms\model\Slider as SliderModel;
 use think\Validate;
 use think\Db;
@@ -88,7 +80,10 @@ class Index extends Common
 		        foreach($business as $k=>$v){
 		        	$business[$k]['thumb'] = get_file_path($v['thumb']);
 		        	$business[$k]['distance'] = round($v['distance']/1000 ,2);
+                    $business[$k]['url'] = url("business/index",array('id'=>$v['id']));
+                    $business[$k]['coupon'] = BusinessCouponModel::where(array("status"=>1,'bid'=>$v['id'],'begin_time'=>['<',time()],'end_time'=>['>',time()]))->order("create_time asc")->value('title');
 		        }
+                // print_r($business);exit;
 		        session('business'.$page, $business);
 	        }
         }

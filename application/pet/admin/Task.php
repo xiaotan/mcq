@@ -1,13 +1,4 @@
 <?php
-// +----------------------------------------------------------------------
-// | 海豚PHP框架 [ DolphinPHP ]
-// +----------------------------------------------------------------------
-// | 版权所有 2016~2017 河源市卓锐科技有限公司 [ http://www.zrthink.com ]
-// +----------------------------------------------------------------------
-// | 官方网站: http://dolphinphp.com
-// +----------------------------------------------------------------------
-// | 开源协议 ( http://www.apache.org/licenses/LICENSE-2.0 )
-// +----------------------------------------------------------------------
 
 namespace app\pet\admin;
 
@@ -26,7 +17,6 @@ class Task extends Admin
 {
     /**
      * 首页
-     * @author 蔡伟明 <314013107@qq.com>
      * @return mixed
      */
     public function index()
@@ -43,10 +33,10 @@ class Task extends Admin
             ->setSearch(['title' => '任务名称']) // 设置搜索框
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
-                ['title', '任务名称', 'text.edit'],
-                ['type', '任务类型', 'select', config('task_type')],
+                ['title', '任务名称', 'text'],
+                ['type', '任务类型', config('task_type')],
                 ['intro', '任务简介', 'text'],
-                ['amount', '任务积分', 'number'],
+                ['amount', '任务积分', 'text'],
                 ['status', '状态', 'switch'],
                 ['right_button', '操作', 'btn']
             ])
@@ -59,7 +49,6 @@ class Task extends Admin
 
     /**
      * 新增
-     * @author 蔡伟明 <314013107@qq.com>
      * @return mixed
      */
     public function add()
@@ -68,9 +57,13 @@ class Task extends Admin
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
-            $data['status'] = $data['status'] ? 1 : 0;
             // 验证
-            $result = $this->validate($data, 'Task');
+            if($data['type']==1){
+                $result = $this->validate($data, 'Task');
+            }else{
+                $result = $this->validate($data, 'Task.type');
+            }
+            
             // 验证失败 输出错误信息
             if(true !== $result) return $this->error($result);
 
@@ -79,7 +72,7 @@ class Task extends Admin
             
             if ($task) {
                 // 记录行为
-                action_log('task_add', 'task', $task['id'], UID, $data['title']);
+                action_log('task_add', 'pet_task', $task['id'], UID, $data['title']);
                 $this->success('新增成功', 'index');
             } else {
                 $this->error('新增失败');
@@ -96,7 +89,7 @@ class Task extends Admin
                 ['datetime', 'end_time', '任务结束时间', ''],
                 ['text', 'intro', '任务简介'],
                 ['number', 'amount', '奖励积分'],
-                ['switch', 'status', '状态', '', 1],
+                ['radio', 'status', '状态', '', ['禁用', '启用'], 1]
             ])
             ->setTrigger('type', 1, 'begin_time,end_time')
             ->fetch();
@@ -116,15 +109,18 @@ class Task extends Admin
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
-            $data['status'] = $data['status'] ? 1 : 0;
             // 验证
-            $result = $this->validate($data, 'Task');
+            if($data['type']==1){
+                $result = $this->validate($data, 'Task');
+            }else{
+                $result = $this->validate($data, 'Task.type');
+            }
             // 验证失败 输出错误信息
             if(true !== $result) return $this->error($result);
             
             if (TaskModel::update($data)) {
                 // 记录行为
-                action_log('task_edit', 'task', $id, UID, $data['title']);
+                action_log('task_edit', 'pet_task', $id, UID, $data['title']);
                 $this->success('编辑成功', 'index');
             } else {
                 $this->error('编辑失败');
@@ -144,10 +140,68 @@ class Task extends Admin
                 ['datetime', 'end_time', '任务结束时间', ''],
                 ['text', 'intro', '任务简介'],
                 ['number', 'amount', '奖励积分'],
-                ['switch', 'status', '状态', '', 1],
+                ['radio', 'status', '状态', '', ['禁用', '启用'], 1]
             ])
             ->setTrigger('type', 1, 'begin_time,end_time')
             ->setFormData($info)
             ->fetch();
+    }
+
+    /**
+     * 删除
+     * @param array $record 行为日志
+     * @return mixed
+     */
+    public function delete($record = [])
+    {
+        return $this->setStatus('delete');
+    }
+
+    /**
+     * 启用
+     * @param array $record 行为日志
+     * @return mixed
+     */
+    public function enable($record = [])
+    {
+        return $this->setStatus('enable');
+    }
+
+    /**
+     * 禁用
+     * @param array $record 行为日志
+     * @return mixed
+     */
+    public function disable($record = [])
+    {
+        return $this->setStatus('disable');
+    }
+
+    /**
+     * 设置状态：删除、禁用、启用
+     * @param string $type 类型：delete/enable/disable
+     * @param array $record
+     * @return mixed
+     */
+    public function setStatus($type = '', $record = [])
+    {
+        $ids = $this->request->isPost() ? input('post.ids/a') : input('param.ids');
+        $task_name = TaskModel::where('id', 'in', $ids)->column('title');
+        return parent::setStatus($type, ['task_'.$type, 'pet_task', 0, UID, implode('、', $task_name)]);
+    }
+
+    /**
+     * 快速编辑
+     * @param array $record 行为日志
+     * @return mixed
+     */
+    public function quickEdit($record = [])
+    {
+        $id      = input('post.pk', '');
+        $field   = input('post.name', '');
+        $value   = input('post.value', '');
+        $task  = TaskModel::where('id', $id)->value($field);
+        $details = '字段(' . $field . ')，原值(' . $task . ')，新值：(' . $value . ')';
+        return parent::quickEdit(['task_edit', 'pet_task', $id, UID, $details]);
     }
 }

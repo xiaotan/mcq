@@ -51,7 +51,7 @@ textarea:-ms-input-placeholder {
 }
 .base-top .addr-icon{
     font-size:.8rem;
-    top:.5rem;
+    /*top:.5rem;*/
     left:1rem;
     position: absolute;
 }
@@ -61,7 +61,7 @@ textarea:-ms-input-placeholder {
     margin-right:3rem;
     display:inline-block;
     float:left;
-    height:2.5rem;
+    /*height:2.5rem;*/
 }
 .base-top .addr i{
     margin-right:.5rem;
@@ -70,10 +70,12 @@ textarea:-ms-input-placeholder {
 .base-top .tel{
     position: absolute;
     font-size:1.2rem;
-    top:.3rem;
+    top:0;
     right:1rem;
 }
-
+.base-top .tel a{
+    color:#3d4145;
+}
 .order-box{
     margin-top:.5rem;
     background: #fff;
@@ -120,6 +122,11 @@ textarea:-ms-input-placeholder {
     display:inline-block;
     box-sizing: border-box;
 }
+.class-list ul .on img{
+    border:2px solid #f8b319;
+    border-radius: .5rem
+}
+
 .class-list ul li img{
     width:100%;
     display:block;
@@ -178,13 +185,21 @@ textarea:-ms-input-placeholder {
     padding-bottom:.2rem;
 }
 .time-left{
-    text-align:right;
+    text-align:center;
     font-size:.8rem;
     color:#873520;
     font-weight: bold;
 }
+.time-item .col-20{
+    width: 20%;
+    margin-left: 0;
+}
+.time-item .col-80{
+    width: 80%;
+    margin-left: 0;
+}
 .time-right ul li{
-    font-size:.8rem;
+    font-size:.6rem;
     display:inline-block;
     width:45%;
     text-align:center;
@@ -207,8 +222,8 @@ textarea:-ms-input-placeholder {
 .list-block{
     margin:0;
 }
-.doctor ul li{
-    margin:.8rem 0;
+.doctor ul li:last-child{
+    margin-top:.8rem;
 }
 .list-block ul{
     border:none;
@@ -221,13 +236,15 @@ label.label-checkbox input[type="checkbox"]:checked + .item-media i.icon-form-ch
     padding-bottom:0;
 }
 .avatar{
-    width:25%;
+    width:3rem;
+    height:3rem;
     float:left;
-    margin:0 .3rem;
+    margin:0 .5rem;
 }
 .doctor-box{
     width:100%;
     color:#898989;
+    padding-right:.5rem;
 }
 .doctor-box-top{
     position: relative;
@@ -372,7 +389,7 @@ label.label-checkbox input[type="checkbox"]:checked + .item-media i.icon-form-ch
 
 
 
-#basic-modal-content {
+ #basic-modal-content {
     display:none;
 }
 #basic-modal-content .cancel-img{
@@ -380,12 +397,12 @@ label.label-checkbox input[type="checkbox"]:checked + .item-media i.icon-form-ch
     margin:.5rem 10%;
     border:none;
 }
-/* #basic-modal-content p{
+ /* #basic-modal-content p{
     font-size:1rem;
     margin-bottom:.5rem;
     text-align:left;
     color:#898989;
-} */
+ }  */
 #simplemodal-overlay {background-color:#000;}
 #simplemodal-container {height:60%; width:80%; color:#f7b218; background-color:#fff; padding:.5rem;border-radius: .3rem;}
 #simplemodal-container a {color:#ddd;}
@@ -418,19 +435,19 @@ label.label-checkbox input[type="checkbox"]:checked + .item-media i.icon-form-ch
 }
 #basic-modal-content .modal-cancel-button{
     color:#f8b319;
-}
+} 
 
 .no-data img{
     width:40%;
     margin:5rem 30%;
 }
-.modal-box{
+ .modal-box{
     position: relative;
 }
 #simplemodal-container{
     padding-bottom:2.5rem;
-}
-#basic-modal-content .submit{
+} 
+.remodal .submit{
     text-align:center;
     background: #f8b218;
     border-radius: .3rem;
@@ -444,19 +461,23 @@ label.label-checkbox input[type="checkbox"]:checked + .item-media i.icon-form-ch
     z-index: 99999;
     font-size:.8rem;
 }
-#basic-modal-content .pet-img{
+.remodal .pet-img{
     width:50%;
     position: absolute;
     left:25%;
     top:0;
     z-index: 99999;
 }
-#basic-modal-content .pet-img p{
+.remodal .pet-img p{
     width:6rem;
     margin:-3.5rem auto 0 auto;
 }
-#basic-modal-content .pet-img p img{
+.remodal .pet-img p img{
     width:6rem;
+}
+.pets{
+    height:100%;
+    overflow: auto;
 }
 .pets li{
     margin:.8rem 0;
@@ -472,8 +493,15 @@ label.label-checkbox input[type="checkbox"]:checked + .item-media i.icon-form-ch
     text-align:left;
     width:100%;
 }
+.pets .list-block .item-content{
+    padding-left:0;
+} 
 .picker-modal{
     position: fixed;
+}
+.add-addr{
+    overflow: auto;
+    height:100%;
 }
 .address-box{
     padding-bottom:.3rem;
@@ -513,3 +541,4 @@ label.label-checkbox input[type="checkbox"]:checked + .item-media i.icon-form-ch
 .address-box .item-title.label{
     width:25%;
 }
+
