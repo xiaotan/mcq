@@ -2,9 +2,10 @@
 
 namespace app\pet\home;
 
+use app\pet\model\Member as MemberModel;
+use app\cms\model\Slider as SliderModel;
 use app\pet\model\Business as BusinessModel;
 use app\pet\model\BusinessCoupon as BusinessCouponModel;
-use app\cms\model\Slider as SliderModel;
 use think\Validate;
 use think\Db;
 
@@ -88,5 +89,16 @@ class Index extends Common
 	        }
         }
 	    return $business;
+    }
+
+    public function login(){
+        $MemberModel = new MemberModel;
+        $uid = $MemberModel->login('xiaotan', '159456');
+        echo $uid.'---';
+        print_r(session('member_auth'));
+    }
+
+    public function im(){
+        return $this->fetch(); // 渲染模板
     }
 }
