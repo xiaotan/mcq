@@ -73,7 +73,7 @@
                             <div class="project-list">
                                 <ul>
                                     <template v-for="item in service">
-                                        <li :class="item.id == current ? 'on' : ''" @click="changeProject(item.id)">
+                                        <li :class="item.id == current_type ? 'on' : ''" @click="changeProject(item.id)">
                                             <img :src="item.icon" alt="">
                                         </li>
                                     </template>
@@ -88,8 +88,8 @@
                                 </div>
                                 <div class="col-80 class-list">
                                     <ul>
-                                        <template v-for="item in service[current].pets">
-                                            <li :class="item.id == pet_current ? 'on' : ''" @click="changePet(item.id)">
+                                        <template v-for="item in service[current_type].pets">
+                                            <li :class="item.id == current_pet ? 'on' : ''" @click="changePet(item.id)">
                                                 <img :src="item.icon" alt="">
                                             </li>
                                         </template>
@@ -101,8 +101,8 @@
                                     <span>品种</span>
                                 </div>
                                 <div class="col-80 breed-right">
-                                    <input type="text">
-                                    <button @click="choosebreed">选择</button>
+                                    <input type="text" :value="getBreedName">
+                                    <button @click="showBreed">选择</button>
                                 </div>
                             </div>
                             <div class="row pet-item">
@@ -135,7 +135,7 @@
                                 <div class="col-80 time-right">
                                     <ul>
                                         <template v-for="item in times.forenoon">
-                                            <li @click="chooseTime(item.id, $event)" :class="item.status==0 ? 'off' : ''">{{item.name}}</li>
+                                            <li @click="chooseTime(item.id, item.name, $event)" :class="item.status==0 ? 'off' : ''">{{item.name}}</li>
                                         </template>
                                     </ul>
                                 </div>
@@ -147,7 +147,7 @@
                                 <div class="col-80 time-right">
                                     <ul>
                                         <template v-for="item in times.afternoon">
-                                            <li @click="chooseTime(item.id, $event)" :class="item.status==0 ? 'off' : ''">{{item.name}}</li>
+                                            <li @click="chooseTime(item.id, item.name, $event)" :class="item.status==0 ? 'off' : ''">{{item.name}}</li>
                                         </template>
                                     </ul>
                                 </div>
@@ -159,7 +159,7 @@
                                 <div class="col-80 time-right">
                                     <ul>
                                         <template v-for="item in times.night">
-                                            <li @click="chooseTime(item.id, $event)" :class="item.status==0 ? 'off' : ''">{{item.name}}</li>
+                                            <li @click="chooseTime(item.id, item.name, $event)" :class="item.status==0 ? 'off' : ''">{{item.name}}</li>
                                         </template>
                                     </ul>
                                 </div>
@@ -173,7 +173,7 @@
                                     <template v-for="item in doctor">
                                         <li @click="chooseDoctor(item.id)">
                                             <label class="label-checkbox item-content">
-                                                <input type="radio" name="my-radio">
+                                                <input type="radio" name="doctor">
                                                 <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
                                                 <img class="avatar" :src="item.avatar" alt="">
                                                 <div class="doctor-box">
@@ -192,31 +192,34 @@
                             <!-- <p class="more">查看更多 >></p> -->
                         </div>
                         <div class="addr order-box">
-                            <div class="order-box-title">您的地址<span>新增地址 +</span></div>
+                            <div class="order-box-title">您的地址<span @click="addAddress">新增地址 +</span></div>
                             <div class="list-block media-list addr-list">
                                 <ul>
-                                    <li>
-                                        <label class="label-checkbox item-content">
-                                            <input type="radio" name="my-radio">
-                                            <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
-                                            <div class="address">预约医生预约医生预约医生预约医生</div>
-                                        </label>
-                                    </li>
+                                    <template v-for="item in address">
+                                        <li @click="chooseAddress(item.id)">
+                                            <label class="label-checkbox item-content">
+                                                <input type="radio" name="address">
+                                                <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
+                                                <div class="address">{{item.address}} {{item.street}} {{item.name}} {{item.mobile}}</div>
+                                            </label>
+                                        </li>
+                                    </template>
                                 </ul>
+                                <p v-if="address.length == 0 ? true : false">暂无地址</p>
                             </div>
                             <div class="order-box-title pay-title">支付方式</div>
                             <div class="list-block media-list pay-list">
                                 <ul>
-                                    <li>
+                                    <li @click="choosePayment(1)">
                                         <label class="label-checkbox item-content">
-                                            <input type="radio" name="my-radio">
+                                            <input type="radio" name="payment">
                                             <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
                                             <div class="address"><i class="icon icon-home"></i>微信支付</div>
                                         </label>
                                     </li>
-                                    <li>
+                                    <li @click="choosePayment(2)">
                                         <label class="label-checkbox item-content">
-                                            <input type="radio" name="my-radio">
+                                            <input type="radio" name="payment">
                                             <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
                                             <div class="address"><i class="icon icon-home"></i>支付宝支付</div>
                                         </label>
@@ -229,29 +232,47 @@
                                 <ul>
                                     <li class="item-content item-link">
                                         <div class="item-inner">
-                                            <div class="item-title">商品名称</div>
-                                            <div class="item-after">有可用优惠券</div>
+                                            <div class="item-title">优惠券</div>
+                                            <div class="item-after" v-if="isEmptyObject(coupon)">无可用优惠券</div>
+                                            <div class="item-after" @click="showCoupon" v-else>
+                                                <template v-if="current_coupon">
+                                                    {{getCouponName}}
+                                                </template>
+                                                <template v-else>
+                                                    有可用优惠券
+                                                </template>
+                                            </div>
                                         </div>
                                     </li>
                                     <li class="item-content item-link">
                                         <div class="item-inner">
-                                            <div class="item-title">型号</div>
-                                            <div class="item-after">10个虚拟币</div>
+                                            <div class="item-title">虚拟币</div>
+                                            <div class="item-after" @click="chooseScore">{{member.score}}个虚拟币</div>
                                         </div>
                                     </li>
                                 </ul>
                             </div>
                             <p class="remark"><span>备注：</span><input type="text" placeholder="可写下您的需求" /></p>
-                            <div class="selected">
-                                <ul>
-                                    <li>洗澡</li>
-                                    <li>洗澡</li>
-                                    <li>洗澡</li>
-                                    <li>洗澡</li>
-                                </ul>
-                            </div>
+                            <form id="service-form">
+                                <div class="selected">
+                                    <ul>
+                                        <li v-if="current_type ? true : false">{{ getTypeName }}<input type="hidden" name="type" :value="current_type"></li>
+                                        <li v-if="current_pet ? true : false">{{ getPetName }}<input type="hidden" name="pet" :value="current_pet"></li>
+                                        <li v-if="current_breed ? true : false">{{ getBreedName }}<input type="hidden" name="breed" :value="current_breed"></li>
+                                        <li v-if="current_doctor ? true : false">{{ getDoctorName }}<input type="hidden" name="doctor" :value="current_doctor"></li>
+                                        <li v-if="current_age ? true : false">{{ getAgeName }}<input type="hidden" name="age" :value="current_age"></li>
+                                        <li v-if="current_time ? true : false">{{ current_time_name }}<input type="hidden" name="time" :value="current_time"></li>
+                                    </ul>
+                                </div>
+                                <input type="hidden" name="date" :value="current_date">
+                                <input type="hidden" name="address_id" :value="current_address">
+                                <input type="hidden" name="coupon_id" :value="current_coupon">
+                                <input type="hidden" name="score" :value="current_score">
+                                <input type="hidden" name="remark" :value="remark">
+                                <input type="hidden" name="payment" :value="payment">
+                            </form>
                             <div class="affirm">
-                                <span class="price">￥<i>49.9</i></span><span class="coupon">已优惠10元</span><button>立即预约</button>
+                                <span class="price">￥<i>{{getPrice}}</i></span><span class="coupon">已优惠{{getCouponPrice}}元</span><button>立即预约</button>
                             </div>
                         </div>
                     </div>
@@ -262,9 +283,9 @@
                     <div class="list-block pets">
                         <ul>
                             <template v-for="item in breeds">
-                                <li>
+                                <li @click="chooseBreed(item.id)">
                                     <label class="label-checkbox item-content">
-                                        <input type="radio" name="breed">
+                                        <input type="radio" name="breed" :value="item.id">
                                         <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
                                         <img :src="item.icon" alt="">
                                         <p class="pets-name">{{item.name}}</p>
@@ -273,14 +294,33 @@
                             </template>
                         </ul>
                     </div>
-                    <a class="submit">确定</a>
+                    <a class="submit" @click="hideBreed">确定</a>
                     <div class="pet-img"><p><img :src="pet_icon" alt=""></p></div>
+                </div>
+                
+                <div style="height:60%;" class="remodal" data-remodal-id="modal2" role="dialog" aria-labelledby="modal1Title" aria-describedby="modal1Desc">
+                    <button data-remodal-action="close" class="remodal-close" aria-label="Close"></button>
+                    <div class="list-block pets">
+                        <ul>
+                            <template v-for="item in coupon">
+                                <li @click="chooseCoupon(item.id)" style="margin:0;">
+                                    <label class="label-checkbox item-content">
+                                        <input type="radio" name="coupon">
+                                        <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
+                                        <p class="pets-name" style="padding-left:.5rem;">{{item.title}}</p>
+                                    </label>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+                    <a class="submit" @click="hideCoupon">确定</a>
                 </div>
 
                 <div class="remodal" data-remodal-id="modal1" role="dialog" aria-labelledby="modal1Title" aria-describedby="modal1Desc">
                     <button data-remodal-action="close" class="remodal-close" aria-label="Close"></button>
                     <div class="add-addr">
                         <div class="list-block address-box">
+                            <input type="hidden" name="province" value="广西">
                             <p class="addr-title">新增地址</p>
                             <ul>
                                 <li>
@@ -288,7 +328,7 @@
                                         <div class="item-inner">
                                             <div class="item-title label">姓名</div>
                                             <div class="item-input">
-                                                <input type="text">
+                                                <input type="text" name="name">
                                             </div>
                                         </div>
                                     </div>
@@ -298,9 +338,9 @@
                                         <div class="item-inner">
                                             <div class="item-title label">性别</div>
                                             <div class="item-input">
-                                                <select>
-                                                    <option>男</option>
-                                                    <option>女</option>
+                                                <select name="sex" class="sex">
+                                                    <option value="1">男</option>
+                                                    <option value="2">女</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -312,7 +352,7 @@
                                         <div class="item-inner">
                                             <div class="item-title label">电话</div>
                                             <div class="item-input">
-                                                <input type="text">
+                                                <input type="text" name="mobile">
                                             </div>
                                         </div>
                                     </div>
@@ -323,7 +363,7 @@
                                         <div class="item-inner">
                                             <div class="item-title label">地址</div>
                                             <div class="item-input">
-                                                <input type="text" value="南宁市" readonly="readonly">
+                                                <input type="text" name="city" value="南宁市" readonly="readonly">
                                             </div>
                                         </div>
                                     </div>
@@ -333,13 +373,13 @@
                                         <div class="item-inner">
                                             <div class="item-title label"></div>
                                             <div class="item-input">
-                                                <select>
-                                                    <option>青秀区</option>
-                                                    <option>江南区</option>
-                                                    <option>兴宁区</option>
-                                                    <option>邕宁区</option>
-                                                    <option>五象新区</option>
-                                                    <option>西乡塘区</option>
+                                                <select name="district" class="district">
+                                                    <option value="青秀区">青秀区</option>
+                                                    <option value="江南区">江南区</option>
+                                                    <option value="兴宁区">兴宁区</option>
+                                                    <option value="邕宁区">邕宁区</option>
+                                                    <option value="五象新区">五象新区</option>
+                                                    <option value="西乡塘区">西乡塘区</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -350,17 +390,7 @@
                                         <div class="item-inner">
                                             <div class="item-title label"></div>
                                             <div class="item-input">
-                                                <input type="text" placeholder="道路">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="item-content">
-                                        <div class="item-inner">
-                                            <div class="item-title label"></div>
-                                            <div class="item-input">
-                                                <input type="text" placeholder="楼号/门牌号">
+                                                <input type="text" name="street" placeholder="详细地址">
                                             </div>
                                         </div>
                                     </div>
@@ -368,7 +398,7 @@
                             </ul>
                             <!-- <input type="text" id='city-picker' value="浙江 杭州 拱墅区" /> -->
                         </div>
-                        <a class="submit">确定</a>
+                        <a class="submit" @click="submitAddress">确定</a>
                     </div>
                 </div>
             </div>
@@ -405,30 +435,96 @@
         var service = new Vue({
             el: '#service', 
             data: {
-                current: {$current},
-                current_date: {$current_date},
-                current_time: '',
-                current_age: '',
-                pet_current: 0,
+                current_type: {$current_type}, //当前服务类型id
+                current_date: {$current_date}, //当前日期
+                current_time: '', //当前时间段
+                current_time_name: '', //当前时间段名称
+                current_age: '', //当前宠物年龄id
+                current_pet: '', //当前宠物类型id
+                current_breed: '', //当前宠物品种id
+                current_doctor: '', //当前医生id
+                current_address: '', //当前地址id
+                current_coupon: '',
+                current_score: '',
+                remark: '',
+                payment: '',
                 pet_icon: '',
                 breeds: {},
                 times: {$times},
                 dates: {$dates},
                 ages: {$ages},
                 doctor: {$doctor},
+                coupon: {$coupon},
+                member: {$member},
+                address: {$address},
                 service: {$service},
+            },
+            computed: {
+                getTypeName: function () {
+                    return this.service[this.current_type].name;
+                },
+                getPetName: function () {
+                    if(this.current_pet){
+                        return this.service[this.current_type].pets[this.current_pet].name;
+                    }
+                },
+                getBreedName: function () {
+                    if(this.current_breed){
+                        return this.service[this.current_type].pets[this.current_pet].breed[this.current_breed].name;
+                    }
+                },
+                getDoctorName: function () {
+                    if(this.current_doctor){
+                        return this.service[this.current_type].doctors[this.current_doctor].name;
+                    }
+                },
+                getAgeName: function () {
+                    if(this.current_age){
+                        return this.ages[this.current_age];
+                    }
+                },
+                getTimeName: function () {
+                    if(this.current_time){
+                        return this.ages[this.current_time];
+                    }
+                },
+                getCouponName: function () {
+                    if(this.current_coupon){
+                        return this.coupon[this.current_coupon].title;
+                    }
+                },
+                getPrice: function(){
+                    var price = this.service[this.current_type].price;
+                    if(this.current_coupon){
+                        price = Number(price) - Number(this.coupon[this.current_coupon].amount)
+                    }
+                    if(this.current_score){
+                        price = Number(price) - Number(this.current_score)
+                    }
+                    return price;
+                },
+                getCouponPrice: function(){
+                    var price = 0;
+                    if(this.current_coupon){
+                        price = Number(price) + Number(this.coupon[this.current_coupon].amount)
+                    }
+                    if(this.current_score){
+                        price = Number(price) + Number(this.current_score)
+                    }
+                    return price;
+                },
             },
             methods: {
                 changeProject: function(id){
-                    this.current = id;
-                    this.pet_current = 0;
+                    this.current_type = id;
+                    this.current_pet = 0;
                 },
                 changePet: function(id){
-                    this.pet_current = id;
-                    this.pet_icon = this.service[this.current].pets[this.pet_current].pet_icon;
-                    this.breeds = this.service[this.current].pets[this.pet_current].breed;
+                    this.current_pet = id;
+                    this.pet_icon = this.service[this.current_type].pets[this.current_pet].pet_icon;
+                    this.breeds = this.service[this.current_type].pets[this.current_pet].breed;
                 },
-                choosebreed: function(){
+                showBreed: function(){
                     if(JSON.stringify(this.breeds) == "{}"){
                         alert("请先选择宠物");
                         return false;
@@ -436,25 +532,96 @@
                     var inst = $('[data-remodal-id=modal]').remodal();
                     inst.open();
                 },
-                chooseDoctor: function(id){
-
+                chooseBreed: function(id){
+                    this.current_breed = id;
                 },
-                chooseTime: function(id, event){
-                    console.log(event.target)
+                hideBreed: function(){
+                    var inst = $('[data-remodal-id=modal]').remodal();
+                    inst.close();
+                },
+                chooseDoctor: function(id){
+                    this.current_doctor = id;
+                },
+                chooseTime: function(id, name, event){
                     if($(event.target).hasClass("off")){
                         alert("该时间段不可选");
                         return false;
                     }
                     this.current_time = id;
+                    this.current_time_name = name;
                     $(".time-item ul li").removeClass("on");
                     $(event.target).addClass("on");
                 },
                 chooseDate: function(id){
                     this.current_date = id;
-                    this.times = this.service[this.current].times[id];
+                    this.times = this.service[this.current_type].times[id];
                 },
                 chooseAge: function(id){
                     this.current_age = id;
+                },
+                chooseAddress: function(id){
+                    this.current_address = id;
+                },
+                addAddress: function(){
+                    var inst = $('[data-remodal-id=modal1]').remodal();
+                    inst.open();
+                },
+                choosePayment: function(id){
+                    this.payment = id;
+                },
+                isEmptyObject: function(e){
+                    var t;  
+                    for (t in e)  
+                        return !1;  
+                    return !0 
+                },
+                showCoupon: function(){
+                    var inst = $('[data-remodal-id=modal2]').remodal();
+                    inst.open();
+                },
+                chooseCoupon: function(id){
+                    this.current_coupon = id;
+                },
+                hideCoupon: function(){
+                    var inst = $('[data-remodal-id=modal2]').remodal();
+                    inst.close();
+                },
+                chooseScore: function(){
+                    if(this.member.score){
+                        
+                    }else{
+                        alert("您没有可用的积分");
+                    }
+                },
+                submitAddress: function(){
+                    var name = $(".address-box input[name='name']").val();
+                    var sex = $(".address-box .sex").val();
+                    var mobile = $(".address-box input[name='mobile']").val();
+                    var province = $(".address-box input[name='province']").val();
+                    var city = $(".address-box input[name='city']").val();
+                    var district = $(".address-box .district").val();
+                    var street = $(".address-box input[name='street']").val();
+
+                    if(!name || !sex || !mobile || !province || !city || !district){
+                        alert("必填参数不能为空");
+                        return false;
+                    }
+                    var address = province+' '+city+' '+district;
+
+                    // 显示loading
+                    $.showIndicator();
+                    // ajax获取信息
+                    $.post("{:url('business/ajaxAddAddress')}", { name: name, sex: sex, mobile: mobile, address: address, street: street },function(data){
+                        // 隐藏loading
+                        $.hideIndicator();
+                        if(data.code==1){
+                            service.address = data.info;
+                            var inst = $('[data-remodal-id=modal1]').remodal();
+                            inst.close();
+                        }else{
+                            alert(data.code)
+                        }
+                    },'json');
                 },
             }
         })

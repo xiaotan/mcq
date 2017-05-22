@@ -124,17 +124,26 @@
 {/block}
 
 {block name="script"}
-    <script>
+    <script> 
+    //初始化
+    $.init()
+
+    $(document).on('click','.payment', function () {
+        $.prompt('What is your name?', function (value) {
+              $.alert('Your name is "' + value + '". You clicked Ok button');
+        });
+    });
         $(function(){
+
             // $('.tab-link').click(function (e) {
-                $('#basic-modal-content').modal({onOpen: function (dialog) {
+                /*$('#basic-modal-content').modal({onOpen: function (dialog) {
                     dialog.overlay.fadeIn('fast', function () {
                         dialog.container.slideDown('fast', function () {
                             dialog.data.fadeIn('fast');
                         });
                     });
                 }});
-                return false;
+                return false;*/
             // });
         })
     </script>

@@ -310,6 +310,10 @@ label.label-checkbox input[type="checkbox"]:checked + .item-media i.icon-form-ch
     border-bottom: 1px solid #efefef;
     margin-bottom:1rem;
 }
+.addr .addr-list p{
+    text-align:center;
+    margin:.3rem auto;
+}
 .addr .pay-list ul li{
     margin:0;
 }
@@ -542,3 +546,6 @@ label.label-checkbox input[type="checkbox"]:checked + .item-media i.icon-form-ch
     width:25%;
 }
 
+.pets .item-content{
+    padding-left:0;
+}

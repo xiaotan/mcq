@@ -98,6 +98,21 @@ class Index extends Common
         print_r(session('member_auth'));
     }
 
+    /**
+     * 退出登录
+     * @author 蔡伟明 <314013107@qq.com>
+     */
+    public function logout()
+    {
+        // session(null);
+        session('member_auth', null);
+        session('member_auth_sign', null);
+        cookie('member_id', null);
+        cookie('member_signin_token', null);
+
+        return $this->redirect('index/index');
+    }
+
     public function im(){
         return $this->fetch(); // 渲染模板
     }
