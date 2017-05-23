@@ -62,7 +62,7 @@ class Business extends Common
         foreach($business_service as $k=>$v){
             // 默认显示第一个服务的信息
             if($k==0){
-                $current = $v['id'];
+                $current_type = $v['id'];
             }
             // 赋值服务基本信息
             $service[$v['id']]['id'] = $v['id'];
@@ -84,9 +84,9 @@ class Business extends Common
                     $breeds = BusinessServiceConfigModel::where(array("pid"=>$v1['id'], "id"=>['in',$v['breed']], "status"=>1))->select();
                     if($breeds){
                         foreach($breeds as $k2=>$v2){
-                            $service[$v['id']]['pets'][$v1['id']]['breed'][$v2['id']]['id'] = $v2['id'];
-                            $service[$v['id']]['pets'][$v1['id']]['breed'][$v2['id']]['name'] = $v2['name'];
-                            $service[$v['id']]['pets'][$v1['id']]['breed'][$v2['id']]['icon'] = get_file_path($v2['icon']);
+                            $service[$v['id']]['pets'][$v1['id']]['breeds'][$v2['id']]['id'] = $v2['id'];
+                            $service[$v['id']]['pets'][$v1['id']]['breeds'][$v2['id']]['name'] = $v2['name'];
+                            $service[$v['id']]['pets'][$v1['id']]['breeds'][$v2['id']]['icon'] = get_file_path($v2['icon']);
                         }
                     }
                 }
@@ -158,7 +158,7 @@ class Business extends Common
                         $status = 0;
                     }
                     // 如果已有用户预约该时间段，则排除
-                    if(BusinessTimeModel::where(array("bid"=>$v['bid'], "tid"=>$k1, "time"=>$date))->value("id")){
+                    if(BusinessTimeModel::where(array("bid"=>$v['bid'], "tid"=>$k1, "date"=>$date))->value("id")){
                         $status = 0;
                     }
                     // 设置时间段状态
@@ -177,7 +177,7 @@ class Business extends Common
                         $status = 0;
                     }
                     // 如果已有用户预约该时间段，则排除
-                    if(BusinessTimeModel::where(array("bid"=>$v['bid'], "tid"=>$k1, "time"=>$date))->value("id")){
+                    if(BusinessTimeModel::where(array("bid"=>$v['bid'], "tid"=>$k1, "date"=>$date))->value("id")){
                         $status = 0;
                     }
                     // 设置时间段状态
@@ -196,7 +196,7 @@ class Business extends Common
                         $status = 0;
                     }
                     // 如果已有用户预约该时间段，则排除
-                    if(BusinessTimeModel::where(array("bid"=>$v['bid'], "tid"=>$k1, "time"=>$date))->value("id")){
+                    if(BusinessTimeModel::where(array("bid"=>$v['bid'], "tid"=>$k1, "date"=>$date))->value("id")){
                         $status = 0;
                     }
                     // 设置时间段状态
@@ -205,19 +205,198 @@ class Business extends Common
             }
         }
         // print_r($member);exit;
+        $this->assign('id', $id);
         $this->assign('slider', $slider);
         $this->assign('address', json_encode($address));
-        $this->assign('current_type', $current);
+        $this->assign('current_type', $current_type);
         $this->assign('member', json_encode($member));
         $this->assign('business', $business); // 商家基本信息
-        $this->assign('ages', json_encode(config("pet_age"))); // 宠物年龄段
-        $this->assign('current_date', date("Ymd", time())); //默认显示的日期
         $this->assign('service', json_encode($service));
-        $this->assign('doctor', isset($service[$current]['doctors']) ? json_encode($service[$current]['doctors']) : '{}');
-        $this->assign('coupon', isset($service[$current]['coupons']) ? json_encode($service[$current]['coupons']) : '{}');
-        $this->assign('times', json_encode($service[$current]['times'][date("Ymd", time())]));
-        $this->assign('dates', json_encode($service[$current]['times']));
         return $this->fetch(); // 渲染模板
+    }
+
+    /**
+     * ajax商家服务下单
+     * @return mixed
+     */
+    public function ajaxDoOrder(){
+        $order = array();
+        $now = time();
+        // 判断用户是否登录
+        $MemberModel = new MemberModel;
+        if(!$order['mid'] = $MemberModel->isLogin()){
+            $return['code'] = 0;
+            $return['info'] = "请先授权登录";
+            echo json_encode($return);exit;
+        }
+        // 获取用户信息
+        $member = $MemberModel->where(array("id"=>$order['mid']))->find();
+        $order['uname'] = $member->nickname;
+        // 接收参数
+        $data = $this->request->post();
+        // 商家id不存在
+        $order['bid'] = isset($data['business_id']) ? intval($data['business_id']) : '';
+        if(!$order['bid']){
+            $return['code'] = 0;
+            $return['info'] = "该商家不存在";
+            echo json_encode($return);exit;
+        }
+        // 获取商店信息
+        $business = BusinessModel::where(array("id"=>$order['bid'], "status"=>1))->find();
+        // 查询不到商店，则为已关停
+        if(!$business){
+            $return['code'] = 0;
+            $return['info'] = "商店已关停";
+            echo json_encode($return);exit;
+        }
+        $order['bname'] = $business->name;
+        // 服务不存在
+        $service_id = isset($data['service_id']) ? intval($data['service_id']) : '';
+        if(!$service_id){
+            $return['code'] = 0;
+            $return['info'] = "请选择服务类型";
+            echo json_encode($return);exit;
+        }
+        // 获取服务信息
+        $business_service = BusinessServiceModel::where(array("id"=>$service_id, "status"=>1))->find();
+        // 查询不到商店，则为已关停
+        if(!$business_service){
+            $return['code'] = 0;
+            $return['info'] = "商店服务已下架";
+            echo json_encode($return);exit;
+        }
+        $order['type'] = BusinessServiceConfigModel::where(array("id"=>$business_service->type))->value("name");
+        // 宠物不存在
+        $pet_id = isset($data['pet_id']) ? intval($data['pet_id']) : '';
+        if(!$pet_id || !in_array($pet_id, explode(',', $business_service->pet))){
+            $return['code'] = 0;
+            $return['info'] = "请选择宠物";
+            echo json_encode($return);exit;
+        }
+        $order['pet'] = BusinessServiceConfigModel::where(array("id"=>$pet_id))->value("name");
+        // 宠物品种不存在
+        $breed_id = isset($data['breed_id']) ? intval($data['breed_id']) : '';
+        if(!$breed_id || !in_array($breed_id, explode(',', $business_service->breed))){
+            $return['code'] = 0;
+            $return['info'] = "请选择宠物品种";
+            echo json_encode($return);exit;
+        }
+        $order['breed'] = BusinessServiceConfigModel::where(array("id"=>$breed_id))->value("name");
+        // 医生id
+        $doctor_id = isset($data['doctor_id']) ? intval($data['doctor_id']) : '';
+        if($doctor_id && in_array($doctor_id, explode(',', $business_service->doctor))){
+            $order['did'] = $doctor_id;
+            $order['dname'] = BusinessDoctorModel::where(array("id"=>$order['did']))->value("name");
+        }
+        // 宠物年龄
+        $age = config("pet_age");
+        $age_id = isset($data['age_id']) ? intval($data['age_id']) : '';
+        if(!$age_id || !isset($age[$age_id])){
+            $return['code'] = 0;
+            $return['info'] = "请选择宠物年龄";
+            echo json_encode($return);exit;
+        }
+        $order['age'] = $age[$age_id];
+        // 日期
+        if(empty($data['date'])){
+            $return['code'] = 0;
+            $return['info'] = "请选择日期";
+            echo json_encode($return);exit;
+        }
+        $order['date'] = $data['date'];
+        // 时间段
+        $times = get_times();
+        $time_id = isset($data['time_id']) ? intval($data['time_id']) : '';
+        if(!$time_id || !in_array($time_id, explode(',', $business_service->time))){
+            $return['code'] = 0;
+            $return['info'] = "请选择时间段";
+            echo json_encode($return);exit;
+        }
+        // 如果已有用户预约该时间段，则排除
+        if(BusinessTimeModel::where(array("bid"=>$order['bid'], "tid"=>$time_id, "date"=>$order['date']))->value("id")){
+            $return['code'] = 0;
+            $return['info'] = "选择时间段不可用";
+            echo json_encode($return);exit;
+        }
+        $order['time'] = $times[$time_id];
+        // 地址
+        $address_id = isset($data['address_id']) ? intval($data['address_id']) : '';
+        if(!$address_id){
+            $return['code'] = 0;
+            $return['info'] = "请选择地址";
+            echo json_encode($return);exit;
+        }
+        $address = MemberAddressModel::where(array("id"=>$address_id, "mid"=>$order['mid']))->find();
+        if($address){
+            $order['address_id'] = $address_id;
+            $order['address_data'] = json_encode($address->toArray());
+        }else{
+            $return['code'] = 0;
+            $return['info'] = "非法地址";
+            echo json_encode($return);exit;
+        }
+        // 支付类型
+        $pay_type = isset($data['payment']) ? intval($data['payment']) : '';
+        if(!$pay_type){
+            $return['code'] = 0;
+            $return['info'] = "请选择支付类型";
+            echo json_encode($return);exit;
+        }
+        $order['pay_type'] = $pay_type;
+        // 优惠id
+        $coupon_id = isset($data['coupon_id']) ? intval($data['coupon_id']) : '';
+        if($coupon_id && in_array($coupon_id, explode(',', $business_service->coupon))){
+            $coupon = BusinessCouponModel::where(array("id"=>$coupon_id, "bid"=>$business->id, "status"=>1,'begin_time'=>['<',$now],'end_time'=>['>',$now]))->find();
+            if($coupon){
+                $order['coupon_id'] = $coupon_id;
+                $order['coupon_amount'] = $coupon->amount;
+            }else{
+                $return['code'] = 0;
+                $return['info'] = "优惠已过期";
+                echo json_encode($return);exit;
+            }
+        }
+        // 积分
+        $score = isset($data['score']) ? intval($data['score']) : '';
+        if($score){
+            if($member->score<$score){
+                $return['code'] = 0;
+                $return['info'] = "可用积分不足";
+                echo json_encode($return);exit;
+            }else{
+                $order['score'] = $score;
+            }
+        }
+        // 备注
+        $order['remark'] = isset($data['remark']) ? $data['remark'] : '';
+        // 订单号
+        $order['order_no'] = get_order_no();
+        // 支付总额
+        $order['amount'] = $business_service->price;
+        $reduce = 0;
+        if(isset($order['coupon_amount'])){
+            $reduce = $reduce + $order['coupon_amount'];
+        }
+        if(isset($order['score'])){
+            $reduce = $reduce + $order['score'];
+        }
+        $order['price'] = $order['amount'] - $reduce;
+        // 订单入库
+        $result = OrderModel::create($order);
+        if($result){
+            // 添加时间段记录
+            $bTime['oid'] = $result['id'];
+            $bTime['bid'] = $business->id;
+            $bTime['tid'] = $time_id;
+            $bTime['date'] = $order['date'];
+            BusinessTimeModel::create($bTime);
+            // 消耗积分记录 todo
+            
+            //返回相关信息
+            $return['code'] = 1;
+            $return['info'] = $result;
+            echo json_encode($return);exit;
+        }
     }
 
     /**
