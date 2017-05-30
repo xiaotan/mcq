@@ -13,7 +13,7 @@ namespace app\pet\admin;
 
 use app\admin\controller\Admin;
 use app\common\builder\ZBuilder;
-use app\pet\model\Forum as ForumModel;
+use app\pet\model\MemberForum as MemberForumModel;
 // use app\user\model\User as UserModel;
 use think\Validate;
 use think\Config;
@@ -23,7 +23,7 @@ use think\Db;
  * 仪表盘控制器
  * @package app\pet\admin
  */
-class Forum extends Admin
+class MemberForum extends Admin
 {
     /**
      * 首页
@@ -37,93 +37,33 @@ class Forum extends Admin
         // 排序
         $order = $this->getOrder('update_time desc');
         // 数据列表
-        $data_list = ForumModel::where($map)->order($order)->paginate();
+        $data_list = MemberForumModel::where($map)->order($order)->paginate();
 
+        foreach($data_list as $k=>$v){
+            $data_list[$k]['name'] = get_member_name($v['mid']);
+            $data_list[$k]['content'] = str_cut($v['content'], 50);
+        }
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
-            ->setSearch(['name' => '商家名称']) // 设置搜索框
+            // ->setSearch(['name' => '商家名称']) // 设置搜索框
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
-                ['name', '商家名称', 'text.edit'],
-                ['tel', '商家电话', 'text'],
-                ['create_time', '入驻时间', 'datetime'],
+                ['name', '发布人', 'text'],
+                ['content', '发布内容', 'text'],
+                ['create_time', '发布时间', 'datetime'],
                 ['status', '状态', 'switch'],
+                ['is_stick', '置顶', 'switch'],
                 ['right_button', '操作', 'btn']
             ])
-            ->addTopButtons('add,enable,disable,delete') // 批量添加顶部按钮
+            ->addTopButtons('enable,disable,delete') // 批量添加顶部按钮
             ->addRightButtons(['edit', 'delete' => ['data-tips' => '删除后无法恢复。']]) // 批量添加右侧按钮
-            ->addOrder('id,name,create_time')
+            ->addOrder('id,create_time')
             ->setRowList($data_list) // 设置表格数据
-            ->addValidate('Business', 'name')
             ->fetch(); // 渲染模板
     }
 
     /**
-     * 新增
-     * @author 蔡伟明 <314013107@qq.com>
-     * @return mixed
-     */
-    public function add()
-    {
-        // 保存数据
-        if ($this->request->isPost()) {
-            // 表单数据
-            $data = $this->request->post();
-            // 验证
-            $result = $this->validate($data, 'Business');
-            // 验证失败 输出错误信息
-            if(true !== $result) return $this->error($result);
-            //分别存储经纬度
-            $map = explode(",", $data['map']);
-            $data['lng'] = $map[0];
-            $data['lat'] = $map[1];
-            //默认为商家用户分组
-            $data['role'] = 2;
-            //详细地址
-            $data['address'] = $data['map_address'];
-            //保存数据
-            $business = BusinessModel::create($data);
-            $user = UserModel::create($data);
-            
-            if ($business && $user) {
-                // 记录行为
-                action_log('advert_add', 'business', $business['id'], UID, $data['name']);
-                action_log('user_add', 'admin_user', $user['id'], UID);
-                $this->success('新增成功', 'index');
-            } else {
-                BusinessModel::destroy($business['id']);
-                UserModel::destroy($user['id']);
-                $this->error('新增失败');
-            }
-        }
-
-        // 显示添加页面
-        return ZBuilder::make('form')
-            ->setPageTips('如果出现无法添加的情况，可能由于浏览器将本页面当成了广告，请尝试关闭浏览器的广告过滤功能再试。', 'warning')
-            ->addGroup([
-                '商家基本信息' => [
-                    ['text', 'name', '商家名称', '必填，请填写商家全称'],
-                    ['text', 'tel', '商家电话', '可以填手机号或座机号，座机记得加上区号，例：0771-1234567'],
-                    ['image', 'thumb', '缩略图'],
-                    ['images', 'banner', '商家banner（多图）','最多上传5张图,每张图最大4m','','4096'],
-                    ['bmap', 'map', '商家位置', config('baidu_map_ak')],
-                ],
-                '商家账户信息' => [
-                    ['text', 'username', '用户名', '必填，可由英文字母、数字组成'],
-                    ['text', 'nickname', '昵称', '可以是中文'],
-                    ['password', 'password', '密码', '必填，6-20位'],
-                    ['text', 'email', '邮箱', ''],
-                    ['text', 'mobile', '手机号'],
-                    ['image', 'avatar', '头像'],
-                    ['radio', 'status', '状态', '', ['禁用', '启用'], 1]
-                ],
-            ])
-            ->layout(['name' => 6, 'tel' => 6])
-            ->fetch();
-    }
-
-    /**
-     * 编辑
+     * 查看
      * @param null $id id
      * @author 蔡伟明 <314013107@qq.com>
      * @return mixed
@@ -132,45 +72,83 @@ class Forum extends Admin
     {
         if ($id === null) $this->error('缺少参数');
 
-        // 保存数据
-        if ($this->request->isPost()) {
-            // 表单数据
-            $data = $this->request->post();
+        $info = MemberForumModel::get($id);
+        // 显示编辑页面
+        return ZBuilder::make('form')
+            ->setPageTips('如果出现无法添加的情况，可能由于浏览器将本页面当成了广告，请尝试关闭浏览器的广告过滤功能再试。', 'warning')
+            ->addFormItems([
+                ['hidden', 'id'],
+                ['static', 'content', '发布内容'],
+                ['images', 'images', '图片列表'],
+                ['static', 'location', '发布定位'],
+                ['select', 'status', '状态', '', ['0'=>'未启用','1'=>'已启用']],
+                ['select', 'is_refund', '置顶状态', '', ['0'=>'未置顶','1'=>'已置顶']],
+            ])
+            ->hideBtn('submit')
+            ->setFormData($info)
+            ->fetch();
+    }
 
-            // 验证
-            $result = $this->validate($data, 'Business');
-            // 验证失败 输出错误信息
-            if(true !== $result) return $this->error($result);
-            //分别存储经纬度
-            $map = explode(",", $data['map']);
-            $data['lng'] = $map[0];
-            $data['lat'] = $map[1];
-            //默认为商家用户分组
-            $data['role'] = 2;
-            //详细地址
-            $data['address'] = $data['map_address'];
-            //保存数据
-            $business = BusinessModel::create($data);
-            $user = UserModel::create($data);
-            
-            if ($business && $user) {
-                // 记录行为
-                action_log('advert_add', 'business', $business['id'], UID, $data['name']);
-                action_log('user_add', 'admin_user', $user['id'], UID);
-                $this->success('新增成功', 'index');
-            } else {
-                BusinessModel::destroy($business['id']);
-                UserModel::destroy($user['id']);
-                $this->error('新增失败');
-            }
+    /**
+     * 删除广告
+     * @param array $record 行为日志
+     * @author 蔡伟明 <314013107@qq.com>
+     * @return mixed
+     */
+    public function delete($record = [])
+    {
+        return $this->setStatus('delete');
+    }
 
-            if (AdvertModel::update($data)) {
-                // 记录行为
-                action_log('advert_edit', 'cms_advert', $id, UID, $data['name']);
-                $this->success('编辑成功', 'index');
-            } else {
-                $this->error('编辑失败');
-            }
-        }
+    /**
+     * 启用广告
+     * @param array $record 行为日志
+     * @author 蔡伟明 <314013107@qq.com>
+     * @return mixed
+     */
+    public function enable($record = [])
+    {
+        return $this->setStatus('enable');
+    }
+
+    /**
+     * 禁用广告
+     * @param array $record 行为日志
+     * @author 蔡伟明 <314013107@qq.com>
+     * @return mixed
+     */
+    public function disable($record = [])
+    {
+        return $this->setStatus('disable');
+    }
+
+    /**
+     * 设置广告状态：删除、禁用、启用
+     * @param string $type 类型：delete/enable/disable
+     * @param array $record
+     * @author 蔡伟明 <314013107@qq.com>
+     * @return mixed
+     */
+    public function setStatus($type = '', $record = [])
+    {
+        $ids         = $this->request->isPost() ? input('post.ids/a') : input('param.ids');
+        $MemberForum = MemberForumModel::where('id', 'in', $ids)->column('id');
+        return parent::setStatus($type, ['member_forum_'.$type, 'pet_member_forum', 0, UID, implode('、', $MemberForum)]);
+    }
+
+    /**
+     * 快速编辑
+     * @param array $record 行为日志
+     * @author 蔡伟明 <314013107@qq.com>
+     * @return mixed
+     */
+    public function quickEdit($record = [])
+    {
+        $id      = input('post.pk', '');
+        $field   = input('post.name', '');
+        $value   = input('post.value', '');
+        $forum  = MemberForumModel::where('id', $id)->value($field);
+        $details = '字段(' . $field . ')，原值(' . $forum . ')，新值：(' . $value . ')';
+        return parent::quickEdit(['member_forum__edit', 'pet_member_forum', $id, UID, $details]);
     }
 }

@@ -81,7 +81,7 @@
     margin:.8rem .5rem;
     border-bottom:1px solid #efefef;
     position: relative;
-    padding-bottom:.8rem;
+    padding-bottom:.5rem;
 }
 .content-list ul li:last-child{
     margin-bottom:0;
@@ -126,7 +126,7 @@
     color:#333;
 }
 .content-list .con{
-    font-size:1rem;
+    font-size:.8rem;
     margin:.5rem 0;
 }
 .images{
@@ -134,11 +134,21 @@
 }
 .images .img-item{
     width:30%;
+    /*height:5rem;*/
     display:inline-block;
-    margin-right:1%;
+    margin-right:3%;
+    /*margin-top:.3rem;*/
     background-size:100%;
     background-position: center center;
     background-repeat: no-repeat;
+}
+.images .img-item:after{
+    display: block;
+    padding: 50% 0;
+    content : '';
+}
+.item-bottom{
+    height:1.5rem;
 }
 .item-bottom .site{
     font-size:.6rem;
@@ -152,4 +162,24 @@
 .item-bottom .enjoy span, .item-bottom .comment span{
     vertical-align: middle;
     margin-left:.1rem;
+}
+
+.enjoy .is_favorite{
+    color:#EB6669;
+}
+
+.my-icon-like{
+    color:#3d4145;
+}
+.is_follow{
+    color:#EB6669;
+}
+.content-list .list-left p.fs7{
+    font-size:.7rem;
+}
+.list-block ul{
+    border:none;
+}
+.no-data{
+    text-align:center;
 }

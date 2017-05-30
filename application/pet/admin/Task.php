@@ -38,6 +38,7 @@ class Task extends Admin
                 ['intro', '任务简介', 'text'],
                 ['amount', '任务积分', 'text'],
                 ['status', '状态', 'switch'],
+                ['stick', '显示', 'switch'],
                 ['right_button', '操作', 'btn']
             ])
             ->addTopButtons('add,enable,disable,delete') // 批量添加顶部按钮
@@ -85,8 +86,9 @@ class Task extends Admin
             ->addFormItems([
                 ['text', 'title', '任务名称'],
                 ['select', 'type', '任务类型', '唯一任务需要填写任务开始时间和结束时间', config('task_type')],
-                ['datetime', 'begin_time', '任务开始时间', ''],
-                ['datetime', 'end_time', '任务结束时间', ''],
+                ['datetime', 'begin_time', '任务开始时间'],
+                ['datetime', 'end_time', '任务结束时间'],
+                ['text', 'icon', '任务图标'],
                 ['text', 'intro', '任务简介'],
                 ['number', 'amount', '奖励积分'],
                 ['radio', 'status', '状态', '', ['禁用', '启用'], 1]
@@ -109,6 +111,7 @@ class Task extends Admin
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
+            // print_r($data);exit;
             // 验证
             if($data['type']==1){
                 $result = $this->validate($data, 'Task');
@@ -136,8 +139,9 @@ class Task extends Admin
                 ['hidden', 'id'],
                 ['text', 'title', '任务名称'],
                 ['select', 'type', '任务类型', '唯一任务需要填写任务开始时间和结束时间', config('task_type')],
-                ['datetime', 'begin_time', '任务开始时间', ''],
-                ['datetime', 'end_time', '任务结束时间', ''],
+                ['datetime', 'begin_time', '任务开始时间'],
+                ['datetime', 'end_time', '任务结束时间'],
+                ['text', 'icon', '任务图标'],
                 ['text', 'intro', '任务简介'],
                 ['number', 'amount', '奖励积分'],
                 ['radio', 'status', '状态', '', ['禁用', '启用'], 1]

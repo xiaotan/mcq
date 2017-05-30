@@ -27,6 +27,7 @@ class Index extends Common
         // 获取最近用户的商家列表
         $business = $this->getBusinessList();
 
+        $this->assign('tab', 2);
         $this->assign('slider', $slider);
         $this->assign('business', json_encode($business));
         return $this->fetch(); // 渲染模板
@@ -40,7 +41,7 @@ class Index extends Common
 	        $lng = "108.354863";
 	        $lat = "22.831772";
     		// 根据用户经纬度获取最接近用户的商家
-	        $data = Db::query("SELECT id,name,score,thumb, ROUND(6378.138*2*ASIN(SQRT(POW(SIN((".$lat."*PI()/180-lat*PI()/180)/2),2)+COS(".$lat."*PI()/180)*COS(lat*PI()/180)*POW(SIN((".$lng."*PI()/180-lng*PI()/180)/2),2)))*1000) AS distance FROM ".config("database.prefix")."business where keyword like '%".$keyword."%' ORDER BY distance ASC");
+	        $data = Db::query("SELECT id,name,score,thumb, ROUND(6378.138*2*ASIN(SQRT(POW(SIN((".$lat."*PI()/180-lat*PI()/180)/2),2)+COS(".$lat."*PI()/180)*COS(lat*PI()/180)*POW(SIN((".$lng."*PI()/180-lng*PI()/180)/2),2)))*1000) AS distance FROM ".config("database.prefix")."pet_business where status=1 tag like '%".$keyword."%' or name like '%".$keyword."%' ORDER BY distance ASC,score desc");
 	        if($data){
 	        	//获取缩略图url
 		        foreach($data as $k=>$v){
@@ -75,25 +76,23 @@ class Index extends Common
         	$business = session('business'.$page);
         }else{
         	// 根据用户经纬度获取最接近用户的商家
-	        $business = Db::query("SELECT id,name,score,thumb, ROUND(6378.138*2*ASIN(SQRT(POW(SIN((".$lat."*PI()/180-lat*PI()/180)/2),2)+COS(".$lat."*PI()/180)*COS(lat*PI()/180)*POW(SIN((".$lng."*PI()/180-lng*PI()/180)/2),2)))*1000) AS distance FROM ".config("database.prefix")."pet_business ORDER BY distance ASC LIMIT ".($page-1)*$pageSize.",".$pageSize);
+	        $business = Db::query("SELECT id,name,score,thumb, ROUND(6378.138*2*ASIN(SQRT(POW(SIN((".$lat."*PI()/180-lat*PI()/180)/2),2)+COS(".$lat."*PI()/180)*COS(lat*PI()/180)*POW(SIN((".$lng."*PI()/180-lng*PI()/180)/2),2)))*1000) AS distance FROM ".config("database.prefix")."pet_business where status=1 ORDER BY distance ASC,score desc LIMIT ".($page-1)*$pageSize.",".$pageSize);
 	        if($business){
-	        	//获取缩略图url
 		        foreach($business as $k=>$v){
 		        	$business[$k]['thumb'] = get_file_path($v['thumb']);
 		        	$business[$k]['distance'] = round($v['distance']/1000 ,2);
                     $business[$k]['url'] = url("business/index",array('id'=>$v['id']));
                     $business[$k]['coupon'] = BusinessCouponModel::where(array("status"=>1,'bid'=>$v['id'],'begin_time'=>['<',time()],'end_time'=>['>',time()]))->order("create_time asc")->value('title');
 		        }
-                // print_r($business);exit;
 		        session('business'.$page, $business);
 	        }
         }
 	    return $business;
     }
 
-    public function login(){
+    public function login($name = 'xiaotan'){
         $MemberModel = new MemberModel;
-        $uid = $MemberModel->login('xiaotan', '159456');
+        $uid = $MemberModel->login($name, '159456');
         echo $uid.'---';
         print_r(session('member_auth'));
     }

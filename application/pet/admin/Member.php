@@ -35,7 +35,7 @@ class Member extends Admin
                 ['id', 'ID'],
                 ['username', '用户名', 'text'],
                 ['nickname', '昵称', 'text'],
-                ['money', '余额', 'text'],
+                // ['money', '余额', 'text'],
                 ['score', '积分', 'text'],
                 ['email', '邮箱地址', 'text'],
                 ['mobile', '手机号码', 'text'],
@@ -82,10 +82,12 @@ class Member extends Admin
             ->addFormItems([ // 批量添加表单项
                 ['text', 'username', '用户名', '必填，可由英文字母、数字组成'],
                 ['text', 'nickname', '昵称', '可以是中文'],
+                ['text', 'intro', '个人简介'],
                 ['password', 'password', '密码', '必填，6-20位'],
                 ['text', 'email', '邮箱', ''],
                 ['text', 'mobile', '手机号'],
                 ['image', 'avatar', '头像'],
+                ['image', 'banner', '个人空间banner'],
                 ['radio', 'status', '状态', '', ['禁用', '启用'], 1]
             ])
             ->fetch();
@@ -125,10 +127,12 @@ class Member extends Admin
                 ['hidden', 'id'],
                 ['text', 'username', '用户名', '必填，可由英文字母、数字组成'],
                 ['text', 'nickname', '昵称', '可以是中文'],
+                ['text', 'intro', '个人简介'],
                 ['password', 'password', '密码', '必填，6-20位'],
                 ['text', 'email', '邮箱', ''],
                 ['text', 'mobile', '手机号'],
                 ['image', 'avatar', '头像'],
+                ['image', 'banner', '个人空间banner'],
                 ['radio', 'status', '状态', '', ['禁用', '启用'], 1]
             ])
             ->setFormData($info)

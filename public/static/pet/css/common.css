@@ -7,9 +7,10 @@
     vertical-align: 0rem;
 }
 .stars em {
+    font-size:1rem;
     font-style: normal;
-    margin-left: .4em;
-    vertical-align: middle;
+    margin-left: .2em;
+    /*vertical-align: middle;*/
 }
 .icon-star-gray {
     position: relative;
@@ -17,6 +18,7 @@
 .icon-star-half {
     position: absolute;
     left: 0;
+    top:0;
     width: .55em;
     overflow: hidden;
 }
@@ -58,7 +60,7 @@
     margin-right:.5rem;
 }
 .nav-wrap-left a{
-    width: 3.5rem;
+    width: 2.5rem;
 }
 .nav-btn {
     display: inline-block;
@@ -70,7 +72,7 @@
     display: block;
     margin: auto;
     margin-bottom: .3rem;
-    font-size: 1.2rem;
+    font-size: 1rem;
 }
 .navbar .box-search {
     -webkit-box-flex: 1;
@@ -140,4 +142,46 @@
 }
 .swiper-pagination-bullet-active {
     background: #fff;
+}
+
+
+.bar-tab{
+    /*border:none;*/
+    border-top:1px solid #efefef;
+    background: #fff;
+}
+.bar-tab .tab-item.active, .bar-tab .tab-item:active {
+    color: #F9B900;
+}
+
+/*框架的有关弹窗的都改*/
+.preloader-indicator-modal, .photo-browser, .modal{
+    position:fixed;
+}
+
+
+
+
+.swiper-container-horizontal > .swiper-banner {
+    bottom: 10px;
+    left: 0;
+    width: 100%;
+}
+.swiper-banner {
+    position: absolute;
+    text-align: center;
+    -webkit-transition: 300ms;
+    -o-transition: 300ms;
+    transition: 300ms;
+    -webkit-transform: translate3d(0, 0, 0);
+    -ms-transform: translate3d(0, 0, 0);
+    -o-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    z-index: 10;
+}
+.swiper-container-horizontal > .swiper-banner .swiper-pagination-bullet {
+    margin: 0 5px;
+}
+.swiper-container-horizontal > .swiper-banner .swiper-pagination-bullet {
+    margin: 0 5px;
 }

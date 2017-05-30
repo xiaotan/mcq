@@ -1,0 +1,197 @@
+{extend name="public:layout" /}
+
+{block name="style"}
+    <link rel="stylesheet" href="__MODULE_CSS__/order.css">
+    <link rel="stylesheet" href="__MODULE_CSS__/remodal.css">
+    <link rel="stylesheet" href="__MODULE_CSS__/remodal-default-theme.css">
+{/block}
+
+{block name="main"}
+    <div class="page-group">
+        <div class="page">
+
+            <header class="bar bar-nav bn navbar" id="nav-top">
+                <a href="{:url('ucenter/index')}" external style="display:block;">
+                    <button class="button button-link button-nav pull-left">
+                        <span class="icon icon-left"></span> 返回
+                    </button>
+                </a>
+                <div class="nav-wrap-title" id="typename">{{getTypeName}}</div>
+                <div class="nav-wrap nav-wrap-right"><a class="react"></a></div>
+            </header>
+    
+            <div class="order-box">
+                <div class="tabs bn" id="tabs">
+                    <a href="{:url('ucenter/order', array('type'=>1))}" external class="button" :class="type==1 ? 'active' : ''">待付款</a>
+                    <a href="{:url('ucenter/order', array('type'=>2))}" external class="button" :class="type==2 ? 'active' : ''">已付款</a>
+                    <a href="{:url('ucenter/order', array('type'=>3))}" external class="button" :class="type==3 ? 'active' : ''">待评价</a>
+                </div>
+                <div class="content infinite-scroll" data-distance="0">
+                    <div class="list-block order-content" id="order">
+                        <div class="no-data" v-if="isEmptyObject(orders)">
+                            <img src="__MODULE_IMG__/no_data.jpg" alt="">
+                        </div>
+                        <ul v-else>
+                            <template v-for="item in orders">
+                                <li class="content-block list-item">
+                                    <a :href="item.burl" external>
+                                        <div class="list-item-top">
+                                            <i class="icon my-icon-business"></i>
+                                            <span>{{item.bname}}</span>
+                                        </div>
+                                    </a>
+                                    <div class="list-item-content">
+                                        <a :href="item.ourl" external>
+                                            <img :src="item.thumb" alt="">
+                                            <div class="list-item-content-right">
+                                                <p>项目：{{item.type}}</p>
+                                                <p>类型：{{item.pet}}</p>
+                                                <p>品种：{{item.breed}}</p>
+                                                <p>年龄：{{item.age}}</p>
+                                                <p>订单编号：{{item.order_no}}</p>
+                                            </div>
+                                            <div class="price">{{item.price}}</div>
+                                            <div class="amount" v-if="item.amount>item.price">{{item.amount}}</div>
+                                        </a>
+                                        <div class="clearfix"></div>
+                                        <div class="order-button-list" v-if="item.status==0 && item.is_pay==0">
+                                            <span class="on-button"><a external :href="item.purl">立即付款</a></span>
+                                            <span @click="showOrder(item.id)">取消订单</span>
+                                        </div>
+                                        <div class="order-button-list" v-else-if="item.status==0 && item.is_pay==1">
+                                            <span><a external :href="item.rurl">申请退款</a></span>
+                                        </div>
+                                        <div class="order-button-list" v-else-if="item.status==1">
+                                            <span class="on-button" v-if="item.is_evaluate==0"><a external :href="item.eurl">立即评价</a></span>
+                                            <template v-else>
+                                                <span>订单已完成</span>
+                                                <span class="on-button"><a external :href="item.eurl">查看评价</a></span>
+                                            </template>
+                                        </div>
+                                        <div class="order-button-list" v-else-if="item.status==2">
+                                            <span v-if="item.is_refund==0"><a external :href="item.rurl">已申请退款</a></span>
+                                            <span v-else="item.is_refund==1">申请退款成功</span>
+                                        </div>
+                                        <div class="order-button-list" v-else-if="item.status==3">
+                                            <span>订单已取消</span>
+                                        </div>
+                                    </div>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div style="height:13rem;" class="remodal" data-remodal-id="modal" role="dialog" aria-labelledby="modal1Title" aria-describedby="modal1Desc">
+                <button data-remodal-action="close" class="remodal-close" aria-label="Close"></button>
+                <div class="order-cancel">
+                    <p class="cancel-img">
+                        <img src="__MODULE_IMG__/cancel.jpg" alt="">
+                    </p>
+                    <p>您确定要取消订单吗？</p>
+                    <div class="content-block">
+                        <div class="row">
+                            <div class="col-50"><a href="#" class="button button-big modal-cancel-button" id="hideOrder">取消</a></div>
+                            <div class="col-50"><a href="#" class="button button-big button-fill modal-success-button" id="submitOrder">确定</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                
+        </div>
+    </div>
+{/block}
+
+{block name="script"}
+    <script>
+
+        var tabs = new Vue({
+            el: '#tabs',
+            data: {
+                type: "{$type}",
+            },
+        });
+
+        var typename = new Vue({
+            el: '#typename',
+            data: {
+                types: {$types},
+            },
+            computed: {
+                getTypeName: function(){
+                    return this.types[tabs.type];
+                }
+            },
+        });
+
+        var order = new Vue({
+            el: '#order',
+            data: {
+                page: 2,
+                orders: {$data},
+                cancelId: '',
+            },
+            methods: {
+                isEmptyObject: function(e){
+                    var t;  
+                    for (t in e)  
+                        return !1;  
+                    return !0 
+                },
+                concatData: function(data){
+                    this.orders = this.orders.concat(data);
+                    this.page++;
+                },
+                showOrder: function(id){
+                    this.cancelId = id;
+                    var inst = $('[data-remodal-id=modal]').remodal();
+                    inst.open();
+                },
+            },
+        });
+
+        $(document).on('click', '#hideOrder',function() {
+            var inst = $('[data-remodal-id=modal]').remodal();
+            inst.close();
+        });
+
+        $(document).on('click', '#submitOrder',function() {
+            if(!order.cancelId){
+                alert("请选择要取消的订单");
+                return false;
+            }
+            // 显示loading
+            $.showIndicator();
+            // ajax获取信息
+            $.get("{:url('ucenter/ajaxCancelOrder')}", { id: order.cancelId },function(data){
+                // 隐藏loading
+                $.hideIndicator();
+                if(data.code==1){
+                    alert(data.info)
+                    var inst = $('[data-remodal-id=modal]').remodal();
+                    inst.close();
+                    location.reload();
+                }else{
+                    alert(data.info)
+                }
+            },'json');
+        });
+
+        // 监听向上滑动事件，获取更多订单列表
+        $(document).on('infinite', '.infinite-scroll',function() {
+            // 显示loading
+            $.showIndicator();
+            // ajax获取信息
+            $.get("{:url('ucenter/ajaxGetOrderList')}", { page: order.page, type: tabs.type },function(data){
+                // 隐藏loading
+                $.hideIndicator();
+                if(data==1){
+                    $.toast("没有更多的信息...");
+                }else{
+                    order.concatData($.parseJSON( data ));
+                }
+            });
+        });
+    </script>
+{/block}

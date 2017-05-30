@@ -7,7 +7,9 @@ use app\cms\model\Slider as SliderModel;
 use app\pet\model\Member as MemberModel;
 use app\pet\model\Business as BusinessModel;
 use app\pet\model\BusinessTime as BusinessTimeModel;
+use app\pet\model\MemberCollect as MemberCollectModel;
 use app\pet\model\MemberAddress as MemberAddressModel;
+use app\pet\model\MemberScoreUse as MemberScoreUseModel;
 use app\pet\model\BusinessDoctor as BusinessDoctorModel;
 use app\pet\model\BusinessCoupon as BusinessCouponModel;
 use app\pet\model\BusinessService as BusinessServiceModel;
@@ -47,6 +49,8 @@ class Business extends Common
         if(!$business){
             $this->error('商店已关停');
         }
+        //查询用户是否关注该商家
+        $is_collect = MemberCollectModel::where(array("bid"=>$business->id, "mid"=>$member_id))->value("id");
         // 获取滚动图，如果商家没有上传则获取全站的
         if($business->banner){
             $slider = explode(',', $business->banner);
@@ -205,8 +209,10 @@ class Business extends Common
             }
         }
         // print_r($member);exit;
+        $this->assign('tab', 2);
         $this->assign('id', $id);
         $this->assign('slider', $slider);
+        $this->assign('is_collect', $is_collect ? 1 : 0);
         $this->assign('address', json_encode($address));
         $this->assign('current_type', $current_type);
         $this->assign('member', json_encode($member));
@@ -348,6 +354,15 @@ class Business extends Common
         if($coupon_id && in_array($coupon_id, explode(',', $business_service->coupon))){
             $coupon = BusinessCouponModel::where(array("id"=>$coupon_id, "bid"=>$business->id, "status"=>1,'begin_time'=>['<',$now],'end_time'=>['>',$now]))->find();
             if($coupon){
+                // 如果是唯一优惠，则判断用户是否已经用过优惠
+                if($coupon['unique']){
+                    $order_id = OrderModel::where(array("mid"=>$order['mid'], "coupon_id"=>$coupon['id']))->value('id');
+                    if($order_id){
+                        $return['code'] = 0;
+                        $return['info'] = "您已经使用过该优惠";
+                        echo json_encode($return);exit;
+                    }
+                }
                 $order['coupon_id'] = $coupon_id;
                 $order['coupon_amount'] = $coupon->amount;
             }else{
@@ -366,6 +381,8 @@ class Business extends Common
             }else{
                 $order['score'] = $score;
             }
+        }else{
+            $order['score'] = 0;
         }
         // 备注
         $order['remark'] = isset($data['remark']) ? $data['remark'] : '';
@@ -377,10 +394,11 @@ class Business extends Common
         if(isset($order['coupon_amount'])){
             $reduce = $reduce + $order['coupon_amount'];
         }
-        if(isset($order['score'])){
+        if($order['score']){
             $reduce = $reduce + $order['score'];
         }
         $order['price'] = $order['amount'] - $reduce;
+        $order['title'] = $order['bname'].'-'.$order['type'].'-'.$order['pet'].'-'.$order['breed'];
         // 订单入库
         $result = OrderModel::create($order);
         if($result){
@@ -390,8 +408,15 @@ class Business extends Common
             $bTime['tid'] = $time_id;
             $bTime['date'] = $order['date'];
             BusinessTimeModel::create($bTime);
-            // 消耗积分记录 todo
-            
+            // 消耗积分记录，同时更新用户总积分
+            if($order['score']){
+                $scoreUse['mid'] = $order['mid'];
+                $scoreUse['oid'] = $result['id'];
+                $scoreUse['score'] = $order['score'];
+                MemberScoreUseModel::create($scoreUse);
+                // 更新用户总积分
+                $MemberModel::where(array("id"=>$order['mid']))->setField('score', $member->score-$score);
+            }
             //返回相关信息
             $return['code'] = 1;
             $return['info'] = $result;
@@ -436,58 +461,43 @@ class Business extends Common
     }
 
 	/**
-     * 退款
+     * ajax收藏商家
      * @return mixed
      */
-    public function refund(){
-    	return $this->fetch(); // 渲染模板
-    }
-
-	/**
-     * 退款详情
-     * @return mixed
-     */
-    public function refunded(){
-    	return $this->fetch(); // 渲染模板
-    }
-
-	/**
-     * 订单评价
-     * @return mixed
-     */
-    public function comment(){
-    	return $this->fetch(); // 渲染模板
-    }
-
-	/**
-     * 订单详情
-     * @return mixed
-     */
-    public function commented(){
-    	return $this->fetch(); // 渲染模板
-    }
-
-	/**
-     * 订单支付
-     * @return mixed
-     */
-    public function payment(){
-    	return $this->fetch(); // 渲染模板
-    }
-
-	/**
-     * 订单支付
-     * @return mixed
-     */
-    public function order(){
-    	return $this->fetch(); // 渲染模板
-    }
-
-	/**
-     * 订单详情
-     * @return mixed
-     */
-    public function show(){
-    	return $this->fetch(); // 渲染模板
+    public function ajaxCollect(){
+        if($bid = input("get.bid", 0, "intval")){
+            // 判断用户是否登录
+            $MemberModel = new MemberModel;
+            if($member_id = $MemberModel->isLogin()){
+                //判断是否已经收藏
+                $is_collect = MemberCollectModel::where(array("bid"=>$bid, "mid"=>$member_id))->value("id");
+                if($is_collect){
+                    $result = MemberCollectModel::where(array("id"=>$is_collect))->delete();
+                    if($result){
+                        $return['code'] = 2;
+                        $return['info'] = "操作成功";
+                        echo json_encode($return);exit;
+                    }else{
+                        $return['code'] = 0;
+                        $return['info'] = "操作失败";
+                        echo json_encode($return);exit;
+                    }
+                }else{
+                    $input['bid'] = $bid;
+                    $input['mid'] = $member_id;
+                    $result = MemberCollectModel::create($input);
+                    if($result){
+                        $return['code'] = 1;
+                        $return['info'] = "操作成功";
+                        echo json_encode($return);exit;
+                    }else{
+                        $return['code'] = 0;
+                        $return['info'] = "操作失败";
+                        echo json_encode($return);exit;
+                    }
+                }
+            }
+        }
+        	
     }
 }

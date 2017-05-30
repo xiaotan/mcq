@@ -1,0 +1,210 @@
+{extend name="public:layout" /}
+
+{block name="style"}
+    <link rel="stylesheet" href="__MODULE_CSS__/webuploader.css">
+    <link rel="stylesheet" href="__MODULE_CSS__/comment.css">
+{/block}
+
+{block name="main"}
+    <div class="page-group">
+        <div class="page">
+
+            <header class="bar bar-nav bn" id="nav-top">
+                <a href="javascript:history.go(-1);" external style="display:block;">
+                    <button class="button button-link button-nav pull-left">
+                        <span class="icon icon-left"></span> 返回
+                    </button>
+                </a>
+            </header>
+            
+            <div class="order-content" id="evaluate">
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <img src="{$order.thumb}" alt="">
+                        <div class="list-item-content-right">
+                            <p class="order-content-title">项目：{$order.type}</p>
+                            <p>{$business.address}</p>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+                <div class="comment-content">
+                    <p class="comment-content-tap">商家评价：</p>
+                    <div class="comment-stars">
+                        <span class="stars">
+                            <i class="my-icon my-icon-star1" @click="onBStars(1)" :class="b_stars>1 || b_stars==1 ? 'on-stars' : ''"></i>
+                            <i class="my-icon my-icon-star1" @click="onBStars(2)" :class="b_stars>2 || b_stars==2 ? 'on-stars' : ''"></i>
+                            <i class="my-icon my-icon-star1" @click="onBStars(3)" :class="b_stars>3 || b_stars==3 ? 'on-stars' : ''"></i>
+                            <i class="my-icon my-icon-star1" @click="onBStars(4)" :class="b_stars>4 || b_stars==4 ? 'on-stars' : ''"></i>
+                            <i class="my-icon my-icon-star1" @click="onBStars(5)" :class="b_stars==5 ? 'on-stars' : ''"></i>
+                        </span>
+                        <p>（{{getBStarsText}}）</p>
+                    </div>
+
+                    <template v-if="did">
+                        <p class="comment-content-tap">医生评价：</p>
+                        <div class="comment-stars">
+                            <span class="stars">
+                                <i class="my-icon my-icon-star1" @click="onDStars(1)" :class="d_stars>1 || d_stars==1 ? 'on-stars' : ''"></i>
+                                <i class="my-icon my-icon-star1" @click="onDStars(2)" :class="d_stars>2 || d_stars==2 ? 'on-stars' : ''"></i>
+                                <i class="my-icon my-icon-star1" @click="onDStars(3)" :class="d_stars>3 || d_stars==3 ? 'on-stars' : ''"></i>
+                                <i class="my-icon my-icon-star1" @click="onDStars(4)" :class="d_stars>4 || d_stars==4 ? 'on-stars' : ''"></i>
+                                <i class="my-icon my-icon-star1" @click="onDStars(5)" :class="d_stars==5 ? 'on-stars' : ''"></i>
+                            </span>
+                            <p>（{{getDStarsText}}）</p>
+                        </div>
+                    </template>
+
+                    <p class="comment-content-tap">评价内容：</p>
+                    <textarea class="comment-textarea" v-on:blur="doComment"></textarea>
+                    <p class="comment-content-tap">上传图片：</p>
+                    <div class="upload-images">
+                        <ul class="upload-images-box">
+                            <li id="filePicker"></li>
+                        </ul>
+                    </div>
+                    <p class="comment-submit"><a href="#" class="button button-fill" @click="submitComment">发表评价</a></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+{/block}
+
+{block name="script"}
+    <script>
+        //初始化
+        $.init();
+
+        var evaluate = new Vue({
+            el: '#evaluate',
+            data: {
+                id: "{$order.id}",
+                did: "{$order.did}",
+                b_stars: 0,
+                d_stars: 0,
+                comment: '',
+                bStarsText: {:json_encode(config('business_stars_text'))},
+                dStarsText: {:json_encode(config('doctor_stars_text'))},
+            },
+            computed: {
+                getBStarsText: function(){
+                    return this.bStarsText[this.b_stars];
+                },
+                getDStarsText: function(){
+                    return this.dStarsText[this.d_stars];
+                },
+            },
+            methods: {
+                onBStars: function(id){
+                    this.b_stars = id;
+                },
+                onDStars: function(id){
+                    this.d_stars = id;
+                },
+                doComment: function(){
+                    this.comment = $(".comment-textarea").val();
+                },
+                submitComment: function(){
+                    if(this.b_stars==0){
+                        alert("请为商家打分");
+                        return false;
+                    }
+                    if(this.did && this.d_stars==0){
+                        alert("请为医生打分");
+                        return false;
+                    }
+                    if(!this.comment){
+                        alert("请填写评价内容");
+                        return false;
+                    }
+                    var imgs = '';
+                    $(".upload-images-box li").each(function(){
+                        if($(this).attr("data-id")){
+                            imgs += $(this).attr("data-id")+',';
+                        }
+                    })
+                    // 显示loading
+                    $.showIndicator();
+                    // ajax获取信息
+                    $.post("{:url('ucenter/ajaxEvaluateOrder')}", { id: this.id, d_stars:this.d_stars, b_stars:this.b_stars, comment:this.comment, imgs:imgs },function(data){
+                        // 隐藏loading
+                        $.hideIndicator();
+                        if(data.code==1){
+                            alert(data.info)
+                            location.reload();
+                        }else{
+                            alert(data.info)
+                        }
+                    },'json');
+                },
+            },
+        });
+
+        //删除图片
+        $(document).on('click', '.img-delete',function() {
+            $(this).parent().remove();
+        });
+
+        $(function(){
+            // 初始化Web Uploader
+            var uploader = WebUploader.create({
+                // 选完文件后，是否自动上传。
+                auto: true,
+                // swf文件路径
+                swf: '__MODULE_JS__/Uploader.swf',
+                // 文件接收服务端。
+                server: "{:url('ucenter/ajaxUploadImg')}",
+                // 选择文件的按钮。可选。
+                // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+                pick: '#filePicker',
+                // 只允许选择图片文件。
+                accept: {
+                    title: 'Images',
+                    extensions: 'gif,jpg,jpeg,bmp,png',
+                    mimeTypes: 'image/*'
+                },
+                fileNumLimit: 8, //最多8张
+                fileSingleSizeLimit: 5 * 1024 * 1024, //最大5M
+            });
+            // 当有文件添加进来的时候
+            uploader.on( 'fileQueued', function( file ) {
+                // console.log(file)
+                var $li = $('<li id="'+file.id+'"><img><span class="img-delete icon my-icon-cancel"></span></li>');
+                // $list为容器jQuery实例
+                $(".upload-images-box").prepend( $li );
+                // 创建缩略图
+                // 如果为非图片文件，可以不用调用此方法。
+                // thumbnailWidth x thumbnailHeight 为 100 x 100
+                uploader.makeThumb( file, function( error, src ) {
+                    if ( error ) {
+                        $("#"+file.id+" img").replaceWith('<span>不能预览</span>');
+                        return;
+                    }
+                    $("#"+file.id+" img").attr( 'src', src );
+                });
+            });
+            // 文件上传成功，给item添加成功class, 用样式标记上传成功。
+            uploader.on( 'uploadSuccess', function( file, response) {
+                // console.log(response)
+                $( '#'+file.id ).attr( 'data-id', response.id );
+            });
+            //上传错误
+            uploader.on( 'error', function( error ) {
+                console.log(error)
+                if(error=='Q_EXCEED_NUM_LIMIT'){
+                    alert("最多允许添加8张图片");
+                }
+                if(error=='Q_EXCEED_SIZE_LIMIT'){
+                    alert("文件大小不能大于5M");
+                }
+                if(error=='Q_TYPE_DENIED'){
+                    alert("只能上传图片类型的文件")
+                }
+            });
+            uploader.on( 'uploadError', function( file ) {
+                console.log(file)
+            });
+        })
+    </script>
+{/block}

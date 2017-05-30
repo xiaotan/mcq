@@ -37,7 +37,7 @@ textarea:-ms-input-placeholder {
     margin-left:2rem;
 }
 .base-top .stars{
-    font-size:.8rem;
+    font-size:1rem;
     margin-left:2rem;
 }
 .base-top .line{
@@ -50,7 +50,8 @@ textarea:-ms-input-placeholder {
     height:2.5rem;
 }
 .base-top .addr-icon{
-    font-size:.8rem;
+    font-size:1rem;
+    color:#C4C4C4;
     /*top:.5rem;*/
     left:1rem;
     position: absolute;
@@ -72,6 +73,10 @@ textarea:-ms-input-placeholder {
     font-size:1.2rem;
     top:0;
     right:1rem;
+}
+.base-top .tel i{
+    color:#F7B218;
+    font-size:1.8rem;
 }
 .base-top .tel a{
     color:#3d4145;
@@ -549,3 +554,19 @@ label.label-checkbox input[type="checkbox"]:checked + .item-media i.icon-form-ch
 .pets .item-content{
     padding-left:0;
 }
+.nav-wrap-right .nav-btn i{
+    font-size:1.5rem;
+}
+.nav-btn .my-icon-star1{
+    color:#EC666A;
+    /*background: #EC666A;*/
+}
+
+.addr ul li .address .my-icon-wepay{
+    font-size:1.5rem;
+    color:#34AE37;
+}
+.addr ul li .address .my-icon-alipay{
+    font-size:1.2rem;
+    color:#0C9BD9;
+} 

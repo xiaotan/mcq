@@ -11,22 +11,22 @@
         <div class="page">
             <header class="navbar">
                 <div class="nav-wrap nav-wrap-left">
-                    <a class="react" rel="nofollow" href="">
+                    <a href="{:url('index/index')}" external style="display:block;color:#fff;">
                         <span class="nav-btn">
-                            <i class="icon icon-home"></i>
+                            <i class="icon icon-left"></i>
                         </span>
                     </a>
                 </div>
                 <div class="nav-wrap-title">服务</div>
-                <div class="nav-wrap nav-wrap-right">
-                    <a class="react" rel="nofollow" href="">
+                <div class="nav-wrap nav-wrap-right" id="handle">
+                    <!-- <a class="react" rel="nofollow" href="">
                         <span class="nav-btn">
-                            <i class="icon icon-home"></i>
+                            <i class="icon my-icon-share"></i>
                         </span>
-                    </a>
-                    <a class="react" rel="nofollow" href="">
+                    </a> -->
+                    <a class="react" rel="nofollow" @click="handleCollect">
                         <span class="nav-btn">
-                            <i class="icon icon-home"></i>
+                            <i class="icon" :class="is_collect==1 ? 'my-icon-star1' : 'my-icon-star2'"></i>
                         </span>
                     </a>
                 </div>
@@ -51,20 +51,20 @@
                             <p class="name">{$business.name}</p>
                             <span class="stars">
                                 {for start="0" end="intval($business['score'])"}
-                                    <i class="my-icon icon-star"></i>
+                                    <i class="my-icon my-icon-star1"></i>
                                 {/for}
                                 {if $business['score']>intval($business['score'])}
-                                    <i class="my-icon icon-star icon-star-gray">
-                                        <i class="my-icon icon-star icon-star-half"></i>
+                                    <i class="my-icon my-icon-star1 icon-star-gray">
+                                        <i class="my-icon my-icon-star1 icon-star-half"></i>
                                     </i>
                                 {/if}
                                 <em class="star-text">{$business.score}</em>
                             </span>
                             <div class="line"></div>
                             <p class="addr-box pr">
-                                <i class="icon icon-home addr-icon"></i>
+                                <i class="icon my-icon-location1 addr-icon"></i>
                                 <span class="addr" lng="{$business.lng}" lat="{$business.lat}">{$business.address}</span>
-                                <span class="tel"><a href="tel:{$business.tel}"><i class="icon icon-home"></i></a></span>
+                                <span class="tel"><a href="tel:{$business.tel}" external><i class="icon my-icon-tel"></i></a></span>
                             </p>
                             <div class="clearfix"></div>
                         </div>
@@ -214,14 +214,14 @@
                                         <label class="label-checkbox item-content">
                                             <input type="radio" name="payment">
                                             <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
-                                            <div class="address"><i class="icon icon-home"></i>微信支付</div>
+                                            <div class="address"><i class="icon my-icon-wepay"></i>微信支付</div>
                                         </label>
                                     </li>
                                     <li @click="choosePayment(2)">
                                         <label class="label-checkbox item-content">
                                             <input type="radio" name="payment">
                                             <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
-                                            <div class="address"><i class="icon icon-home"></i>支付宝支付</div>
+                                            <div class="address"><i class="icon my-icon-alipay"></i>支付宝支付</div>
                                         </label>
                                     </li>
                                 </ul>
@@ -271,7 +271,7 @@
                                 <input type="hidden" name="score" :value="current_score">
                                 <input type="hidden" name="remark" :value="remark">
                                 <input type="hidden" name="payment" :value="payment">
-                                <input type="hidden" name="business_id" value="{$id}">
+                                <input type="hidden" name="business_id" :value="business_id">
                             </form>
                             <div class="affirm">
                                 <span class="price">￥<i>{{getPrice}}</i></span><span class="coupon">已优惠{{getCouponPrice}}元</span><button @click="doOrder">立即预约</button>
@@ -369,7 +369,6 @@
                                         </div>
                                     </div>
                                 </li>
-
                                 <li>
                                     <div class="item-content">
                                         <div class="item-inner">
@@ -380,7 +379,6 @@
                                         </div>
                                     </div>
                                 </li>
-
                                 <li>
                                     <div class="item-content">
                                         <div class="item-inner">
@@ -426,25 +424,7 @@
                 </div>
             </div>
 
-            <nav class="bar bar-tab">
-                <a class="tab-item active" href="#">
-                    <span class="icon icon-home"></span>
-                    <span class="tab-label">萌宠圈</span>
-                </a>
-                <a class="tab-item" href="#">
-                    <span class="icon icon-me"></span>
-                    <span class="tab-label">服务</span>
-                    <!-- <span class="badge">2</span> -->
-                </a>
-                <a class="tab-item" href="#">
-                    <span class="icon icon-star"></span>
-                    <span class="tab-label">遛狗</span>
-                </a>
-                <a class="tab-item" href="#">
-                    <span class="icon icon-cart"></span>
-                    <span class="tab-label">我的</span>
-                </a>
-            </nav>
+            {include file="public/nav" /}
 
         </div>
     </div>
@@ -452,12 +432,30 @@
 
 {block name="script"}
     <script>
-        //初始化
-        $.init()
+
+        var handle = new Vue({
+            el: '#handle',
+            data: {
+                is_collect: "{$is_collect}",
+            },
+            methods: {
+                handleCollect: function(){
+                    $.get("{:url('business/ajaxCollect')}", { bid: service.business_id },function(data){
+                        if(data.code==1){
+                            handle.is_collect = 1;
+                        }
+                        if(data.code==2){
+                            handle.is_collect = 0;
+                        }
+                    },'json');
+                },
+            }
+        });
 
         var service = new Vue({
             el: '#service', 
             data: {
+                business_id: "{$id}",
                 current_type: {$current_type}, //当前服务类型id
                 current_date: {:date("Ymd", time())}, //当前日期
                 current_time: '', //当前时间段
@@ -537,6 +535,7 @@
                 },
                 changePet: function(id){
                     this.current_pet = id;
+                    this.current_breed = 0;
                     this.pet_icon = this.service[this.current_type].pets[this.current_pet].pet_icon;
                     this.breeds = this.service[this.current_type].pets[this.current_pet].breeds;
                 },
@@ -611,13 +610,17 @@
                 },
                 submitScore: function(){
                     var score = $(".address-box input[name='score']").val();
+                    if(score%1!==0){
+                        alert("使用的积分只能为整数")
+                        return false
+                    }
                     if(this.member.score<score){
                         alert("可用积分不足")
-                    }else{
-                        this.current_score = score;
-                        var inst = $('[data-remodal-id=modal3]').remodal();
-                        inst.close();
+                        return false
                     }
+                    this.current_score = score;
+                    var inst = $('[data-remodal-id=modal3]').remodal();
+                    inst.close();
                 },
                 doRemark: function(){
                     this.remark = $("input[name='remark']").val();
@@ -667,6 +670,8 @@
                             $.hideIndicator();
                             if(data.code){
                                 //成功后支付 todo
+                                alert("下单成功")
+                                window.location.href = "{:url('ucenter/order')}";
                             }else{
                                 alert(data.info)
                             }

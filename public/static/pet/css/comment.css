@@ -94,12 +94,12 @@ label.label-checkbox input[type="checkbox"]:checked + .item-media i.icon-form-ch
 
 .upload-images ul li{
     display:inline-block;
-    margin-right:.2rem;
+    margin-right:.5rem;
     position: relative;
 }
 .upload-images ul li .img-delete{
     position: absolute;
-    font-size:1rem;
+    font-size:.8rem;
     top:-.5rem;
     right:-.3rem;
 }
@@ -122,4 +122,10 @@ label.label-checkbox input[type="checkbox"]:checked + .item-media i.icon-form-ch
     height:3rem;
     background: none;
     padding:0;
+}
+.stars .my-icon-star1{
+    color:#E2E2E2;
+}
+.stars .on-stars{
+    color:#FF9900;
 }

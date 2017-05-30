@@ -12,7 +12,7 @@
                 <div class="nav-wrap nav-wrap-left">
                     <a class="react" rel="nofollow" href="">
                         <span class="nav-btn">
-                            <i class="icon icon-home"></i>
+                            <i class="icon my-icon-location1"></i>
                             <span>南宁市</span>
                         </span>
                     </a>
@@ -39,9 +39,9 @@
             </div>
 
             <!-- 添加 class infinite-scroll 和 data-distance -->
-            <div class="scroll-box" id="business">
+            <div class="scroll-box">
                 <div class="content infinite-scroll" data-distance="0">
-                    <div class="list-block content-list">
+                    <div class="list-block content-list" id="business">
                         <ul class="list-container">
                             <template v-for="item in items">
                                 <a style="display:block;" :href="item.url" external>
@@ -52,14 +52,14 @@
                                             <span class="distance">{{item.distance}}km</span>
                                             <div>
                                                 <span class="stars">
-                                                    <i class="my-icon icon-star" v-for="n in parseInt(item.score)"></i>
-                                                    <i class="my-icon icon-star icon-star-gray" v-if="item.score > parseInt(item.score)">
-                                                        <i class="my-icon icon-star icon-star-half"></i>
+                                                    <i class="my-icon my-icon-star1" v-for="n in parseInt(item.score)"></i>
+                                                    <i class="my-icon my-icon-star1 icon-star-gray" v-if="item.score > parseInt(item.score)">
+                                                        <i class="my-icon my-icon-star1 icon-star-half"></i>
                                                     </i>
                                                     <em class="star-text">{{item.score}}</em>
                                                 </span>
                                             </div>
-                                            <div class="coupon"><i class="icon icon-star"></i><span>{{item.coupon}}</span></div>
+                                            <div class="coupon" v-if="item.coupon"><i class="icon my-icon-coupon"></i><span>{{item.coupon}}</span></div>
                                         </div>
                                         <div class="clearfix"></div>
                                     </li>
@@ -78,18 +78,16 @@
 
 {block name="script"}
     <script>
-        // 初始化
-        $.init();
-
         // 循环商家列表
         var business = new Vue({
             el: '#business', 
             data: {
-                page: 2,
+                page: 1,
                 items: {$business},
             },
             methods: {
                 concatData: function(data){
+                    console.log(this.items)
                     this.items = this.items.concat(data);
                     this.page++;
                 }
@@ -111,6 +109,10 @@
                         business.items = $.parseJSON( data );
                     }
                 });
+            }else{
+                location.reload();
+                /*alert("关键字不能为空");
+                return false;*/
             }
         });
 

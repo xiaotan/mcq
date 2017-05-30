@@ -1,19 +1,19 @@
 <nav class="bar bar-tab">
-    <a class="tab-item active" href="#">
-        <span class="icon icon-home"></span>
+    <a class="tab-item {if $tab==1}active{/if}" href="{:url('forum/index')}" external>
+        <span class="icon my-icon-camera"></span>
         <span class="tab-label">萌宠圈</span>
     </a>
-    <a class="tab-item" href="#">
-        <span class="icon icon-me"></span>
+    <a class="tab-item {if $tab==2}active{/if}" href="{:url('index/index')}" external>
+        <span class="icon my-icon-heart1"></span>
         <span class="tab-label">服务</span>
         <!-- <span class="badge">2</span> -->
     </a>
-    <a class="tab-item" href="#">
-        <span class="icon icon-star"></span>
+    <a class="tab-item {if $tab==3}active{/if}" href="{:url('route/index')}" external>
+        <span class="icon my-icon-dog"></span>
         <span class="tab-label">遛狗</span>
     </a>
-    <a class="tab-item" href="#">
-        <span class="icon icon-cart"></span>
+    <a class="tab-item {if $tab==4}active{/if}" href="{:url('ucenter/index')}" external>
+        <span class="icon my-icon-me"></span>
         <span class="tab-label">我的</span>
     </a>
 </nav>

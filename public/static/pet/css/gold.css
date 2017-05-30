@@ -87,7 +87,7 @@
 .get-gold span{
     font-size:.7rem;
     vertical-align: middle;
-    margin-left:.3rem;
+    /*margin-left:.3rem;*/
 }
 
 .work{
@@ -110,6 +110,9 @@
     font-size:.6rem;
     border:1px solid #f7b218;
     color:#f7b218;
-    padding:.1rem .5rem;
+    text-align:center;
+    display:block;
+    width:4.5rem;
+    padding:.2rem 0;
     border-radius: 1rem;
 }

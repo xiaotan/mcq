@@ -13,7 +13,106 @@ use think\Db;
 use think\Config;
 use Wechat\Loader;
 // 应用公共文件
+// 
+if (!function_exists('str_cut')) {
+    /**
+     * 字符截取 支持UTF8/GBK
+     * @param $string
+     * @param $length
+     * @param $dot
+     */
+    function str_cut($string, $length, $dot = '...') {
+        $strlen = strlen($string);
+        if($strlen <= $length) return $string;
+        $string = str_replace(array(' ','&nbsp;', '&amp;', '&quot;', '&#039;', '&ldquo;', '&rdquo;', '&mdash;', '&lt;', '&gt;', '&middot;', '&hellip;'), array('∵',' ', '&', '"', "'", '“', '”', '—', '<', '>', '·', '…'), $string);
+        $strcut = '';
+        if(strtolower(CHARSET) == 'utf-8') {
+            $length = intval($length-strlen($dot)-$length/3);
+            $n = $tn = $noc = 0;
+            while($n < strlen($string)) {
+                $t = ord($string[$n]);
+                if($t == 9 || $t == 10 || (32 <= $t && $t <= 126)) {
+                    $tn = 1; $n++; $noc++;
+                } elseif(194 <= $t && $t <= 223) {
+                    $tn = 2; $n += 2; $noc += 2;
+                } elseif(224 <= $t && $t <= 239) {
+                    $tn = 3; $n += 3; $noc += 2;
+                } elseif(240 <= $t && $t <= 247) {
+                    $tn = 4; $n += 4; $noc += 2;
+                } elseif(248 <= $t && $t <= 251) {
+                    $tn = 5; $n += 5; $noc += 2;
+                } elseif($t == 252 || $t == 253) {
+                    $tn = 6; $n += 6; $noc += 2;
+                } else {
+                    $n++;
+                }
+                if($noc >= $length) {
+                    break;
+                }
+            }
+            if($noc > $length) {
+                $n -= $tn;
+            }
+            $strcut = substr($string, 0, $n);
+            $strcut = str_replace(array('∵', '&', '"', "'", '“', '”', '—', '<', '>', '·', '…'), array(' ', '&amp;', '&quot;', '&#039;', '&ldquo;', '&rdquo;', '&mdash;', '&lt;', '&gt;', '&middot;', '&hellip;'), $strcut);
+        } else {
+            $dotlen = strlen($dot);
+            $maxi = $length - $dotlen - 1;
+            $current_str = '';
+            $search_arr = array('&',' ', '"', "'", '“', '”', '—', '<', '>', '·', '…','∵');
+            $replace_arr = array('&amp;','&nbsp;', '&quot;', '&#039;', '&ldquo;', '&rdquo;', '&mdash;', '&lt;', '&gt;', '&middot;', '&hellip;',' ');
+            $search_flip = array_flip($search_arr);
+            for ($i = 0; $i < $maxi; $i++) {
+                $current_str = ord($string[$i]) > 127 ? $string[$i].$string[++$i] : $string[$i];
+                if (in_array($current_str, $search_arr)) {
+                    $key = $search_flip[$current_str];
+                    $current_str = str_replace($search_arr[$key], $replace_arr[$key], $current_str);
+                }
+                $strcut .= $current_str;
+            }
+        }
+        return $strcut.$dot;
+    }
+}
 
+if (!function_exists('time_tran')) {
+    function time_tran($the_time) {
+        $dur = time() - $the_time;  
+        if ($dur < 0) {  
+            return "未知";
+        } else {
+            if ($dur < 60) {
+                return $dur . '秒前';
+            } else {  
+                if ($dur < 3600) {
+                    return floor($dur / 60) . '分钟前';
+                } else {
+                    if ($dur < 86400) {
+                        return floor($dur / 3600) . '小时前';
+                    } else {
+                        if ($dur < 259200) {//3天内
+                            return floor($dur / 86400) . '天前';
+                        } else {
+                            return "未知";
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+if (!function_exists('get_doctor_ava')) {
+    function get_doctor_ava($id){
+        return Db::name("pet_business_evaluate")->where(array("did"=>$id))->avg('doctor_rate');
+    }
+}
+
+if (!function_exists('get_business_ava')) {
+    function get_business_ava($id){
+        return Db::name("pet_business_evaluate")->where(array("bid"=>$id))->avg('business_rate');
+    }
+}
 
 if (!function_exists('get_order_no')) {
     //生成唯一订单号
@@ -1208,5 +1307,26 @@ if (!function_exists('parse_name')) {
         } else {
             return strtolower(trim(preg_replace("/[A-Z]/", "_\\0", $name), "_"));
         }
+    }
+}
+
+
+
+if (!function_exists('get_member_name')) {
+    /**
+     * 根据用户ID获取用户昵称
+     * @param  integer $uid 用户ID
+     * @return string  用户昵称
+     */
+    function get_member_name($uid = 0)
+    {
+        // 调用接口获取用户信息
+        $info = model('pet/member')->field('nickname')->find($uid);
+        if ($info !== false && $info['nickname']) {
+            $name = $info['nickname'];
+        } else {
+            $name = '';
+        }
+        return $name;
     }
 }

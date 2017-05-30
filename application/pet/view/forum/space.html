@@ -1,0 +1,169 @@
+{extend name="public:layout" /}
+
+{block name="style"}
+    <link rel="stylesheet" href="__MODULE_CSS__/me.css">
+{/block}
+
+{block name="main"}
+    <div class="page-group">
+        <div class="page">
+
+            <div id="follow">
+                <header class="navbar">
+                    <div class="nav-wrap nav-wrap-left">
+                        <a class="react" rel="nofollow" href="javascript:history.go(-1);" external>
+                            <span class="nav-btn">
+                                <i class="icon icon-left"></i>
+                            </span>
+                        </a>
+                    </div>
+                    <div class="nav-wrap-title">{$member.nickname}</div>
+                    <div class="nav-wrap nav-wrap-right">
+                        {if $member['id'] == session("member_auth.member_id")}
+                            <a class="react" rel="nofollow" href="{:url('forum/publish')}" external>
+                                <span class="nav-btn">
+                                    <i class="icon my-icon-camera" style="font-size:1.5rem;"></i>
+                                </span>
+                            </a>
+                        {else}
+                            <a class="react" rel="nofollow" href="">
+                                <span class="nav-btn">
+                                    <i class="icon dolike my-icon-like" :class="is_follow==1 ? 'is_follow' : ''" style="font-size:1.5rem;"></i>
+                                </span>
+                            </a>
+                        {/if}
+                    </div>
+                </header>
+                <div class="header-box"></div>
+
+                <div class="my-info" {if $member['banner']}style="background-image:url({:get_file_path($member['banner'])});"{/if}>
+                    <div class="info-box">
+                        <img class="avatar" src="{:get_file_path($member['avatar'])}" alt="">
+                        <span class="username"><span class="name">{$member.nickname}</span><!-- <span class="level"><i class="icon icon-home"></i></span> --></span>
+                        <span class="like"><span>关注 {$member.follow}</span><span>粉丝 {{followed}}</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 添加 class infinite-scroll 和 data-distaance -->
+            <div class="scroll-box">
+                <div class="content infinite-scroll" data-distance="0">
+                    <div class="list-block content-list" id="forum">
+                        <ul class="list-container">
+                            <template v-for="(item, item_i) in forums">
+                                <li>
+                                    <div class="list-left">
+                                        <p :class="isNaN(item.day) ? 'fs7' : ''">{{item.day}}</p>
+                                        <p style="font-size:.6rem;">{{item.month}}月</p>
+                                    </div>
+                                    <div class="list-right">
+                                        <div class="con">{{item.content}}</div>
+                                        <div class="images">
+                                            <template v-for="(img, index) in item.images">
+                                                <div @click="showImages(item_i, index)" class="img-item" :style="{ backgroundImage: 'url('+img+')'}"></div>
+                                            </template>
+                                        </div>
+                                        <div class="item-bottom">
+                                            <span class="site" v-if="item.location">{{item.location}}</span>
+                                            <!-- <p class="comment"><i class="icon my-icon-comment"></i><span>100</span></p> -->
+                                            <p class="enjoy" @click="favorite(item_i)"><i class="icon my-icon-heart" :class="item.is_favorite ? 'is_favorite' : ''"></i><span>{{item.favorite}}</span></p>
+                                        </div>
+                                    </div>
+                                </li>
+                            </template>
+                        </ul>
+                        <p v-if="isEmptyObject(forums)" class="no-data">暂无数据</p>
+                    </div>
+                </div>
+            </div>
+
+            {include file="public/nav" /}
+
+        </div>
+    </div>
+{/block}
+
+{block name="script"}
+    <script>
+        var follow = new Vue({
+            el: '#follow', 
+            data: {
+                is_follow: "{$is_follow}",
+                followed: "{$member.followed}",
+            },
+        })
+
+        var forum = new Vue({
+            el: '#forum', 
+            data: {
+                page: 2,
+                mid: "{$member['id']}",
+                forums: {$forums},
+            },
+            methods: {
+                concatData: function(data){
+                    this.forums = this.forums.concat(data);
+                    this.page++;
+                },
+                showImages: function(id, index){
+                    var photos = this.forums[id].images;
+                    var myPhotoBrowserStandalone = $.photoBrowser({photos : photos, initialSlide : index, loop: true});
+                    myPhotoBrowserStandalone.open();
+                },
+                isEmptyObject: function(e){
+                    var t;  
+                    for (t in e)  
+                        return !1;  
+                    return !0 
+                },
+                favorite: function(id){
+                    $.get("{:url('forum/ajaxFavorite')}", { id: forum.forums[id].id },function(data){
+                        if(data.code==1){
+                            forum.forums[id].is_favorite = data.info;
+                            if(data.info==0){
+                                forum.forums[id].favorite = Number(forum.forums[id].favorite)-Number(1);
+                            }else{
+                                forum.forums[id].favorite = Number(forum.forums[id].favorite)+Number(1);
+                            }
+                        }else{
+                            alert(data.info);
+                        }
+                    }, 'json');
+                },
+            }
+        })
+
+        $(document).on('click', '.dolike', function() {
+            var mid = forum.mid;
+            $.get("{:url('forum/ajaxFollow')}", { id: mid },function(data){
+                if(data.code==1){
+                    follow.is_follow = data.info;
+                    if(data.info==0){
+                        follow.followed = Number(follow.followed)-Number(1);
+                    }else{
+                        follow.followed = Number(follow.followed)+Number(1);
+                    }
+                }else{
+                    alert(data.info);
+                }
+            }, 'json');
+        });
+
+        $(document).on('infinite', '.infinite-scroll',function() {
+            var mid = forum.mid;
+            // 显示loading
+            $.showIndicator();
+            // ajax获取信息
+            $.get("{:url('forum/ajaxGetFourmList')}", { page: forum.page, mid: mid },function(data){
+                // console.log(data)
+                // 隐藏loading
+                $.hideIndicator();
+                if(data==1){
+                    $.toast("没有更多的信息...");
+                }else{
+                    forum.concatData(data);
+                }
+            }, 'json');
+        });
+    </script>
+{/block}

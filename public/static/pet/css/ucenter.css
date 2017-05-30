@@ -102,7 +102,7 @@ body, .page, .page-group, .page-group.page-current, .page.page-current{
   height: 1.2rem;
   padding-top: 0;
   padding-bottom: 0;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   line-height: 1.2rem;
 }
 .order-type .tab-item .icon ~ .tab-label {
@@ -112,4 +112,7 @@ body, .page, .page-group, .page-group.page-current, .page.page-current{
   font-size: .6rem;
   margin-top:.2rem;
   color:#221814;
+}
+.nav-btn .my-icon-system{
+  font-size:1.2rem;
 }

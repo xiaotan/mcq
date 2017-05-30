@@ -8,7 +8,7 @@ body, .page, .page-group, .page-group.page-current, .page.page-current{
     color:#f9b831;
 }
 .order-show{
-    margin-top:2.2rem;
+    margin-top:2.5rem;
 }
 .order-show img{
     display:block;
@@ -23,10 +23,14 @@ body, .page, .page-group, .page-group.page-current, .page.page-current{
     font-size:.7rem;
     margin-bottom:.2rem;
 }
+.order-show-box a{
+    color:#221814;
+}
 .order-show-box .tel{
     font-size:1.8rem;
-    top:0;
+    top:.5rem;
     right:.5rem;
+    color:#00A1E9;
 }
 .order-show-box:last-child{
     margin-bottom:5.5rem;
@@ -63,6 +67,11 @@ body, .page, .page-group, .page-group.page-current, .page.page-current{
     border-radius: 2.25rem;
     margin-left:1rem;
     margin-top:.3rem;
+    border:1px solid #f9b700;
+    color:#f9b700;
+}
+.order-footer-button span a{
+    color:#f9b700;
 }
 .order-footer-button .cancel_order{
     border:1px solid #888;
@@ -71,4 +80,39 @@ body, .page, .page-group, .page-group.page-current, .page.page-current{
 .order-footer-button .payment{
     border:1px solid #f9b700;
     color:#f9b700;
+}
+.nav-wrap-title{
+    color:#f9b831;
+}
+
+
+.order-cancel .cancel-img{
+    width:5rem;
+    margin:.5rem auto;
+}
+.order-cancel .cancel-img img{
+    width:100%;
+    border:none;
+}
+.order-cancel p{
+    font-size:.8rem;
+    margin-bottom:.5rem;
+    text-align:center;
+    color:#898989;
+}
+
+.order-cancel .button{
+    border:1px solid #f8b319;
+    font-size:1rem;
+}
+.order-cancel .modal-success-button{
+    background: #f8b319;
+    color:#fff;
+}
+.order-cancel .modal-cancel-button{
+    color:#f8b319;
+}
+
+.content-block{
+    margin:0;
 }

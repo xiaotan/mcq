@@ -9,24 +9,20 @@
         <div class="page">
 
             <header class="bar bar-nav bn" id="nav-top">
-                <button class="button button-link button-nav pull-left">
-                    <span class="icon icon-left"></span> 退款
-                </button>
+                <a href="javascript:history.go(-1);" external style="display:block;">
+                    <button class="button button-link button-nav pull-left">
+                        <span class="icon icon-left"></span> 返回
+                    </button>
+                </a>
             </header>
             
             <div class="refund-show">
                 <img width="100%" src="__MODULE_IMG__/refund.jpg" alt="">
                 <div class="refund-box pr">
-                    <p>订单金额：<span>￥<i>49.9</i></span></p>
-                    <p>申请时间：2017-05-15</p>
+                    <p>订单金额：<span>￥<i>{$order.price}</i></span></p>
+                    <p>申请时间：{$order.refund_time}</p>
                 </div>
             </div>
         </div>
     </div>
-{/block}
-
-{block name="script"}
-    <script>
-
-    </script>
 {/block}

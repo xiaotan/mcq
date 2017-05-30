@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="__MODULE_CSS__/light7-swiper.css">
     <link rel="stylesheet" href="__MODULE_CSS__/base.css">
     <link rel="stylesheet" href="__MODULE_CSS__/common.css">
+    <link rel="stylesheet" href="__MODULE_CSS__/fonts.css">
 
     {block name="style"}{/block}
 
@@ -47,11 +48,9 @@
     <script type='text/javascript' src='__MODULE_JS__/jquery.simplemodal.js' charset='utf-8'></script>
     <script type='text/javascript' src='__MODULE_JS__/remodal.js' charset='utf-8'></script>
     <script type='text/javascript' src='__MODULE_JS__/webuploader.js' charset='utf-8'></script>
-    <script type='text/javascript' src='__MODULE_JS__/vue.js' charset='utf-8'></script>remodal.js
+    <script type='text/javascript' src='__MODULE_JS__/vue.js' charset='utf-8'></script>
     <script>
-        $(function(){
-            $(".bar-tab .tab-item").eq(1).trigger("click");
-        })
+        $.init();
     </script>
     {block name="script"}{/block}
 </body>
