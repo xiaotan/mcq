@@ -86,7 +86,7 @@ body, .page, .page-group, .page-group.page-current, .page.page-current{
 }
 .order-type .tab-item.active,
 .order-type .tab-item:active {
-  color: #0894ec;
+  color: #f8b319;
 }
 .order-type .tab-item .badge {
   position: absolute;
