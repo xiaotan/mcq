@@ -50,7 +50,12 @@ body, .page, .page-group, .page-group.page-current, .page.page-current{
     text-align:center;
 }
 .my-roder{
-    margin:.5rem 0;
+    margin:0;
+    padding:.5rem 0;
+}
+.content-padded{
+  margin:0;
+  padding:.5rem;
 }
 .my-roder .item-after{
     font-size:.6rem;
