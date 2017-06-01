@@ -73,6 +73,7 @@
                             </template>
                         </ul>
                         <p v-if="isEmptyObject(forums)" class="no-data">暂无数据</p>
+                        <p class="no-more" v-if="noMore==1 ? true : false">没有更多信息</p>
                     </div>
                 </div>
             </div>
@@ -91,6 +92,7 @@
             data: {
                 page: 2,
                 forums: {$forums},
+                noMore: 0,
             },
             methods: {
                 concatData: function(data){
@@ -126,15 +128,10 @@
         })
 
         $(document).on('infinite', '.infinite-scroll',function() {
-            // 显示loading
-            $.showIndicator();
             // ajax获取信息
             $.get("{:url('forum/ajaxGetFourmList')}", { page: forum.page },function(data){
-                // console.log(data)
-                // 隐藏loading
-                $.hideIndicator();
                 if(data==1){
-                    $.toast("没有更多的信息...");
+                    forum.noMore = 1;
                 }else{
                     forum.concatData(data);
                 }

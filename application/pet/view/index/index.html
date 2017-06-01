@@ -62,6 +62,7 @@
                                 </a>
                             </template>
                         </ul>
+                        <p class="no-more" v-if="noMore==1 ? true : false">没有更多信息</p>
                     </div>
                 </div>
             </div>
@@ -80,6 +81,7 @@
             data: {
                 page: 1,
                 items: {$business},
+                noMore: 0,
             },
             methods: {
                 concatData: function(data){
@@ -114,14 +116,10 @@
 
         // 监听向上滑动事件，获取更多商家列表
         $(document).on('infinite', '.infinite-scroll',function() {
-            // 显示loading
-            $.showIndicator();
             // ajax获取信息
             $.get("{:url('index/ajaxGetBusinessList')}", { page: business.page },function(data){
-                // 隐藏loading
-                $.hideIndicator();
                 if(data==1){
-                    $.toast("没有更多的信息...");
+                    business.noMore = 1;
                 }else{
                     business.concatData(data);
                 }

@@ -1,7 +1,10 @@
 .bar {
     position: fixed;
 }
-
+.no-more{
+    text-align:center;
+    margin:.5rem;
+}
 .my-icon {
     font-family: "iconfont-sm" !important;
     font-style: normal;

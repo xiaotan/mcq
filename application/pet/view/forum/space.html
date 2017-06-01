@@ -73,6 +73,7 @@
                             </template>
                         </ul>
                         <p v-if="isEmptyObject(forums)" class="no-data">暂无数据</p>
+                        <p class="no-more" v-if="noMore==1 ? true : false">没有更多信息</p>
                     </div>
                 </div>
             </div>
@@ -99,6 +100,7 @@
                 page: 2,
                 mid: "{$member['id']}",
                 forums: {$forums},
+                noMore: 0,
             },
             methods: {
                 concatData: function(data){
@@ -134,8 +136,7 @@
         })
 
         $(document).on('click', '.dolike', function() {
-            var mid = forum.mid;
-            $.get("{:url('forum/ajaxFollow')}", { id: mid },function(data){
+            $.get("{:url('forum/ajaxFollow')}", { id: forum.mid },function(data){
                 if(data.code==1){
                     follow.is_follow = data.info;
                     if(data.info==0){
@@ -150,16 +151,10 @@
         });
 
         $(document).on('infinite', '.infinite-scroll',function() {
-            var mid = forum.mid;
-            // 显示loading
-            $.showIndicator();
             // ajax获取信息
-            $.get("{:url('forum/ajaxGetFourmList')}", { page: forum.page, mid: mid },function(data){
-                // console.log(data)
-                // 隐藏loading
-                $.hideIndicator();
+            $.get("{:url('forum/ajaxGetFourmList')}", { page: forum.page, mid: forum.mid },function(data){
                 if(data==1){
-                    $.toast("没有更多的信息...");
+                    forum.noMore = 1;
                 }else{
                     forum.concatData(data);
                 }

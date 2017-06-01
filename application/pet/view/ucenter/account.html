@@ -81,37 +81,5 @@
                 }
             },'json');
         }
-        $(function(){
-            /*$(document).on('click', '.js-get-gold',function() {
-                alert(1)
-                var task_id = $(this).attr("data-id");
-                // 显示loading
-                $.showIndicator();
-                // ajax获取信息
-                $.get("{:url('ucenter/ajaxGetScore')}", { task_id: task_id },function(data){
-                    // 隐藏loading
-                    $.hideIndicator();
-                    alert(data.info)
-                    if(data.code==1){
-                        location.reload();
-                    }
-                },'json');
-            });*/
-            /*$(".js-get-gold").click(function(){
-                alert(1)
-                var task_id = $(this).attr("data-id");
-                // 显示loading
-                $.showIndicator();
-                // ajax获取信息
-                $.get("{:url('ucenter/ajaxGetScore')}", { task_id: task_id },function(data){
-                    // 隐藏loading
-                    $.hideIndicator();
-                    alert(data.info)
-                    if(data.code==1){
-                        location.reload();
-                    }
-                },'json');
-            })*/
-        })
     </script>
 {/block}
