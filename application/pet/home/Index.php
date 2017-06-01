@@ -41,7 +41,7 @@ class Index extends Common
 	        $lng = "108.354863";
 	        $lat = "22.831772";
     		// 根据用户经纬度获取最接近用户的商家
-	        $data = Db::query("SELECT id,name,score,thumb, ROUND(6378.138*2*ASIN(SQRT(POW(SIN((".$lat."*PI()/180-lat*PI()/180)/2),2)+COS(".$lat."*PI()/180)*COS(lat*PI()/180)*POW(SIN((".$lng."*PI()/180-lng*PI()/180)/2),2)))*1000) AS distance FROM ".config("database.prefix")."pet_business where status=1 tag like '%".$keyword."%' or name like '%".$keyword."%' ORDER BY distance ASC,score desc");
+	        $data = Db::query("SELECT id,name,score,thumb, ROUND(6378.138*2*ASIN(SQRT(POW(SIN((".$lat."*PI()/180-lat*PI()/180)/2),2)+COS(".$lat."*PI()/180)*COS(lat*PI()/180)*POW(SIN((".$lng."*PI()/180-lng*PI()/180)/2),2)))*1000) AS distance FROM ".config("database.prefix")."pet_business where status=1 and tag like '%".$keyword."%' or name like '%".$keyword."%' ORDER BY distance ASC,score desc");
 	        if($data){
 	        	//获取缩略图url
 		        foreach($data as $k=>$v){

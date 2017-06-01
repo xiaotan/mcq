@@ -18,10 +18,8 @@
 .icon-star-half {
     position: absolute;
     left: 0;
-    top:0;
     bottom:0;
-    right:0;
-    width: .55em;
+    width: 50%;
     overflow: hidden;
 }
 .icon-star-gray:before{
@@ -186,4 +184,8 @@
 }
 .swiper-container-horizontal > .swiper-banner .swiper-pagination-bullet {
     margin: 0 5px;
+}
+
+.list-block ul{
+    border-bottom: none;
 }
