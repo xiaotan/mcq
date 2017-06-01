@@ -5,7 +5,6 @@
 .account{
     background: #f4f4f4;
     padding-top:3rem;
-    padding-bottom:1rem;
 }
 .account-box{
     background: #fff;
@@ -92,7 +91,7 @@
 }
 
 .work{
-    margin-top:.5rem;
+    margin:.5rem 0;
 }
 .work .list-block ul{
     padding-top:.3rem;
