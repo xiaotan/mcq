@@ -36,17 +36,17 @@ define('ENTRANCE', 'admin');
 // | 如果需要开启路由功能，请注释下面三句
 // +----------------------------------------------------------------------
 // 加载框架基础文件
-// require './thinkphp/base.php';
+require './thinkphp/base.php';
 
 // 关闭路由
-// \think\App::route(false);
+\think\App::route(false);
 
 // 执行应用
-// \think\App::run()->send();
+\think\App::run()->send();
 
 // +----------------------------------------------------------------------
 // | 默认为关闭路由
 // | 如果需要开启路由，请取消以下注释
 // +----------------------------------------------------------------------
 // 加载框架引导文件
-require './thinkphp/start.php';
+// require './thinkphp/start.php';
