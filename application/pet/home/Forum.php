@@ -23,10 +23,9 @@ class Forum extends Common
         $slider = SliderModel::where(array("typeid"=>2, "status"=>1))->select();
 
         // 获取用户信息
-        $member = MemberModel::where(array("id"=>session("member_auth.member_id")))->find()->toArray();
+        $member = MemberModel::where(array("id"=>session("member_auth.member_id")))->find();
 
         $forums = $this->getFourmList();
-        // print_r($member['id']);exit;
 
         $this->assign('tab', 1);
         $this->assign('slider', $slider);
