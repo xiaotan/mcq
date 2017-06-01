@@ -4,6 +4,9 @@ body, .page, .page-group, .page-group.page-current, .page.page-current{
 .u-box{
     background: #fff;
 }
+.footer-box{
+  background: #EFEFEF;
+}
 .my-info{
     width:100%;
     height:9rem;   
