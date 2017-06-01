@@ -52,11 +52,7 @@
                                             <span class="distance">{{item.distance}}km</span>
                                             <div>
                                                 <span class="stars">
-                                                    <i class="my-icon my-icon-star1" v-for="n in parseInt(item.score)"></i>
-                                                    <i class="my-icon my-icon-star1 icon-star-gray" v-if="item.score > parseInt(item.score)">
-                                                        <i class="my-icon my-icon-star1 icon-star-half"></i>
-                                                    </i>
-                                                    <em class="star-text">{{item.score}}</em>
+                                                    <i class="my-icon my-icon-star1" v-for="n in parseInt(item.score)"></i><i class="my-icon my-icon-star1 icon-star-gray" v-if="item.score > parseInt(item.score)"><i class="my-icon my-icon-star1 icon-star-half"></i></i><em class="star-text">{{item.score}}</em>
                                                 </span>
                                             </div>
                                             <div class="coupon" v-if="item.coupon"><i class="icon my-icon-coupon"></i><span>{{item.coupon}}</span></div>
