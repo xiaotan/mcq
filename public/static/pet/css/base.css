@@ -149,18 +149,3 @@ textarea:-ms-input-placeholder {
 
 /* IE7 */
 
-.bar {
-    position: fixed;
-}
-
-.my-icon {
-    font-family: "iconfont-sm" !important;
-    font-style: normal;
-    -webkit-font-smoothing: antialiased;
-    -webkit-text-stroke-width: .2px;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-.header-box {
-    height: 2.5rem;
-}

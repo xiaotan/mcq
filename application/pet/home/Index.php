@@ -47,6 +47,8 @@ class Index extends Common
 		        foreach($data as $k=>$v){
 		        	$data[$k]['thumb'] = get_file_path($v['thumb']);
 		        	$data[$k]['distance'] = round($v['distance']/1000 ,2);
+                    $data[$k]['url'] = url("business/index",array('id'=>$v['id']));
+                    $data[$k]['coupon'] = BusinessCouponModel::where(array("status"=>1,'bid'=>$v['id'],'begin_time'=>['<',time()],'end_time'=>['>',time()]))->order("create_time asc")->value('title');
 		        }
 	        }
 	        echo $data ? json_encode($data) : 1;
