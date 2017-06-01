@@ -466,7 +466,7 @@ label.label-checkbox input[type="checkbox"]:checked + .item-media i.icon-form-ch
     line-height:1.5rem;
     position: absolute;
     left:25%;
-    bottom:.3rem;
+    bottom:.5rem;
     z-index: 99999;
     font-size:.8rem;
 }
