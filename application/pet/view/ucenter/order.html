@@ -178,14 +178,20 @@
             },'json');
         });
 
+        var loading = false;
         // 监听向上滑动事件，获取更多订单列表
         $(document).on('infinite', '.infinite-scroll',function() {
+            // 如果正在加载，则退出
+            if (loading) return;
+            // 设置flag
+            loading = true;
             // 显示loading
             $.showIndicator();
             // ajax获取信息
             $.get("{:url('ucenter/ajaxGetOrderList')}", { page: order.page, type: tabs.type },function(data){
                 // 隐藏loading
                 $.hideIndicator();
+                loading = false;
                 if(data==1){
                     $.toast("没有更多的信息...");
                 }else{
