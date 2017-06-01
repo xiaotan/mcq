@@ -365,7 +365,7 @@ label.label-checkbox input[type="checkbox"]:checked + .item-media i.icon-form-ch
     margin-bottom:.3rem;
 }
 .affirm{
-    margin:.5rem 1rem;
+    margin:.5rem;
     color:#eb666a;
     position: relative;
 }
@@ -387,7 +387,7 @@ label.label-checkbox input[type="checkbox"]:checked + .item-media i.icon-form-ch
     right:0;
     top:0;
     height:2rem;
-    width:6rem;
+    width:5rem;
     background: #eb666a;
     border:none;
     border-radius: .5rem;
