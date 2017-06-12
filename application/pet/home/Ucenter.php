@@ -460,7 +460,7 @@ class Ucenter extends Common
      */
     public function setting(){
         $member = $this->MemberModel->where(array("id"=>$this->member_id))->find()->toArray();
-        $member['avatar'] = get_file_path($member['avatar']);
+        $member['avatar'] = get_avatar($member['id']);
         switch ($member['sex']) {
             case '1':
                 $member['sex'] = '男';
@@ -708,7 +708,7 @@ class Ucenter extends Common
                     if(in_array($v['id'], $uids)){
                         unset($v);
                     }else{
-                        $friends[$k]['avatar'] = get_file_path($v['avatar']);
+                        $friends[$k]['avatar'] = get_avatar($v['id']);
                         $friends[$k]['id'] = $v['id'];
                         $friends[$k]['intro'] = $v['intro'];
                         $friends[$k]['nickname'] = $v['nickname'];

@@ -12,7 +12,7 @@
                 <div class="nav-wrap nav-wrap-left">
                     {if isset($member['avatar'])}
                         <a class="react" rel="nofollow" href="{:url('forum/space', array('id'=>$member['id']))}" external>
-                            <img class="avatar" src="{:get_file_path($member['avatar'])}" alt="">
+                            <img class="avatar" src="{:get_avatar($member['id'])}" alt="">
                         </a>
                     {else}
                         <a class="react" rel="nofollow" external>

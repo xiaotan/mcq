@@ -29,25 +29,6 @@ class Common extends Home
     protected function _initialize()
     {
         parent::_initialize();
-
-        //在这里处理微信授权登录,先进行静默授权
-        // if(!session('member_auth')){
-            // SDK实例对象
-            $oauth = & load_wechat('Oauth');
-            $callback = url("pet/index/wxLogin", '', 'html', true);
-            // 执行接口操作
-            $result = $oauth->getOauthRedirect($callback, 'fuck', 'snsapi_base');
-            print_r($result);
-            // 处理返回结果
-            if($result===FALSE){
-                // 接口失败的处理
-                return false;
-            }else{
-                // 接口成功的处理
-                // print_r($result);
-                header("Location: $result");
-            }
-        // }
     }
 
     /**

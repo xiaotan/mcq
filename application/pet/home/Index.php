@@ -21,6 +21,10 @@ class Index extends Common
      */
     public function index()
     {
+        // print_r(get_avatar());exit;
+        //在这里处理微信授权登录,先进行静默授权
+        do_wxlogin();
+
     	// 商家列表页滚动图
         $slider = SliderModel::where(array("typeid"=>1, "status"=>1))->order("sort asc")->select();
 
@@ -123,13 +127,76 @@ class Index extends Common
         $oauth = & load_wechat('Oauth');
         // 执行接口操作
         $result = $oauth->getOauthAccessToken();
+        // print_r($result);exit;
         // 处理返回结果
         if($result===FALSE){
-            // 接口失败的处理
             return false;
         }else{
-            // 接口成功的处理
-            print_r($result);
+            if($result['scope'] == 'snsapi_base'){
+                //先判断是否有用户
+                $member = MemberModel::where(array("openid"=>$result['openid']))->find();
+                if($member){
+                    $this->dologinUser($member['username']);
+                }else{
+                    $user = & load_wechat('User');
+                    $result = $user->getUserInfo($result['openid']);
+                    if($result['subscribe']==0){
+                        $result = $oauth->getOauthRedirect(url("pet/index/wxLogin", '', 'html', true), 'state', 'snsapi_userinfo');
+                        if($result===FALSE){
+                            return false;
+                        }else{
+                            header("Location: " . $result);
+                            exit;
+                        }
+                    }else{
+                        $this->loginUser($result);
+                    }
+                }
+            }else{
+                $result = $oauth->getOauthUserinfo($result['access_token'], $result['openid']);
+                // 处理返回结果
+                if($result===FALSE){
+                    return false;
+                }else{
+                    $this->loginUser($result);
+                }
+            }
+        }
+    }
+
+    //处理微信登录
+    private function loginUser($info){
+        //查询用户信息
+        $member = MemberModel::where(array("openid"=>$info['openid']))->find();
+        //openid判断是否存在用户,如果不存在，则先自动注册一个
+        if($member){
+            //用户已经存在，则进行登陆操作
+            $this->dologinUser($member['username']);
+        }else{
+            //用户不存在，进行注册
+            $input['openid'] = $info['openid'];
+            $input['username'] = "mcq".time();
+            $input['nickname'] = $info['nickname'];
+            $input['sex'] = $info['sex'];
+            $input['status'] = 1;
+            $input['wx_avatar'] = $info['headimgurl'];
+            $input['password'] = $info['openid'].'mcq159456';
+            $result = MemberModel::create($input);
+            //进行登陆操作
+            if($result){
+                $this->dologinUser($result['username']);
+            }
+        }
+    }
+
+    //登录操作
+    private function dologinUser($username){
+        //进行登陆操作
+        $MemberModel = new MemberModel;
+        $MemberModel->wxlogin($username);
+        //重定向到原页面
+        if(session("?back_url")){
+            $this->redirect(session("back_url"));
         }
     }
 }

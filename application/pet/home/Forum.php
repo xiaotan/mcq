@@ -67,7 +67,7 @@ class Forum extends Common
                 $member = MemberModel::get($v['mid']);
                 $forums[$k]['id'] = $v['id'];
                 $forums[$k]['nickname'] = $member['nickname'];
-                $forums[$k]['avatar'] = get_file_path($member['avatar']);
+                $forums[$k]['avatar'] = get_avatar($member['id']);
                 $forums[$k]['date'] = time_tran($v['create_time']);
                 $forums[$k]['content'] = $v['content'];
                 $forums[$k]['lng'] = $v['lng'];

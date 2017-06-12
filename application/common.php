@@ -13,7 +13,64 @@ use think\Db;
 use think\Config;
 use Wechat\Loader;
 // 应用公共文件
-// 
+
+
+if (!function_exists('get_avatar')) {
+    /**
+     * 获取用户头像
+     * @param $mid
+     */
+    function get_avatar($mid) {
+        //优先返回avatar
+        $member = Db::name("pet_member")->where(array("id"=>$mid))->find();
+        if($member['avatar']){
+            return get_file_path($member['avatar']);
+        }elseif($member['wx_avatar']){
+            return $member['wx_avatar'];
+        }else{
+            return config('public_static_path').'admin/img/none.png';
+        }
+    }
+}
+
+if (!function_exists('get_url')) {
+    /**
+     * 获取当前页面完整URL地址
+     */
+    function get_url() {
+        $sys_protocal = isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443' ? 'https://' : 'http://';
+        $php_self = $_SERVER['PHP_SELF'] ? $_SERVER['PHP_SELF'] : $_SERVER['SCRIPT_NAME'];
+        $path_info = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '';
+        $relate_url = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $php_self.(isset($_SERVER['QUERY_STRING']) ? '?'.$_SERVER['QUERY_STRING'] : $path_info);
+        return $sys_protocal.(isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').$relate_url;
+    }
+}
+
+if (!function_exists('do_wxlogin')) {
+    /**
+     * 手动进行微信授权登陆操作
+     * @return mix
+     */
+    function do_wxlogin(){
+        if(!session('?member_auth')){
+            session("back_url", get_url());
+            // SDK实例对象
+            $oauth = & load_wechat('Oauth');
+            // 执行接口操作
+            $result = $oauth->getOauthRedirect(url("pet/index/wxLogin", '', 'html', true), 'state', 'snsapi_base');
+            // 处理返回结果
+            if($result===FALSE){
+                // 接口失败的处理
+                return false;
+            }else{
+                // 接口成功的处理
+                header("Location: " . $result);
+                exit;
+            }
+        } 
+    }
+}
+
 if (!function_exists('str_cut')) {
     /**
      * 字符截取 支持UTF8/GBK

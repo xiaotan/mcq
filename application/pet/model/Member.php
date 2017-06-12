@@ -77,6 +77,50 @@ class Member extends ThinkModel
     }
 
     /**
+     * 微信用户登录
+     * @param string $username 用户名
+     * @return bool|mixed
+     */
+    public function wxlogin($username = '', $rememberme = false)
+    {
+        $username = trim($username);
+
+        // 匹配登录方式
+        if (preg_match("/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/", $username)) {
+            // 邮箱登录
+            $map['email'] = $username;
+        } elseif (preg_match("/^1\d{10}$/", $username)) {
+            // 手机号登录
+            $map['mobile'] = $username;
+        } else {
+            // 用户名登录
+            $map['username'] = $username;
+        }
+
+        $map['status'] = 1;
+
+        // 查找用户
+        $member = $this::get($map);
+        if (!$member) {
+            $this->error = '用户不存在或被禁用！';
+        } else {
+            $member_id = $member->id;
+            // 更新登录信息
+            $member->last_login_time = request()->time();
+            $member->last_login_ip   = get_client_ip(1);
+            if ($member->save()) {
+                // 自动登录
+                return $this->autoLogin($this::get($member_id), $rememberme);
+            } else {
+                // 更新登录信息失败
+                $this->error = '登录信息更新失败，请重新登录！';
+                return false;
+            }
+        }
+        return false;
+    }
+
+    /**
      * 自动登录
      * @param object $member 用户对象
      * @param bool $rememberme 是否记住登录，默认7天
