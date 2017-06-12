@@ -129,6 +129,7 @@ class Index extends Common
             return false;
         }else{
             // 接口成功的处理
+            print_r($result);
         }
     }
 }
