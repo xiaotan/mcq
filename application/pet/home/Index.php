@@ -117,4 +117,18 @@ class Index extends Common
     public function im(){
         return $this->fetch(); // 渲染模板
     }
+
+    public function wxLogin(){
+        // SDK实例对象
+        $oauth = & load_wechat('Oauth');
+        // 执行接口操作
+        $result = $oauth->getOauthAccessToken();
+        // 处理返回结果
+        if($result===FALSE){
+            // 接口失败的处理
+            return false;
+        }else{
+            // 接口成功的处理
+        }
+    }
 }
