@@ -1,0 +1,93 @@
+{extend name="public:layout" /}
+
+{block name="style"}
+    <link rel="stylesheet" href="__MODULE_CSS__/addfriend.css">
+{/block}
+
+{block name="main"}
+    <div class="page-group">
+        <div class="page">
+            
+            <header class="bar bar-nav bn" id="nav-top">
+                <a href="javascript:history.go(-1);" external style="display:block;">
+                    <button class="button button-link button-nav pull-left">
+                        <span class="icon icon-left"></span> 添加好友
+                    </button>
+                </a>
+            </header>
+            <div id="friend">
+                <div class="nickname">
+                    <input type="text" name="nickname" placeholder="请输入用户昵称">
+                </div>
+                
+                <div class="list-block media-list" v-if="!isEmptyObject(list)">
+                    <div class="search-list">搜索结果</div>
+                    <ul>
+                        <template v-for="item in list">
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media"><img :src="item.avatar"></div>
+                                    <div class="item-inner">
+                                        <div class="item-title-row">
+                                            <div class="item-title">{{item.nickname}}</div>
+                                        </div>
+                                        <div class="item-subtitle">{{item.intro}}</div>
+                                    </div>
+                                    <div class="add-action" @click="addFriend(item.id)">添加</div>
+                                </div>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+
+            <p class="save"><a class="button button-fill">搜索</a></p>
+        </div>
+    </div>
+{/block}
+
+{block name="script"}
+    <script>
+
+        var friend = new Vue({
+            el: '#friend',
+            data: {
+                list: {},
+            },
+            methods: {
+                isEmptyObject: function(e){
+                    var t;  
+                    for (t in e)  
+                        return !1;  
+                    return !0 
+                },
+                addFriend: function(id){
+                    $.post("{:url('ucenter/ajaxAddFriend')}", { id: id },function(data){
+                        // 隐藏loading
+                        $.hideIndicator();
+                        alert(data.info)
+                    },'json');
+                },
+            },
+        });
+
+        $(document).on('click','.save', function () {
+            var nickname = $("input[name='nickname']").val();
+            if(!nickname){
+                alert("昵称不能为空");
+                return false;
+            }
+            // 显示loading
+            $.showIndicator();
+            $.post("{:url('ucenter/ajaxSearchFriend')}", { nickname: nickname },function(data){
+                // 隐藏loading
+                $.hideIndicator();
+                if(data.code==1){
+                    friend.list = data.info;
+                }else{
+                    alert(data.info)
+                }
+            },'json');
+        });
+    </script>
+{/block}

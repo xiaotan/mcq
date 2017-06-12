@@ -1,0 +1,41 @@
+#nav-top{
+    background: #fff;
+}
+#nav-top .button-link {
+    color: #f9b831;
+}
+.setting-box{
+    background:#F4F5F4;
+    margin-top:2.2rem;
+}
+.setting-box .list-block{
+    padding-top:.5rem;
+}
+.list-block{
+    margin:0;
+}
+.list-block ul{
+    border:none;
+}
+.logout {
+    position: fixed;
+    bottom: 1rem;
+    left: 0;
+    width: 80%;
+    margin: 0 10%;
+}
+.logout .button.button-fill {
+    height: 2rem;
+    line-height: 2rem;
+    background: #eb666a;
+}
+.last-block li:last-child .item-inner, .last-block li:last-child li:last-child .item-inner{
+    border-bottom: 1px solid #e7e7e7;
+}
+.webuploader-pick{
+    background: none;
+    padding:0;
+}
+.popup-overlay.modal-overlay-visible{
+    opacity: 0;
+}

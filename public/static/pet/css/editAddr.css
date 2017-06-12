@@ -1,0 +1,47 @@
+#nav-top{
+    background: #fff;
+}
+#nav-top .button-link {
+    color: #f9b831;
+}
+.list-block ul{
+    border:none;
+}
+.save {
+    position: fixed;
+    bottom: 1rem;
+    left: 0;
+    width: 80%;
+    margin: 0 10%;
+}
+.save .button.button-fill {
+    height: 2rem;
+    line-height: 2rem;
+    background: #F8B31A;
+}
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+    color: #999;
+}
+
+input:-moz-placeholder,
+textarea:-moz-placeholder {
+    color: #999;
+}
+
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+    color: #999;
+}
+
+input:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+    color: #999;
+}
+.list-block{
+    border-top:.5rem solid #F5F5F5;
+    margin:.5rem 0;
+}
+.list-block li:last-child .item-inner, .list-block li:last-child li:last-child .item-inner{
+    border-bottom: 1px solid #e7e7e7;
+}

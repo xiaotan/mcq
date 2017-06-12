@@ -1,76 +1,52 @@
 {extend name="public:layout" /}
 
 {block name="style"}
-    <link rel="stylesheet" href="__MODULE_CSS__/service.css">
+    <link rel="stylesheet" href="__MODULE_CSS__/collect.css">
 {/block}
 
 {block name="main"}
     <div class="page-group">
         <div class="page">
 
-            <header class="navbar">
-                <div class="nav-wrap nav-wrap-left">
-                    <a class="react" rel="nofollow" href="">
-                        <span class="nav-btn">
-                            <i class="icon icon-home"></i>
-                            <span>南宁市</span>
-                        </span>
-                    </a>
-                </div>
-                <div class="box-search">
-                    <a class="react" href="">
-                        <i class="icon icon-search j-search"></i>
-                        <form><input type="search" class="single-line keyword" placeholder="大家都在搜：宠物洗护"></form>
-                    </a>
-                </div>
+            <header class="bar bar-nav bn" id="nav-top">
+                <a href="javascript:history.go(-1);" external style="display:block;">
+                    <button class="button button-link button-nav pull-left">
+                        <span class="icon icon-left"></span> 收藏
+                    </button>
+                </a>
             </header>
-            <div class="header-box"></div>
-
-
-            <div class="content banner">
-                <div class="swiper-container" data-autoplay="5000">
-                    <div class="swiper-wrapper">
-                        {volist name="slider" id="vo"}
-                            <div class="swiper-slide"><img width="100%" src="{:get_file_path($vo['cover'])}" alt=""></div>
-                        {/volist}
-                    </div>
-                    <div class="swiper-pagination"></div>
-                </div>
-            </div>
-
+            
             <!-- 添加 class infinite-scroll 和 data-distance -->
-            <div class="scroll-box" id="business">
+            <div class="scroll-box">
                 <div class="content infinite-scroll" data-distance="0">
-                    <div class="list-block content-list">
-                        <ul class="list-container">
+                    <div class="list-block content-list" id="collect">
+                        <div class="no-data" v-if="isEmptyObject(items)">
+                            <img src="__MODULE_IMG__/no-collect.jpg" alt="">
+                        </div>
+                        <ul class="list-container" v-else>
                             <template v-for="item in items">
                                 <a style="display:block;" :href="item.url" external>
                                     <li>
                                         <img :src="item.thumb" alt="">
                                         <div class="item-box">
                                             <div class="item-title">{{item.name}}</div>
-                                            <span class="distance">{{item.distance}}km</span>
+                                            <span class="delete" @click="deleteCollect(item.id)">删除</span>
                                             <div>
                                                 <span class="stars">
-                                                    <i class="my-icon icon-star" v-for="n in parseInt(item.score)"></i>
-                                                    <i class="my-icon icon-star icon-star-gray" v-if="item.score > parseInt(item.score)">
-                                                        <i class="my-icon icon-star icon-star-half"></i>
-                                                    </i>
-                                                    <em class="star-text">{{item.score}}</em>
+                                                    <i class="my-icon my-icon-star1" v-for="n in parseInt(item.score)"></i><i class="my-icon my-icon-star1 icon-star-gray" v-if="item.score > parseInt(item.score)"><i class="my-icon my-icon-star1 icon-star-half"></i></i><em class="star-text">{{item.score}}</em>
                                                 </span>
                                             </div>
-                                            <div class="coupon"><i class="icon icon-star"></i><span>{{item.coupon}}</span></div>
+                                            <div class="coupon" v-if="item.address"><span>{{item.address}}</span></div>
                                         </div>
                                         <div class="clearfix"></div>
                                     </li>
                                 </a>
                             </template>
                         </ul>
+                        <p class="no-more" v-if="noMore==1 ? true : false">没有更多信息</p>
                     </div>
                 </div>
             </div>
-
-            {include file="public/nav" /}
 
         </div>
     </div>
@@ -78,58 +54,49 @@
 
 {block name="script"}
     <script>
-        // 初始化
-        $.init();
-
-        // 循环商家列表
-        var business = new Vue({
-            el: '#business', 
+        var collect = new Vue({
+            el: '#collect', 
             data: {
-                page: 2,
-                items: {$business},
+                page: 1,
+                noMore: 0,
+                items: {$collect},
             },
             methods: {
                 concatData: function(data){
+                    console.log(this.items)
                     this.items = this.items.concat(data);
                     this.page++;
-                }
+                },
+                deleteCollect: function(id){
+                    // 显示loading
+                    $.showIndicator();
+                    $.get("{:url('ucenter/collect')}", { id: id },function(data){
+                        // 隐藏loading
+                        $.hideIndicator();
+                        if(data.code==1){
+                            location.reload();
+                        }else{
+                            alert(data.info)
+                        }
+                    }, "json");
+                },
+                isEmptyObject: function(e){
+                    var t;  
+                    for (t in e)  
+                        return !1;  
+                    return !0 
+                },
             }
         })
 
-        $(document).on('click', '.j-search',function() {
-            var keyword = $(".keyword").val();
-            if(keyword){
-                // 显示loading
-                $.showIndicator();
-                // ajax获取信息
-                $.get("{:url('index/ajaxSearchKeyword')}", { keyword: keyword },function(data){
-                    // 隐藏loading
-                    $.hideIndicator();
-                    if(data==1){
-                        $.toast("没有符合的信息...");
-                    }else{
-                        business.items = $.parseJSON( data );
-                    }
-                });
-            }else{
-                location.reload();
-                /*alert("关键字不能为空");
-                return false;*/
-            }
-        });
-
         // 监听向上滑动事件，获取更多商家列表
         $(document).on('infinite', '.infinite-scroll',function() {
-            // 显示loading
-            $.showIndicator();
             // ajax获取信息
-            $.get("{:url('index/ajaxGetBusinessList')}", { page: business.page },function(data){
-                // 隐藏loading
-                $.hideIndicator();
+            $.get("{:url('ucenter/ajaxGetCollect')}", { page: collect.page },function(data){
                 if(data==1){
-                    $.toast("没有更多的信息...");
+                    collect.noMore = 1;
                 }else{
-                    business.concatData(data);
+                    collect.concatData(data);
                 }
             });
         });

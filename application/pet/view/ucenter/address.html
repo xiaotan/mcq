@@ -1,0 +1,124 @@
+{extend name="public:layout" /}
+
+{block name="style"}
+    <link rel="stylesheet" href="__MODULE_CSS__/address.css">
+{/block}
+
+{block name="main"}
+    <div class="page-group">
+        <div class="page">
+            
+            <header class="bar bar-nav bn" id="nav-top">
+                <a href="{:url('ucenter/index')}" external style="display:block;">
+                    <button class="button button-link button-nav pull-left">
+                        <span class="icon icon-left"></span> 地址管理
+                    </button>
+                </a>
+            </header>
+
+            <!-- 添加 class infinite-scroll 和 data-distance -->
+            <div class="scroll-box">
+                <div class="content infinite-scroll" data-distance="0">
+                    <div class="list-block content-list addr-box" id="address">
+                        <div class="no-data" v-if="isEmptyObject(address)">
+                            <img src="__MODULE_IMG__/no-address.jpg" alt="">
+                        </div>
+                        <ul class="list-container" v-else>
+                            <template v-for="item in address">
+                                <div class="addr-item">
+                                    <div class="addr-info">
+                                        <div class="info-top">
+                                            <span class="name">{{item.name}}</span>
+                                            <span class="tel">{{item.mobile}}</span>
+                                        </div>
+                                        <p class="info-bottom">{{item.address}} {{item.street}}</p>
+                                    </div>
+                                    <div class="addr-action">
+                                        <div @click="mainAddr(item.id)" class="action-left" :class="item.is_main==1 ? 'is_main' : ''">
+                                            <i class="icon my-icon-business"></i>默认地址
+                                        </div>
+                                        <div class="action-right">
+                                            <span @click="editAddr(item.url)"><i class="icon my-icon-business"></i>编辑</span>
+                                            <span @click="deleteAddr(item.id)"><i class="icon my-icon-business"></i>删除</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </ul>
+                        <p class="no-more" v-if="noMore==1 ? true : false">没有更多信息</p>
+                    </div>
+                </div>
+            </div>
+            <p class="save"><a href="{:url('ucenter/editAddr')}" external class="button button-fill">添加地址</a></p>
+        </div>
+    </div>
+{/block}
+
+{block name="script"}
+    <script>
+
+        var address = new Vue({
+            el: '#address',
+            data: {
+                page: 1,
+                noMore: 0,
+                address: {$address},
+            },
+            methods: {
+                concatData: function(data){
+                    // console.log(this.items)
+                    this.address = this.address.concat(data);
+                    this.page++;
+                },
+                deleteAddr: function(id){
+                    // 显示loading
+                    $.showIndicator();
+                    $.get("{:url('ucenter/address')}", { id: id, action: 'delete' },function(data){
+                        // 隐藏loading
+                        $.hideIndicator();
+                        if(data.code==1){
+                            location.reload();
+                        }else{
+                            alert(data.info)
+                        }
+                    }, "json");
+                },
+                isEmptyObject: function(e){
+                    var t;  
+                    for (t in e)  
+                        return !1;  
+                    return !0 
+                },
+                editAddr: function(url){
+                    window.location.href = url;
+                },
+                mainAddr: function(id){
+                    // 显示loading
+                    $.showIndicator();
+                    $.get("{:url('ucenter/address')}", { id: id, action: 'main' },function(data){
+                        // 隐藏loading
+                        $.hideIndicator();
+                        if(data.code==1){
+                            location.reload();
+                        }else{
+                            alert(data.info)
+                        }
+                    }, "json");
+                },
+            },
+        });
+
+        // 监听向上滑动事件，获取更多商家列表
+        $(document).on('infinite', '.infinite-scroll',function() {
+            // ajax获取信息
+            $.get("{:url('ucenter/ajaxGetAddress')}", { page: address.page },function(data){
+                if(data==1){
+                    address.noMore = 1;
+                }else{
+                    address.concatData(data);
+                }
+            });
+        });
+
+    </script>
+{/block}

@@ -1,0 +1,26 @@
+#nav-top{
+    background: #fff;
+}
+#nav-top .button-link {
+    color: #f9b831;
+}
+#nav-top .add-friend{
+    font-size:.8rem;
+}
+.list-block{
+    margin:0;
+}
+.list-block .item-divider, .list-block .list-group-title{
+    color:#f9b831;
+}
+.friend-bottom{
+    width:100%;
+    height:1rem;
+    background: #f7f7f7;
+}
+.list-group a{
+    color:#3d4145;
+}
+.list-block li:last-child .item-inner, .list-block li:last-child li:last-child .item-inner{
+    border-bottom: 1px solid #e7e7e7;
+}

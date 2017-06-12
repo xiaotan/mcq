@@ -1,3 +1,7 @@
+.no-data img{
+    width:60%;
+    margin:5rem 20%;
+}
 .bar {
     position: fixed;
 }

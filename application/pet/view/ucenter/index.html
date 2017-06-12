@@ -10,15 +10,15 @@
 
             <header class="navbar">
                 <div class="nav-wrap nav-wrap-left">
-                    <a class="react" rel="nofollow" href="">
-                        <span class="nav-btn">
+                    <a class="react" rel="nofollow">
+                        <!-- <span class="nav-btn">
                             <i class="icon my-icon-news"></i>
-                        </span>
+                        </span> -->
                     </a>
                 </div>
                 <div class="nav-wrap-title">我的</div>
                 <div class="nav-wrap nav-wrap-right">
-                    <a class="react" rel="nofollow">
+                    <a class="react" rel="nofollow" href="{:url('ucenter/setting')}" external>
                         <span class="nav-btn">
                             <i class="icon my-icon-system"></i>
                         </span>
@@ -28,13 +28,15 @@
             <div class="header-box"></div>
 
             <div class="my-info">
-                <div class="info-box">
-                    <img class="avatar" src="{:get_file_path($member['avatar'])}" alt="">
-                    <div class="info">
-                        <p class="p1"><span class="name">{$member.nickname}</span><!-- <span class="level"><i class="icon icon-home"></i></span> --></p>
-                        <p class="desc">{$member.intro}</p>
+                <a href="{:url('ucenter/setting')}" external>
+                    <div class="info-box">
+                        <img class="avatar" src="{:get_file_path($member['avatar'])}" alt="">
+                        <div class="info">
+                            <p class="p1"><span class="name">{$member.nickname}</span><!-- <span class="level"><i class="icon icon-home"></i></span> --></p>
+                            <p class="desc">{$member.intro}</p>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
             
             <div class="u-box pr">
@@ -86,7 +88,7 @@
                     <ul>
                         <a href="{:url('ucenter/account')}" class="item-a" external>
                             <li class="item-content item-link">
-                                <div class="item-media"><i class="icon my-icon-account" style="color:#767676;font-size:1.2rem;"></i></div>
+                                <div class="item-media"><i class="icon my-icon-account"></i></div>
                                 <div class="item-inner">
                                     <div class="item-title">我的账户</div>
                                     <!-- <div class="item-after">杜蕾斯</div> -->
@@ -94,9 +96,19 @@
 
                             </li>
                         </a>
+                        <a href="{:url('ucenter/friend')}" class="item-a" external>
+                            <li class="item-content item-link">
+                                <div class="item-media"><i class="icon my-icon-me"></i></div>
+                                <div class="item-inner">
+                                    <div class="item-title">我的好友</div>
+                                    <!-- <div class="item-after">杜蕾斯</div> -->
+                                </div>
+
+                            </li>
+                        </a>
                         <a href="{:url('ucenter/collect')}" class="item-a" external>
                             <li class="item-content item-link">
-                                <div class="item-media"><i class="icon my-icon-star2" style="color:#767676;font-size:1.2rem;"></i></div>
+                                <div class="item-media"><i class="icon my-icon-star2"></i></div>
                                 <div class="item-inner">
                                     <div class="item-title">我的收藏</div>
                                     <!-- <div class="item-after">杜蕾斯</div> -->
@@ -105,7 +117,7 @@
                         </a>
                         <a href="{:url('ucenter/address')}" class="item-a" external>
                             <li class="item-content item-link">
-                                <div class="item-media"><i class="icon my-icon-location" style="color:#767676;font-size:1.2rem;"></i></div>
+                                <div class="item-media"><i class="icon my-icon-location"></i></div>
                                 <div class="item-inner">
                                     <div class="item-title">地址管理</div>
                                     <!-- <div class="item-after">杜蕾斯</div> -->

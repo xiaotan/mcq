@@ -1,0 +1,50 @@
+{extend name="public:layout" /}
+
+{block name="style"}
+    <link rel="stylesheet" href="__MODULE_CSS__/nickname.css">
+{/block}
+
+{block name="main"}
+    <div class="page-group">
+        <div class="page">
+            
+            <header class="bar bar-nav bn" id="nav-top">
+                <a href="javascript:history.go(-1);" external style="display:block;">
+                    <button class="button button-link button-nav pull-left">
+                        <span class="icon icon-left"></span> 昵称
+                    </button>
+                </a>
+            </header>
+            
+            <div class="nickname">
+                <input type="text" name="nickname" value="{$member.nickname}">
+            </div>
+
+            <p class="save"><a class="button button-fill">保存</a></p>
+        </div>
+    </div>
+{/block}
+
+{block name="script"}
+    <script>
+
+        $(document).on('click','.save', function () {
+            var nickname = $("input[name='nickname']").val();
+            if(!nickname){
+                alert("昵称不能为空");
+                return false;
+            }
+            // 显示loading
+            $.showIndicator();
+            $.post("{:url('ucenter/ajaxSetting')}", { nickname: nickname },function(data){
+                // 隐藏loading
+                $.hideIndicator();
+                if(data.code==1){
+                    window.location.href = "{:url('ucenter/setting')}"
+                }else{
+                    alert(data.info)
+                }
+            },'json');
+        });
+    </script>
+{/block}

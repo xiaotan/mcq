@@ -1,0 +1,80 @@
+{extend name="public:layout" /}
+
+{block name="style"}
+    <link rel="stylesheet" href="__MODULE_CSS__/route.css">
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=OXUey0ZTSETucYQdC5OmvsKUIdrsiotT"></script>
+{/block}
+
+{block name="main"}
+    <div class="page-group">
+        <div class="page">
+
+            <header class="navbar">
+                <div class="nav-wrap nav-wrap-left">
+                    <a class="react" rel="nofollow">
+                        <!-- <span class="nav-btn">
+                            <i class="icon my-icon-news"></i>
+                        </span> -->
+                    </a>
+                </div>
+                <div class="nav-wrap-title">溜狗</div>
+                <div class="nav-wrap nav-wrap-right">
+                    <a class="react" rel="nofollow">
+                        <!-- <span class="nav-btn">
+                            <i class="icon my-icon-system"></i>
+                        </span> -->
+                    </a>
+                </div>
+            </header>
+
+            <div id="route">
+                <div id="allmap"></div>
+            </div>
+            <div class="route-button position">
+                <i class="icon my-icon-aim" style="font-size:1rem;"></i>我的位置
+            </div>
+            <div class="route-button route">
+                <i class="icon my-icon-route" style="font-size:.8rem;"></i>我的路线
+            </div>
+
+            {include file="public/nav" /}
+
+        </div>
+    </div>
+{/block}
+{block name="script"}
+    <script>
+        var route = new Vue({
+            el: '#route',
+            data: {
+                points: {$points},
+            },
+            methods: {
+                isEmptyObject: function(e){
+                    var t;  
+                    for (t in e)  
+                        return !1;  
+                    return !0 
+                },
+                makePoint: function(){
+                    let Points = [];
+                    for (var i = 0; i < this.points.length; i++) {
+                        Points.push(new BMap.Point(this.points[i].lng, this.points[i].lat));
+                        // console.log(this.points[i].lng)
+                    }
+                    return Points;
+                },
+            },
+        });
+
+        Points = route.makePoint();
+
+        // 百度地图API功能
+        var map = new BMap.Map("allmap");
+        map.centerAndZoom(new BMap.Point(116.404, 39.915), 15);
+        map.enableScrollWheelZoom();
+
+        var polyline = new BMap.Polyline(Points, {strokeColor:"blue", strokeWeight:2, strokeOpacity:0.5});   //创建折线
+        map.addOverlay(polyline);   //增加折线
+    </script>
+{/block}

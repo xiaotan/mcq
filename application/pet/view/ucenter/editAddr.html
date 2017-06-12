@@ -1,0 +1,122 @@
+{extend name="public:layout" /}
+
+{block name="style"}
+    <link rel="stylesheet" href="__MODULE_CSS__/editAddr.css">
+{/block}
+
+{block name="main"}
+    <div class="page-group">
+        <div class="page">
+            
+            <header class="bar bar-nav bn" id="nav-top">
+                <a href="javascript:history.go(-1);" external style="display:block;">
+                    <button class="button button-link button-nav pull-left">
+                        <span class="icon icon-left"></span> 地址管理
+                    </button>
+                </a>
+            </header>
+
+            <div class="content">
+                <div class="list-block">
+                    <form id="addr">
+                        <input type="hidden" name="id" value="{if isset($address['id'])}{$address.id}{/if}">
+                        <ul>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media"><i class="icon icon-form-name"></i></div>
+                                    <div class="item-inner">
+                                        <div class="item-title label">收货人</div>
+                                        <div class="item-input">
+                                            <input type="text" name="name" placeholder="收货人姓名" value="{if isset($address['name'])}{$address.name}{/if}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media"><i class="icon icon-form-tel"></i></div>
+                                    <div class="item-inner">
+                                        <div class="item-title label">联系电话</div>
+                                        <div class="item-input">
+                                            <input type="text" name="mobile" placeholder="收货人电话" value="{if isset($address['mobile'])}{$address.mobile}{/if}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media"><i class="icon icon-form-gender"></i></div>
+                                    <div class="item-inner">
+                                        <div class="item-title label">性别</div>
+                                        <div class="item-input">
+                                            <select name="sex">
+                                                <option value="1" {if isset($address['sex']) && $address['sex']==1}selected{/if}>男</option>
+                                                <option value="2" {if isset($address['sex']) && $address['sex']==2}selected{/if}>女</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media"><i class="icon icon-form-settings"></i></div>
+                                    <div class="item-inner">
+                                        <div class="item-title label">所在地区</div>
+                                        <div class="item-input">
+                                            <select name="address">
+                                                <option value="青秀区" {if isset($address['qu']) && $address['qu']=='青秀区'}selected{/if}>青秀区</option>
+                                                <option value="江南区" {if isset($address['qu']) && $address['qu']=='江南区'}selected{/if}>江南区</option>
+                                                <option value="兴宁区" {if isset($address['qu']) && $address['qu']=='兴宁区'}selected{/if}>兴宁区</option>
+                                                <option value="邕宁区" {if isset($address['qu']) && $address['qu']=='邕宁区'}selected{/if}>邕宁区</option>
+                                                <option value="五象新区" {if isset($address['qu']) && $address['qu']=='五象新区'}selected{/if}>五象新区</option>
+                                                <option value="西乡塘区" {if isset($address['qu']) && $address['qu']=='西乡塘区'}selected{/if}>西乡塘区</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media"><i class="icon icon-form-comment"></i></div>
+                                    <div class="item-inner">
+                                        <div class="item-title label">详细地址</div>
+                                        <div class="item-input">
+                                            <input type="text" name="street" placeholder="详细地址" value="{if isset($address['street'])}{$address.street}{/if}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </form>
+                </div>
+            </div>
+
+            <p class="save"><a class="button button-fill">保存</a></p>
+        </div>
+    </div>
+{/block}
+
+{block name="script"}
+    <script>
+        $(document).on('click','.save', function () {
+            var data = $("#addr").serialize();
+            // 显示loading
+            $.showIndicator();
+            // ajax获取信息
+            $.ajax( {
+                type : "POST",
+                url : "{:url('ucenter/editAddr')}",
+                data : data,
+                dataType: "json",
+                success : function(data) {
+                    // 隐藏loading
+                    $.hideIndicator();
+                    alert(data.info)
+                    if(data.code){
+                        window.location.href = "{:url('ucenter/address')}";
+                    }
+                }
+            });
+        });
+    </script>
+{/block}

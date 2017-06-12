@@ -15,6 +15,9 @@ body, .page, .page-group, .page-group.page-current, .page.page-current{
     background:-webkit-gradient(linear, 0 0, 0 bottom, from(#f7b216), to(#e69400)); 
     color:#fff;
 }
+.my-info a{
+  color:#fff;
+}
 .info-box{
     padding:2.5rem 2rem 0 2rem;
 }
@@ -45,6 +48,10 @@ body, .page, .page-group, .page-group.page-current, .page.page-current{
 }
 .list-block ul{
     border:none;
+}
+.list-block .item-media i{
+  color:#767676;
+  font-size:1.2rem;
 }
 .order-type .col-33{
     text-align:center;

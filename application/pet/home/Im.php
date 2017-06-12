@@ -15,7 +15,7 @@ namespace app\pet\home;
  * 前台首页控制器
  * @package app\pet\admin
  */
-class Index extends Common
+class Im extends Common
 {
     /**
      * 首页

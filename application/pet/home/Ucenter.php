@@ -8,9 +8,15 @@ use app\pet\model\Order as OrderModel;
 use app\pet\model\Member as MemberModel;
 use app\pet\model\Business as BusinessModel;
 use app\pet\model\MemberScore as MemberScoreModel;
+use app\pet\model\MemberCollect as MemberCollectModel;
+use app\pet\model\MemberAddress as MemberAddressModel;
+use app\pet\model\MemberFriend as MemberFriendModel;
+use app\pet\model\MemberFriendRequest as MemberFriendRequestModel;
 use app\pet\model\BusinessCoupon as BusinessCouponModel;
 use app\pet\model\BusinessDoctor as BusinessDoctorModel;
 use app\pet\model\BusinessEvaluate as BusinessEvaluateModel;
+use think\Db;
+use util\Pinyin;
 
 /**
  * 前台首页控制器
@@ -449,11 +455,170 @@ class Ucenter extends Common
     }
 
     /**
+     * 个人信息设置
+     * @return mixed
+     */
+    public function setting(){
+        $member = $this->MemberModel->where(array("id"=>$this->member_id))->find()->toArray();
+        $member['avatar'] = get_file_path($member['avatar']);
+        switch ($member['sex']) {
+            case '1':
+                $member['sex'] = '男';
+                break;
+            case '2':
+                $member['sex'] = '女';
+                break;
+            default:
+                $member['sex'] = '未知';
+                break;
+        }
+        // print_r($member);exit;
+        $this->assign('member', json_encode($member));
+        return $this->fetch(); // 渲染模板
+    }
+
+    public function ajaxSetting(){
+        if($avatar = input("post.avatar/d")){
+            $input['avatar'] = $avatar;
+        }
+        if($sex = input("post.sex/d")){
+            $input['sex'] = $sex==1 ? 1 : 2;
+        }
+        if($nickname = input("post.nickname/s")){
+            //判断昵称是否有人使用
+            $result = $this->MemberModel->where(array("id"=>$this->member_id, "nickname"=>$nickname))->value("id");
+            if($result){
+                $return['code'] = 0;
+                $return['info'] = "昵称已经被使用";
+                echo json_encode($return);exit;
+            }
+            if(strlen($nickname)>20 || strlen($nickname)<2){
+                $return['code'] = 0;
+                $return['info'] = "昵称长度为2-20个字符";
+                echo json_encode($return);exit;
+            }
+            $input['nickname'] = $nickname;
+        }
+        $result = $this->MemberModel->where(array("id"=>$this->member_id))->update($input);
+        if($result){
+            $return['code'] = 1;
+            $return['info'] = "更新成功";
+            echo json_encode($return);exit;
+        }else{
+            $return['code'] = 0;
+            $return['info'] = "更新失败";
+            echo json_encode($return);exit;
+        }
+    }
+
+    public function nickname(){
+        $member = $this->MemberModel->where(array("id"=>$this->member_id))->find()->toArray();
+        $this->assign('member', $member);
+        return $this->fetch(); // 渲染模板
+    }
+
+    /**
      * 我的地址
      * @return mixed
      */
     public function address(){
-        
+        if(request()->isAjax()){
+            if($id = input('get.id/d')){
+                if(input('get.action/s')=='delete'){
+                    $result = MemberAddressModel::where(array("mid"=>$this->member_id, "id"=>$id))->delete();
+                }else{
+                    $is_main = MemberAddressModel::where(array("mid"=>$this->member_id, "id"=>$id))->value("is_main");
+                    if($is_main){
+                        $result = MemberAddressModel::where(array("mid"=>$this->member_id, "id"=>$id))->setField("is_main", 0);
+                    }else{
+                        $result = MemberAddressModel::where(array("mid"=>$this->member_id))->setField("is_main", 0);
+                        $result = MemberAddressModel::where(array("mid"=>$this->member_id, "id"=>$id))->setField("is_main", 1);
+                    }
+                }
+                if($result){
+                    $return['code'] = 1;
+                    $return['info'] = "操作成功";
+                    echo json_encode($return);exit;
+                }else{
+                    $return['code'] = 0;
+                    $return['info'] = "操作失败";
+                    echo json_encode($return);exit;
+                }
+            }
+        }else{
+            $address = $this->getAddressList();
+            $this->assign('address', json_encode($address));
+            return $this->fetch(); // 渲染模板
+        }
+    }
+
+    public function ajaxGetAddress(){
+        $page = input('get.page/d', 1);
+        $data = $this->getAddressList($page);
+        echo $data ? json_encode($data) : 1;
+    }
+
+    public function getAddressList($page = 1, $pageSize = 10, $cache = false){
+        $address = array();
+        // 做session缓存，防止多次查询数据库，需在用户重新定位时清除该缓存
+        if(session('address'.$page) && $cache){
+            $address = session('address'.$page);
+        }else{
+            // 根据用户经纬度获取最接近用户的商家
+            $address = Db::query("SELECT * FROM ".config("database.prefix")."pet_member_address where mid=".$this->member_id." order by is_main desc, create_time desc LIMIT ".($page-1)*$pageSize.",".$pageSize);
+            if($address){
+                foreach($address as $k=>$v){
+                    $address[$k]['url'] = url('ucenter/editAddr',array('id'=>$v['id']));
+                }
+                session('address'.$page, $address);
+            }
+        }
+        return $address;
+    }
+
+    public function editAddr($id=''){
+        if(request()->isPost()){
+            $data = $this->request->post();
+            // 验证
+            $result = $this->validate($data, 'MemberAddress');
+            // 验证失败 输出错误信息
+            if(true !== $result){
+                $return['code'] = 0;
+                $return['info'] = $result;
+                echo json_encode($return);exit;
+            }
+            $data['mid'] = $this->member_id;
+            $data['address'] = "广西 南宁市 ".$data['address'];
+            //如果为修改，判断是否为用户所有
+            if($data['id']){
+                $result = MemberAddressModel::where(array("mid"=>$this->member_id, "id"=>$data['id']))->value("id");
+                if(!$result){
+                    $return['code'] = 0;
+                    $return['info'] = "非法请求";
+                    echo json_encode($return);exit;
+                }
+            }
+            //保存数据
+            $address = MemberAddressModel::update($data);
+            if($address){
+                $return['code'] = 1;
+                $return['info'] = "编辑成功";
+                echo json_encode($return);exit;
+            }else{
+                $return['code'] = 0;
+                $return['info'] = "编辑失败";
+                echo json_encode($return);exit;
+            }
+        }else{
+            $address = [];
+            if($id){
+                $address = MemberAddressModel::where(array("mid"=>$this->member_id, "id"=>$id))->find()->toArray();
+                $addr = explode(" ", $address['address']);
+                $address['qu'] = $addr['2'];
+            }
+            $this->assign('address', $address);
+            return $this->fetch(); // 渲染模板
+        }
     }
 
     /**
@@ -461,7 +626,143 @@ class Ucenter extends Common
      * @return mixed
      */
     public function collect(){
-        
+        if(request()->isAjax()){
+            if($id = input('get.id/d')){
+                $result = MemberCollectModel::where(array("mid"=>$this->member_id, "id"=>$id))->delete();
+                if($result){
+                    $return['code'] = 1;
+                    $return['info'] = "删除成功";
+                    echo json_encode($return);exit;
+                }else{
+                    $return['code'] = 0;
+                    $return['info'] = "删除失败";
+                    echo json_encode($return);exit;
+                }
+            }
+        }else{
+            $collect = $this->getCollectList();
+            $this->assign('collect', json_encode($collect));
+            return $this->fetch(); // 渲染模板
+        }
+    }
+
+    public function ajaxGetCollect(){
+        $page = input('get.page/d', 1);
+        $data = $this->getCollectList($page);
+        echo $data ? json_encode($data) : 1;
+    }
+
+    public function getCollectList($page = 1, $pageSize = 10, $cache = false){
+        $collect = array();
+        // 做session缓存，防止多次查询数据库，需在用户重新定位时清除该缓存
+        if(session('collect'.$page) && $cache){
+            $collect = session('collect'.$page);
+        }else{
+            // 根据用户经纬度获取最接近用户的商家
+            $collect = Db::query("SELECT b.thumb,b.name,b.score,b.address,c.id,c.bid FROM ".config("database.prefix")."pet_member_collect as c, ".config("database.prefix")."pet_business as b where c.mid=".$this->member_id." and c.bid=b.id order by c.id desc LIMIT ".($page-1)*$pageSize.",".$pageSize);
+            if($collect){
+                foreach($collect as $k=>$v){
+                    $collect[$k]['thumb'] = get_file_path($v['thumb']);
+                    $collect[$k]['url'] = url("business/index",array('id'=>$v['bid']));
+                }
+                session('collect'.$page, $collect);
+            }
+        }
+        return $collect;
+    }
+
+    public function friend(){
+
+        $friend = MemberFriendModel::where(array("mid"=>$this->member_id))->select();
+        $letter = config("letter");
+        $friends = [];
+        if($friend){
+            foreach($friend as $k=>$v){
+                foreach($letter as $k1=>$v1){
+                    $head = Pinyin::getShortPinyin(get_member_name($v->fmid));
+                    /*if(!isset($friends[$v1])){
+                        $friends[$v1] = [];
+                    }*/
+                    if(strtolower($v1) == substr($head,0,1)){
+                        $friends[$v1][] = $v;
+                    }
+                }
+            }
+        }
+        // print_r($friends);exit;
+        $this->assign('friends', $friends);
+        return $this->fetch(); // 渲染模板
+    }
+
+    public function addfriend(){
+        return $this->fetch(); // 渲染模板
+    }
+
+    public function ajaxSearchFriend($nickname=''){
+        if($nickname){
+            $list = MemberModel::where(array("nickname"=>["like", '%'.$nickname.'%']))->select();
+            if($list){
+                $friends = [];
+                $uids = MemberFriendModel::where(array("mid"=>$this->member_id))->column("fmid");
+                foreach($list as $k=>$v){
+                    if(in_array($v['id'], $uids)){
+                        unset($v);
+                    }else{
+                        $friends[$k]['avatar'] = get_file_path($v['avatar']);
+                        $friends[$k]['id'] = $v['id'];
+                        $friends[$k]['intro'] = $v['intro'];
+                        $friends[$k]['nickname'] = $v['nickname'];
+                    }
+                }
+                $return['code'] = 1;
+                $return['info'] = $friends;
+                echo json_encode($return);exit;
+            }else{
+                $return['code'] = 0;
+                $return['info'] = "没有符合的用户";
+                echo json_encode($return);exit;
+            }
+        }
+    }
+
+    public function ajaxAddFriend($id=0){
+        if($id){
+            //查询是否已经是好友
+            $is_friend = MemberFriendModel::where(array("mid"=>$this->member_id, "fmid"=>$id))->value("mid");
+            if($is_friend){
+                $return['code'] = 0;
+                $return['info'] = "你们已经是好友";
+                echo json_encode($return);exit;
+            }
+            //查询对方是否已经有申请信息
+            $to_request = MemberFriendRequestModel::where(array("mid"=>$id, "fmid"=>$this->member_id))->find();
+            if($to_request){
+                //如果对方已经申请，则直接加为好友，并删除申请信息
+                MemberFriendRequestModel::where(array("mid"=>$id, "fmid"=>$this->member_id))->delete();
+                MemberFriendModel::create(array("mid"=>$this->member_id, "fmid"=>$id, "create_time"=>time(), "note"=>$to_request->note));
+                MemberFriendModel::create(array("mid"=>$id, "fmid"=>$this->member_id, "create_time"=>time(), "note"=>$to_request->note));
+                $return['code'] = 1;
+                $return['info'] = "添加成功";
+                echo json_encode($return);exit;
+            }else{
+                $is_request = MemberFriendRequestModel::where(array("mid"=>$this->member_id, "fmid"=>$id))->value("mid");
+                if($is_request){
+                    $return['code'] = 0;
+                    $return['info'] = "申请信息已经发送";
+                    echo json_encode($return);exit;
+                }
+                $result = MemberFriendRequestModel::create(array("mid"=>$this->member_id, "fmid"=>$id, "create_time"=>time()));
+                if($result){
+                    $return['code'] = 1;
+                    $return['info'] = "申请信息已发送";
+                    echo json_encode($return);exit;
+                }else{
+                    $return['code'] = 0;
+                    $return['info'] = "申请信息发送失败";
+                    echo json_encode($return);exit;
+                }
+            }
+        }
     }
 
     /**

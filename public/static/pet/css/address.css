@@ -1,0 +1,68 @@
+#nav-top{
+    background: #fff;
+}
+#nav-top .button-link {
+    color: #f9b831;
+}
+.addr-box{
+    background: #f5f5f5;
+    margin-top:2.2rem;
+    padding-top:.5rem;
+}
+.addr-box .addr-item{
+    border-bottom:.5rem solid #f5f5f5;
+}
+.addr-info{
+    padding:.8rem 1rem .5rem 1rem;
+    border-bottom:1px solid #efefef;
+}
+.addr-info .info-top{
+    height:1.2rem;
+    line-height:1.2rem;
+}
+.addr-info .name{
+    font-size:1.2rem;
+}
+.addr-info .tel{
+    font-size:.8rem;
+    float:right;
+}
+.info-bottom{
+    font-size:.7rem;
+    margin-top:.2rem;
+}
+.addr-action{
+    height:2rem;
+    padding:.5rem 1rem;
+    font-size:.8rem;
+}
+.addr-action span{
+    margin-left:.5rem;
+}
+.addr-action i{
+    margin-right:.2rem;
+}
+.action-left{
+    float:left;
+}
+.action-right{
+    float:right;
+}
+.addr-action .is_main{
+    color:#F8B31A;
+}
+.save {
+    position: fixed;
+    bottom: 1rem;
+    left: 0;
+    width: 80%;
+    margin: 0 10%;
+}
+.save .button.button-fill {
+    height: 2rem;
+    line-height: 2rem;
+    background: #F8B31A;
+}
+.list-block ul{
+    border:none;
+}

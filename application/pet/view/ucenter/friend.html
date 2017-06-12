@@ -1,0 +1,61 @@
+{extend name="public:layout" /}
+
+{block name="style"}
+    <link rel="stylesheet" href="__MODULE_CSS__/friend.css">
+{/block}
+
+{block name="main"}
+    <div class="page-group">
+        <div class="page">
+
+            <header class="bar bar-nav bn" id="nav-top">
+                <a href="javascript:history.go(-1);" external style="display:block;">
+                    <button class="button button-link button-nav pull-left">
+                        <span class="icon icon-left"></span> 好友列表
+                    </button>
+                </a>
+                <div class="nav-wrap nav-wrap-right pull-right">
+                    <a class="react add-friend" rel="nofollow" href="{:url('ucenter/addfriend')}" external>添加</a>
+                </div>
+            </header>
+
+            <div class="content">
+                <div class="list-block contacts-block">
+                    {volist name="friends" id="vo"}
+                        <div class="list-group">
+                            <ul>
+                                <li class="list-group-title">{$key}</li>
+                                {volist name="vo" id="v1"}
+                                    <a href="#" external>
+                                        <li data-id="{$v1.fmid}">
+                                            <div class="item-content">
+                                                <div class="item-inner">
+                                                    <div class="item-title">{:get_member_name($v1['fmid'])}</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </a>
+                                {/volist}
+                            </ul>
+                        </div>
+                    {/volist}
+                    {if empty($friends)}
+                        <style>.content{background:#F5F5F5;}</style>
+                        <div class="no-data">
+                            <img src="__MODULE_IMG__/no-friend.jpg" alt="">
+                        </div>
+                    {/if}
+                </div>
+                <div class="friend-bottom"></div>
+            </div>
+
+            
+        </div>
+    </div>
+{/block}
+
+{block name="script"}
+    <script>
+        
+    </script>
+{/block}
