@@ -29,7 +29,7 @@
                 <ul>
                     <li @click="changePayment(1)">
                         <label class="label-checkbox item-content">
-                            <input type="radio" value="1" name="pay_type">
+                            <input type="radio" value="1" checked>
                             <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
                             <div class="item-inner">
                                 <i class="icon my-icon-wepay"></i>
@@ -37,16 +37,16 @@
                             </div>
                         </label>
                     </li>
-                    <li @click="changePayment(2)">
+                    <!-- <li @click="changePayment(2)">
                         <label class="label-checkbox item-content">
-                            <input type="radio" value="2" name="pay_type">
+                            <input type="radio" value="2">
                             <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
                             <div class="item-inner">
                                 <i class="icon my-icon-alipay"></i>
                                 <span>支付宝支付</span>
                             </div>
                         </label>
-                    </li>
+                    </li> -->
                 </ul>
                 <p class="payment-submit" @click="submitPayment"><a class="button button-fill" external>立即支付</a></p>
             </div>
@@ -60,18 +60,18 @@
             el: '#payment',
             data: {
                 order_id: "{$order.id}",
-                pay_type: 0,
+                // pay_type: 1,
             },
             methods: {
                 changePayment: function(id){
                     this.pay_type = id;
                 },
                 submitPayment: function(){
-                    if(this.pay_type == 0){
+                    /*if(this.pay_type == 0){
                         alert("请选择支付方式");
                         return false;
-                    }
-                    console.log(this.pay_type)
+                    }*/
+                    window.location.href = "{:url('business/wxpay', array('order_no'=>$order['order_no']))}";
                 }
             },
         });

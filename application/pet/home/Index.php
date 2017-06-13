@@ -21,9 +21,10 @@ class Index extends Common
      */
     public function index()
     {
+        // echo date('ymdH') . rand(1000, 9999);exit;
         // print_r(get_avatar());exit;
         //在这里处理微信授权登录,先进行静默授权
-        do_wxlogin();
+        // do_wxlogin();
 
     	// 商家列表页滚动图
         $slider = SliderModel::where(array("typeid"=>1, "status"=>1))->order("sort asc")->select();

@@ -23,6 +23,7 @@
             <div class="order-show">
                 <img width="100%" src="__MODULE_IMG__/img5.jpg" alt="">
                 <div class="order-show-box pr">
+                    <p>服务核验码(用于商家核验)：<br/><span style="color:#eb666a;">{if $order['status']==1}[已核验]{/if} {:number_rewrite($order['verify_no'], ' ')}</span></p>
                     <p>订单编号：{$order.order_no}</p>
                     <p>项目：{$order.type}</p>
                     <p>类型：{$order.pet}</p>
@@ -43,11 +44,12 @@
                     <p>备注：{if $order['remark']}{$order.remark}{else}无{/if}</p>
                 </div>
             </div>
+            <div class="order-footer-box"></div>
             <div class="order-footer">
                 <p>应付：<span>￥<i>{$order.price}</i></span></p>
                 <div class="order-footer-button">
                     {if $order['status']==0 and $order['is_pay']==0}
-                        <span class="payment">立即付款</span>
+                        <span class="payment"><a external href="{:url('business/wxpay', array('order_no'=>$order['order_no']))}">立即付款</a></span>
                         <span class="cancel_order" id="showOrder">取消订单</span>
                     {/if}
                     {if $order['status']==0 and $order['is_pay']==1}

@@ -230,7 +230,8 @@ class Business extends Common
         $now = time();
         // 判断用户是否登录
         $MemberModel = new MemberModel;
-        if(!$order['mid'] = $MemberModel->isLogin()){
+        $order['mid'] = $MemberModel->isLogin();
+        if(!$order['mid']){
             $return['code'] = 0;
             $return['info'] = "请先授权登录";
             echo json_encode($return);exit;
@@ -499,5 +500,80 @@ class Business extends Common
             }
         }
         	
+    }
+
+    /**
+     * 微信支付页面
+     * @return
+     */
+    public function wxpay($order_no=''){
+        //根据订单id获取订单数据
+        $order = OrderModel::where(array("order_no"=>$order_no, "mid"=>session("member_auth.member_id")))->find();
+        if(!$order){
+            $this->error("订单不存在");
+        }
+
+        // 创建SDK实例
+        $script = &  load_wechat('Script');
+        // 获取JsApi使用签名，通常这里只需要传 $ur l参数
+        $options = $script->getJsSign(get_url());
+        // 处理执行结果
+        if($options===FALSE){
+            // 接口失败的处理
+            $this->error($script->errMsg);
+        }
+
+        // 实例支付接口
+        $pay = & load_wechat('Pay');
+        $openid = session("member_auth.openid");
+        $body = "萌宠圈服务支付".$order->price."元";
+        $out_trade_no = $order->order_no;
+        $total_fee = $order->price*100;
+        $notify_url = url('business/wxpaynotify', '', 'html', true);
+        // print_r($openid.'-'.$body.'-'.$out_trade_no.'-'.$total_fee.'-'.$notify_url);exit;
+        // 获取预支付ID
+        $prepayid = $pay->getPrepayId($openid, $body, $out_trade_no, $total_fee, $notify_url, $trade_type = "JSAPI");
+        // 处理创建结果
+        if($prepayid===FALSE){
+            // 接口失败的处理
+            $this->error($pay->errMsg);
+        }
+        // 创建JSAPI签名参数包，这里返回的是数组
+        $parameter = $pay->createMchPay($prepayid);
+
+        $this->assign('payment', url('ucenter/show', array("id"=>$order['id'])));
+        $this->assign('options', json_encode($options));
+        $this->assign('parameter', json_encode($parameter));
+        return $this->fetch(); // 渲染模板
+    }
+
+    //微信支付回调页面
+    public function wxpaynotify(){
+        // 实例支付接口
+        $pay = & load_wechat('Pay');
+        // 获取支付通知
+        $notifyInfo = $pay->getNotify();
+        // 支付通知数据获取失败
+        if($notifyInfo===FALSE){
+            // 接口失败的处理
+            echo $pay->errMsg;
+        }else{
+            //支付通知数据获取成功
+            if ($notifyInfo['result_code'] == 'SUCCESS' && $notifyInfo['return_code'] == 'SUCCESS') {
+                $order['is_pay'] = 1;
+                $order['pay_time'] = strtotime($notifyInfo['time_end']);
+                $order['out_trade_no'] = $notifyInfo['transaction_id'];
+                $order['verify_no'] = date('ymdH') . rand(1000, 9999);
+                OrderModel::where(array("order_no"=>$notifyInfo['out_trade_no']))->update($order);
+                // 支付状态完全成功，可以更新订单的支付状态了
+                // @todo 
+                // 返回XML状态，至于XML数据可以自己生成，成功状态是必需要返回的。
+                // <xml>
+                //    return_code><![CDATA[SUCCESS]]></return_code>
+                //    return_msg><![CDATA[OK]]></return_msg>
+                // </xml>
+                return xml(['return_code' => 'SUCCESS', 'return_msg' => 'DEAL WITH SUCCESS']);
+            }
+        }
     }
 }

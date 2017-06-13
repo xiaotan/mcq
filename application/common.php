@@ -14,6 +14,14 @@ use think\Config;
 use Wechat\Loader;
 // 应用公共文件
 
+if (!function_exists('number_rewrite')) {
+    function number_rewrite($str, $split='-'){
+        //4的意思就是每4个为一组
+        $arr = str_split($str, 4);
+        $str = implode(' ',$arr);
+        return $str;
+    }
+}
 
 if (!function_exists('get_avatar')) {
     /**

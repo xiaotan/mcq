@@ -212,18 +212,18 @@
                                 <ul>
                                     <li @click="choosePayment(1)">
                                         <label class="label-checkbox item-content">
-                                            <input type="radio" name="payment">
+                                            <input type="radio" name="payment" checked>
                                             <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
                                             <div class="address"><i class="icon my-icon-wepay"></i>微信支付</div>
                                         </label>
                                     </li>
-                                    <li @click="choosePayment(2)">
+                                    <!-- <li @click="choosePayment(2)">
                                         <label class="label-checkbox item-content">
                                             <input type="radio" name="payment">
                                             <div class="item-media"><i class="icon icon-form-checkbox"></i></div>
                                             <div class="address"><i class="icon my-icon-alipay"></i>支付宝支付</div>
                                         </label>
-                                    </li>
+                                    </li> -->
                                 </ul>
                             </div>
                         </div>
@@ -468,7 +468,7 @@
                 current_coupon: '',
                 current_score: '',
                 remark: '',
-                payment: '',
+                payment: 1,
                 pet_icon: '',
                 breeds: {},
                 ages: {:json_encode(config("pet_age"))},
@@ -671,7 +671,7 @@
                             if(data.code){
                                 //成功后支付 todo
                                 alert("下单成功")
-                                window.location.href = "{:url('ucenter/order')}";
+                                window.location.href = "{:url('business/wxpay', '', '', true)}"+"/order_no/"+data.info.order_no;
                             }else{
                                 alert(data.info)
                             }

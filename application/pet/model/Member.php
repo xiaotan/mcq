@@ -130,7 +130,8 @@ class Member extends ThinkModel
     {
         // 记录登录SESSION和COOKIES
         $auth = array(
-            'member_id'             => $member->id,
+            'member_id'       => $member->id,
+            'openid'          => $member->openid,
             'avatar'          => $member->avatar,
             'username'        => $member->username,
             'nickname'        => $member->nickname,

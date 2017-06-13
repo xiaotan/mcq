@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>微信支付</title>
+    <script src="//res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script>
+        // 微信JSSDK异常处理
+        wx.error(function(e){
+            console.log(e);
+        });
+        // 注入JSSDK配置参数，默认开启所有接口权限
+        wx.config({$options});
+
+        // 下面是 javascript 代码
+        wx.ready(function () {
+            // 这里获取到PHP生成签名参数包，注意是JSON格式
+            var  options = {$parameter};
+            // 支付成功后的操作
+            options.success = function () {
+                window.location.href = "{$payment}";
+            };
+            //  取消支付的操作
+            options.cancel = function () {
+                window.location.href = "{$payment}";
+            };
+            // 支付失败的处理 
+            options.fail = function () {
+                window.location.href = "{$payment}";
+            };
+            // 传入参数，发起JSAPI支付
+            wx.chooseWXPay(options);
+         });
+    </script>
+</head>
+<body>
+    
+</body>
+</html>
