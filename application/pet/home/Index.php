@@ -21,7 +21,6 @@ class Index extends Common
      */
     public function index()
     {
-        // echo session("member_auth.member_id");
         //在这里处理微信授权登录,先进行静默授权
         // do_wxlogin();
         // 跳转到萌宠圈

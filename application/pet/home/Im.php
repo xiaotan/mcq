@@ -121,7 +121,13 @@ class Im extends Common
                 $sendmsg[$k]['position'] = $v['position']==1?2:1;
             }
             //发送数据
-            $this->sendMessage($mid, $sendmsg);
+            $send['type'] = 'sendMessage';
+            $send['title'] = '未读消息';
+            $send['text'] = '用户： '.$sendmsg['0']['from_name'].' 给你发送了一条消息，请点击阅读';
+            $send['url'] = url('im/index', array('mid'=>$sendmsg['0']['from_mid']));
+            $send['data'] = $sendmsg;
+            send_message($mid, $send);
+
             $return['code'] = 1;
             $return['info'] = $msg;
             echo json_encode($return);exit;
@@ -151,7 +157,13 @@ class Im extends Common
                 $sendmsg[$k]['position'] = $v['position']==1?2:1;
             }
             //发送数据
-            $this->sendMessage($mid, $sendmsg);
+            $send['type'] = 'sendMessage';
+            $send['title'] = '未读消息';
+            $send['text'] = '用户： '.$sendmsg['0']['from_name'].' 给你发送了一条消息，请点击阅读';
+            $send['url'] = url('im/index', array('mid'=>$sendmsg['0']['from_mid']));
+            $send['data'] = $sendmsg;
+            send_message($mid, $send);
+            
             $return['code'] = 1;
             $return['info'] = $msg;
             echo json_encode($return);exit;

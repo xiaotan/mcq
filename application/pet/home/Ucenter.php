@@ -46,7 +46,7 @@ class Ucenter extends Common
      */
     public function index()
     {
-        $member = $this->MemberModel->where(array("id"=>$this->member_id))->find()->toArray();
+        $member = $this->MemberModel->where(array("id"=>$this->member_id))->find();
         // print_r($member);exit;
         $this->assign('tab', 4);
         $this->assign('member', $member);
@@ -365,6 +365,18 @@ class Ucenter extends Common
         $member = $this->MemberModel->where(array("id"=>$this->member_id))->find()->toArray();
         $score = MemberScoreModel::where("mid=".$this->member_id." and create_time>".mktime(0,0,0,date("m"),date("d"),date("Y"))." and create_time<".mktime(23,59,59,date("m"),date("d"),date("Y")))->sum("amount");
         $tasks = TaskModel::where(array("status"=>1, "begin_time"=>['<', time()], "end_time"=>['>', time()]))->select();
+        foreach($tasks as $k=>$v){
+            $tasks[$k]['status'] = 0;
+            $task_do = '';
+            $task_do = TaskDoModel::where(array("mid"=>$this->member_id, "task_id"=>$v['id']))->find();
+            if($task_do){
+                if($task_do['is_get']==1){
+                    $tasks[$k]['status'] = 2;
+                }else{
+                    $tasks[$k]['status'] = 1;
+                }
+            }
+        }
         //今天是否签到
         $qiandao = TaskDoModel::where("task_id=2 and mid=".$this->member_id." and create_time>".mktime(0,0,0,date("m"),date("d"),date("Y"))." and create_time<".mktime(23,59,59,date("m"),date("d"),date("Y")))->value("id");
         // print_r($qiandao);exit;
@@ -407,12 +419,15 @@ class Ucenter extends Common
             }else{
                 //根据任务类型分别处理 1唯一任务 2每日任务
                 if($task['type']==1){
-                    $task_do = TaskDoModel::where(array("task_id"=>$task_id, "mid"=>$this->member_id))->find();
+                    $task_do = TaskDoModel::where(array("task_id"=>$task_id, "mid"=>$this->member_id, "is_get"=>0))->find();
                 }else{
                     $task_do = TaskDoModel::where("task_id=".$task_id." and mid=".$this->member_id." and create_time>".mktime(0,0,0,date("m"),date("d"),date("Y"))." and create_time<".mktime(23,59,59,date("m"),date("d"),date("Y")))->value("id");
                 }
                 if($task_do){
                     $this->handleScore($task_id, $task_do['amount']);
+                    $return['code'] = 1;
+                    $return['info'] = "积分领取成功";
+                    echo json_encode($return);exit;
                 }else{
                     $return['code'] = 0;
                     $return['info'] = "任务未完成, 不可领取";
@@ -473,6 +488,7 @@ class Ucenter extends Common
     public function setting(){
         $member = $this->MemberModel->where(array("id"=>$this->member_id))->find()->toArray();
         $member['avatar'] = get_member_avatar($member['id']);
+        $member['intro'] = str_cut($member['intro'], 20);
         switch ($member['sex']) {
             case '1':
                 $member['sex'] = '男';
@@ -511,6 +527,11 @@ class Ucenter extends Common
             }
             $input['nickname'] = $nickname;
         }
+        if($intro = input("post.intro/s")){
+            //完成完善资料任务
+            handle_task(3);
+            $input['intro'] = $intro;
+        }
         $result = $this->MemberModel->where(array("id"=>$this->member_id))->update($input);
         if($result){
             $return['code'] = 1;
@@ -524,6 +545,12 @@ class Ucenter extends Common
     }
 
     public function nickname(){
+        $member = $this->MemberModel->where(array("id"=>$this->member_id))->find()->toArray();
+        $this->assign('member', $member);
+        return $this->fetch(); // 渲染模板
+    }
+
+    public function intro(){
         $member = $this->MemberModel->where(array("id"=>$this->member_id))->find()->toArray();
         $this->assign('member', $member);
         return $this->fetch(); // 渲染模板
@@ -737,36 +764,55 @@ class Ucenter extends Common
         }
     }
 
-    public function ajaxAddFriend($id=0){
-        if($id){
+    public function ajaxAddFriend($mid=0){
+        if($mid){
             //查询是否已经是好友
-            $is_friend = MemberFriendModel::where(array("mid"=>$this->member_id, "fmid"=>$id))->value("mid");
+            $is_friend = MemberFriendModel::where(array("mid"=>$this->member_id, "fmid"=>$mid))->value("mid");
             if($is_friend){
                 $return['code'] = 0;
                 $return['info'] = "你们已经是好友";
                 echo json_encode($return);exit;
             }
             //查询对方是否已经有申请信息
-            $to_request = MemberFriendRequestModel::where(array("mid"=>$id, "fmid"=>$this->member_id))->find();
+            $to_request = MemberFriendRequestModel::where(array("mid"=>$mid, "fmid"=>$this->member_id))->find();
             if($to_request){
+                //发送数据
+                $send['type'] = 'addFriend';
+                $send['title'] = '好友申请';
+                $send['text'] = '用户： '.get_member_name($this->member_id).' 已经通过你的好友申请';
+                $send['url'] = url('ucenter/message');
+                send_message($mid, $send);
+
                 //如果对方已经申请，则直接加为好友，并删除申请信息
-                MemberFriendRequestModel::where(array("mid"=>$id, "fmid"=>$this->member_id))->delete();
-                MemberFriendModel::create(array("mid"=>$this->member_id, "fmid"=>$id, "create_time"=>time(), "note"=>$to_request->note));
-                MemberFriendModel::create(array("mid"=>$id, "fmid"=>$this->member_id, "create_time"=>time(), "note"=>$to_request->note));
+                MemberFriendRequestModel::where(array("mid"=>$mid, "fmid"=>$this->member_id))->delete();
+                MemberFriendModel::create(array("mid"=>$this->member_id, "fmid"=>$mid, "create_time"=>time(), "note"=>$to_request->note));
+                MemberFriendModel::create(array("mid"=>$mid, "fmid"=>$this->member_id, "create_time"=>time(), "note"=>$to_request->note));
+
+                //完成加好友任务
+                handle_task(4, $mid);
+                handle_task(4, $this->member_id);
+
                 $return['code'] = 1;
                 $return['info'] = "添加成功";
                 echo json_encode($return);exit;
             }else{
-                $is_request = MemberFriendRequestModel::where(array("mid"=>$this->member_id, "fmid"=>$id))->value("mid");
+                $is_request = MemberFriendRequestModel::where(array("mid"=>$this->member_id, "fmid"=>$mid))->value("mid");
                 if($is_request){
                     $return['code'] = 0;
                     $return['info'] = "申请信息已经发送";
                     echo json_encode($return);exit;
                 }
-                $result = MemberFriendRequestModel::create(array("mid"=>$this->member_id, "fmid"=>$id, "create_time"=>time()));
+                $result = MemberFriendRequestModel::create(array("mid"=>$this->member_id, "fmid"=>$mid, "create_time"=>time()));
                 if($result){
+                    //发送数据
+                    $send['type'] = 'addFriend';
+                    $send['title'] = '好友申请';
+                    $send['text'] = '用户： '.get_member_name($mid).' 请求加你为好友';
+                    $send['url'] = url('ucenter/message');
+                    send_message($mid, $send);
+
                     $return['code'] = 1;
-                    $return['info'] = "申请信息已发送";
+                    $return['info'] = "申请信息发送成功";
                     echo json_encode($return);exit;
                 }else{
                     $return['code'] = 0;

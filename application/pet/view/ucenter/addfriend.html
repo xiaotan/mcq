@@ -61,8 +61,8 @@
                         return !1;  
                     return !0 
                 },
-                addFriend: function(id){
-                    $.post("{:url('ucenter/ajaxAddFriend')}", { id: id },function(data){
+                addFriend: function(mid){
+                    $.post("{:url('ucenter/ajaxAddFriend')}", { mid: mid },function(data){
                         // 隐藏loading
                         $.hideIndicator();
                         alert(data.info)

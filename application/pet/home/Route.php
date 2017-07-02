@@ -5,6 +5,7 @@ namespace app\pet\home;
 use app\pet\model\Member as MemberModel;
 use app\pet\model\MemberRoute as MemberRouteModel;
 use app\pet\model\MemberRouteExtend as MemberRouteExtendModel;
+use think\Db;
 
 /**
  * 前台首页控制器
@@ -41,7 +42,18 @@ class Route extends Common
             ["lng"=>'116.423493', "lat"=>'39.907445'],
         ];*/
 
+        // 用户经纬度
+        $lng = get_member_location("lng");
+        $lat = get_member_location("lat");
+        //获取附近的用户
+        $members = Db::query("SELECT id,lng,lat,nickname, ROUND(6378.138*2*ASIN(SQRT(POW(SIN((".$lat."*PI()/180-lat*PI()/180)/2),2)+COS(".$lat."*PI()/180)*COS(lat*PI()/180)*POW(SIN((".$lng."*PI()/180-lng*PI()/180)/2),2)))*1000) AS distance FROM ".config("database.prefix")."pet_member where status=1 and online=1 and lng<>'' and lat<>'' ORDER BY distance ASC");
+        foreach($members as $k=>$v){
+            $members[$k]['avatar'] = get_member_avatar($v['id']);
+            $members[$k]['url'] = url('im/index', array("mid"=>$v['id']));
+        }
+
     	$this->assign("tab", 3);
+        $this->assign("members", json_encode($members));
     	$this->assign("points", json_encode($points));
         $this->assign('options', json_encode($options));
         $this->assign('is_route', session("?route_id") ? 1 : 0);

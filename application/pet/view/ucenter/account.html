@@ -51,7 +51,13 @@
                                     <div class="item-media"><i class="icon {$vo.icon}" style="font-size:1.2rem;"></i></div>
                                     <div class="item-inner">
                                         <div class="item-title">{$vo.title}</div>
-                                        <div class="item-after" onclick="getGold({$vo.id})">领取{$vo.amount}金币</div>
+                                        {if condition="$vo['status']==0"}
+                                            <div class="item-after">任务未完成</div>
+                                        {elseif condition="$vo['status']==2"/}
+                                            <div class="item-after">已领取奖励</div>
+                                        {else /}
+                                            <div class="item-after" onclick="getGold({$vo.id})">领取{$vo.amount}金币</div>
+                                        {/if}
                                     </div>
                                 </li>
                             {/volist}

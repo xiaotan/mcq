@@ -82,23 +82,38 @@
                 case 'sendMessage':
                     //正在对话页面
                     if(msg_type=='sendMessage'){
-                        im.showMessage(data.msg);
+                        im.showMessage(data.data);
                         resetHeight();
                     }else{
                         $.closeNotification();
                         $.notification({
-                            title: '未读消息',
-                            text: '用户： 给你发送了一条消息，请点击阅读',
+                            title: data.title,
+                            text: data.text,
                             media: "<img src='__MODULE_IMG__/message.png'>",
-                            data: data.msg[0],
+                            data: data,
                             onClick: function(data) {
-                                window.location.href = "{:url('im/index', '', '', true)}"+"/mid/"+data.from_mid;
+                                window.location.href = data.url;
                             },
                             onClose: function(data) {
 
                             }
                         });
                     }
+                    break;
+                case 'addFriend':
+                    $.closeNotification();
+                    $.notification({
+                        title: data.title,
+                        text: data.text,
+                        media: "<img src='__MODULE_IMG__/message.png'>",
+                        data: data,
+                        onClick: function(data) {
+                            window.location.href = data.url;
+                        },
+                        onClose: function(data) {
+
+                        }
+                    });
                     break;
                 default :
                     alert(data.msg);

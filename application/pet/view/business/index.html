@@ -318,12 +318,13 @@
                     <a class="submit" @click="hideCoupon">确定</a>
                 </div>
 
-                <div style="height:6rem;" class="remodal" data-remodal-id="modal3" role="dialog" aria-labelledby="modal1Title" aria-describedby="modal1Desc">
+                <div style="height:8rem;" class="remodal" data-remodal-id="modal3" role="dialog" aria-labelledby="modal1Title" aria-describedby="modal1Desc">
                     <button data-remodal-action="close" class="remodal-close" aria-label="Close"></button>
                     <div class="add-addr">
                         <div class="list-block address-box">
                             <ul>
                                 <li>
+                                    <p style="color:#EB666A;margin-bottom:10px;">（{{gold_money}} 虚拟币兑换 1 人民币）</p>
                                     <div class="item-content">
                                         <div class="item-inner">
                                             <div class="item-title label">积分</div>
@@ -475,6 +476,7 @@
                 member: {$member},
                 address: {$address},
                 service: {$service},
+                gold_money: {:config('gold_money')},
             },
             computed: {
                 getTypeName: function () {
@@ -511,7 +513,7 @@
                         price = Number(price) - Number(this.service[this.current_type].coupons[this.current_coupon].amount)
                     }
                     if(this.current_score){
-                        price = Number(price) - Number(this.current_score)
+                        price = Number(price) - Number(this.current_score/this.gold_money)
                     }
                     return price;
                 },
@@ -521,7 +523,7 @@
                         price = Number(price) + Number(this.service[this.current_type].coupons[this.current_coupon].amount)
                     }
                     if(this.current_score){
-                        price = Number(price) + Number(this.current_score)
+                        price = Number(price) + Number(this.current_score/this.gold_money)
                     }
                     return price;
                 },

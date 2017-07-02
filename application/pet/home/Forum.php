@@ -215,6 +215,9 @@ class Forum extends Common
         $publish['images'] = $data['imgs'] ? trim($data['imgs'],',') : '';
         $result = MemberForumModel::create($publish);
         if($result){
+            //完成任务
+            handle_task(6);
+
             $return['code'] = 1;
             $return['info'] = "发布成功";
             echo json_encode($return);exit;

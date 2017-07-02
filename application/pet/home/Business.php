@@ -400,13 +400,15 @@ class Business extends Common
             $reduce = $reduce + $order['coupon_amount'];
         }
         if($order['score']){
-            $reduce = $reduce + $order['score'];
+            $reduce = $reduce + $order['score']/config('gold_money');
         }
         $order['price'] = $order['amount'] - $reduce;
         $order['title'] = $order['bname'].'-'.$order['type'].'-'.$order['pet'].'-'.$order['breed'];
         // 订单入库
         $result = OrderModel::create($order);
         if($result){
+            //完成任务
+            handle_task(5);
             // 添加时间段记录
             $bTime['oid'] = $result['id'];
             $bTime['bid'] = $business->id;

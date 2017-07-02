@@ -12,8 +12,43 @@
 use think\Db;
 use think\Config;
 use Wechat\Loader;
+use GatewayClient\Gateway;
 // 应用公共文件
 
+if (!function_exists('handle_task')) {
+    function handle_task($task_id, $mid=''){
+        $mid = $mid ? $mid : session("member_auth.member_id");
+        $task = Db::name("pet_task")->where(array("id"=>$task_id))->find();
+        if($task['type']==1){
+            //唯一任务，需要判断是否完成或在做
+            $task_do = Db::name("pet_task_do")->where(array("mid"=>$mid, "task_id"=>$task_id))->find();
+            if(!$task_do){
+                $input['mid'] = $mid;
+                $input['task_id'] = $task['id'];
+                $input['amount'] = $task['amount'];
+                $input['create_time'] = time();
+                Db::name("pet_task_do")->insert($input);
+            }
+        }
+    }
+}
+
+if (!function_exists('send_message')) {
+    function send_message($mid, $data){
+        if(empty($mid) || empty($data)){
+            return false;
+        }
+        //判断用户是否在线
+        $member = Db::name("pet_member")->where(array("id"=>$mid))->find();
+        $online = Gateway::isOnline($member['client_id']);
+        if(!$online){
+            return false;
+        }
+        Gateway::$registerAddress = '127.0.0.1:1238';
+        // 向指定用户发送数据
+        Gateway::sendToUid($mid, json_encode($data));
+    }
+}
 
 if (!function_exists('get_service_time')) {
     function get_service_time($order_no){
@@ -126,7 +161,7 @@ if (!function_exists('str_cut')) {
         if($strlen <= $length) return $string;
         $string = str_replace(array(' ','&nbsp;', '&amp;', '&quot;', '&#039;', '&ldquo;', '&rdquo;', '&mdash;', '&lt;', '&gt;', '&middot;', '&hellip;'), array('∵',' ', '&', '"', "'", '“', '”', '—', '<', '>', '·', '…'), $string);
         $strcut = '';
-        if(strtolower(CHARSET) == 'utf-8') {
+        // if(strtolower(CHARSET) == 'utf-8') {
             $length = intval($length-strlen($dot)-$length/3);
             $n = $tn = $noc = 0;
             while($n < strlen($string)) {
@@ -155,7 +190,7 @@ if (!function_exists('str_cut')) {
             }
             $strcut = substr($string, 0, $n);
             $strcut = str_replace(array('∵', '&', '"', "'", '“', '”', '—', '<', '>', '·', '…'), array(' ', '&amp;', '&quot;', '&#039;', '&ldquo;', '&rdquo;', '&mdash;', '&lt;', '&gt;', '&middot;', '&hellip;'), $strcut);
-        } else {
+        /*} else {
             $dotlen = strlen($dot);
             $maxi = $length - $dotlen - 1;
             $current_str = '';
@@ -170,7 +205,7 @@ if (!function_exists('str_cut')) {
                 }
                 $strcut .= $current_str;
             }
-        }
+        }*/
         return $strcut.$dot;
     }
 }

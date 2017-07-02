@@ -55,6 +55,7 @@
             data: {
                 points: {$points},
                 is_route: "{$is_route}",
+                members: {$members},
                 lng: '',
                 lat: '',
                 b_lng: '',
@@ -109,6 +110,23 @@
                         }, 'json');
                     }
                 },
+                makeMemberLocation: function(){
+                    if(!this.isEmptyObject(this.members)){
+                        for (var i = 0; i < this.members.length; i++) {
+                            var icon = "icon"+i;
+                            var item = "item"+i;
+                            this.url = this.members[i].url;
+                            //生成用户坐标
+                            icon = new BMap.Icon(this.members[i].avatar, new BMap.Size(50,50), {imageOffset: new BMap.Size(0, 0)});
+                            item = new BMap.Marker(new BMap.Point(this.members[i].lng,this.members[i].lat), {icon:icon});
+                            map.addOverlay(item);
+                            item.addEventListener("click", function(url){
+                                // console.log(url)
+                                window.location.href = route.url;
+                            });
+                        }
+                    }
+                },
             },
         });
 
@@ -119,11 +137,14 @@
         var map = new BMap.Map("allmap");
         var myLocationMarker,petMarker;
         var petIcon = new BMap.Icon("__MODULE_IMG__/pet1.png", new BMap.Size(30,30), {imageOffset: new BMap.Size(0, 0)});
-        map.centerAndZoom(new BMap.Point({:get_member_location("lng")}, {:get_member_location("lat")}), 18);
+        map.centerAndZoom(new BMap.Point({:get_member_location("lng")}, {:get_member_location("lat")}), 15);
         // map.centerAndZoom(new BMap.Point("116.399", "39.910"), 15);
         map.enableScrollWheelZoom();
 
         Points = route.makePoints();
+
+        Points = route.makeMemberLocation();
+
         // console.log(Points);
         var polyline = new BMap.Polyline(Points, {strokeColor:"blue", strokeWeight:2, strokeOpacity:0.5});
         map.addOverlay(polyline);   //增加折线
