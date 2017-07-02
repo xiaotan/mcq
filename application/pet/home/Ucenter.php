@@ -231,6 +231,18 @@ class Ucenter extends Common
             echo json_encode($return);exit;
         }
         if($order['status']==0 && $order['is_pay']==1){
+            //服务时间已经过去
+            if(time() > get_service_time($order['order_no'])){
+                $return['code'] = 0;
+                $return['info'] = "服务时间段已过";
+                echo json_encode($return);exit;
+            }
+            //临近设定时间不可退款（分钟）
+            if((time()+config("limit_minute")*60) > get_service_time($order['order_no'])){
+                $return['code'] = 0;
+                $return['info'] = "预定服务时间前 ".config("limit_minute")." 分钟不可退款";
+                echo json_encode($return);exit;
+            }
             $input['status'] = 2;
             $input['refund_time'] = time();
             $input['refund_reason'] = $reason;
@@ -460,7 +472,7 @@ class Ucenter extends Common
      */
     public function setting(){
         $member = $this->MemberModel->where(array("id"=>$this->member_id))->find()->toArray();
-        $member['avatar'] = get_avatar($member['id']);
+        $member['avatar'] = get_member_avatar($member['id']);
         switch ($member['sex']) {
             case '1':
                 $member['sex'] = '男';
@@ -708,7 +720,7 @@ class Ucenter extends Common
                     if(in_array($v['id'], $uids)){
                         unset($v);
                     }else{
-                        $friends[$k]['avatar'] = get_avatar($v['id']);
+                        $friends[$k]['avatar'] = get_member_avatar($v['id']);
                         $friends[$k]['id'] = $v['id'];
                         $friends[$k]['intro'] = $v['intro'];
                         $friends[$k]['nickname'] = $v['nickname'];

@@ -10,7 +10,7 @@
 
             <header class="navbar">
                 <div class="nav-wrap nav-wrap-left">
-                    <a class="react" rel="nofollow" href="">
+                    <a class="react my-location" rel="nofollow" href="">
                         <span class="nav-btn">
                             <i class="icon my-icon-location1"></i>
                             <span>南宁市</span>
@@ -92,13 +92,47 @@
             }
         })
 
+        // 注入JSSDK配置参数，默认开启所有接口权限
+        wx.config({$options});
+
+        {if $location==0}
+            wx.ready(function () {
+                updateLocation();
+            });
+        {/if}
+
+        updateLocation = function(){
+            wx.getLocation({
+                type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+                success: function (res) {
+                    var convertor = new BMap.Convertor();
+                    var pointArr = [];
+                    pointArr.push(new BMap.Point(res.longitude,res.latitude));
+                    convertor.translate(pointArr, 1, 5, translateCallback)
+                }
+            });
+        };
+        translateCallback = function (data){
+            if(data.status === 0) {
+                $.post("{:url('business/ajaxUpdateLocation')}", { lng:data.points[0].lng, lat:data.points[0].lat}, function(data){
+                    if(data==1){
+                        location.reload();
+                    }
+                });
+            } 
+        }
+
+        $(document).on('click', '.my-location',function() {
+            updateLocation();
+        });
+
         $(document).on('click', '.j-search',function() {
             var keyword = $(".keyword").val();
             if(keyword){
                 // 显示loading
                 $.showIndicator();
                 // ajax获取信息
-                $.get("{:url('index/ajaxSearchKeyword')}", { keyword: keyword },function(data){
+                $.get("{:url('business/ajaxSearchKeyword')}", { keyword: keyword },function(data){
                     // 隐藏loading
                     $.hideIndicator();
                     if(data==1){
@@ -109,15 +143,13 @@
                 });
             }else{
                 location.reload();
-                /*alert("关键字不能为空");
-                return false;*/
             }
         });
 
         // 监听向上滑动事件，获取更多商家列表
         $(document).on('infinite', '.infinite-scroll',function() {
             // ajax获取信息
-            $.get("{:url('index/ajaxGetBusinessList')}", { page: business.page },function(data){
+            $.get("{:url('business/ajaxGetBusinessList')}", { page: business.page },function(data){
                 if(data==1){
                     business.noMore = 1;
                 }else{

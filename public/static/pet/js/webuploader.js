@@ -951,7 +951,7 @@
                 container.css({
                     position: 'absolute',
                     top: '0px',
-                    left: '162px',
+                    left: '0px',
                     width: '168px',
                     height: '44px',
                     overflow: 'hidden'

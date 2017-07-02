@@ -1,6 +1,10 @@
 body, .page, .page-group, .page-group.page-current, .page.page-current{
     background:#F5F5F5;
 }
+.webuploader-pick{
+    background: none;
+    padding:0;
+}
 .layui-m-layerchild {
     display: inline-block;
     text-align: left;
@@ -9,7 +13,7 @@ body, .page, .page-group, .page-group.page-current, .page.page-current{
     border-radius: 5px;
     box-shadow: 0 0 8px rgba(0,0,0,.1);
     pointer-events: auto;
-    display:none;
+    /*display:none;*/
 }
 .layui-m-layermain .layui-m-layersection {
     display: table-cell;

@@ -38,7 +38,7 @@
 
                 <div class="my-info" {if $member['banner']}style="background-image:url({:get_file_path($member['banner'])});"{/if}>
                     <div class="info-box">
-                        <img class="avatar" src="{:get_avatar($member['id'])}" alt="">
+                        <img class="avatar" src="{:get_member_avatar($member['id'])}" alt="">
                         <span class="username"><span class="name">{$member.nickname}</span><!-- <span class="level"><i class="icon icon-home"></i></span> --></span>
                         <span class="like"><span>关注 {$member.follow}</span><span>粉丝 {{followed}}</span></span>
                     </div>

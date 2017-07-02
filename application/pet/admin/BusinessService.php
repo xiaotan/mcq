@@ -158,6 +158,7 @@ EOF;
                 ['checkbox', 'doctor', '医生', '选择负责该项服务的医生', $doctor],
                 ['checkbox', 'coupon', '商家优惠', '选择该项服务支持的优惠（只显示启用的未过期的优惠）', $coupon],
                 ['checkbox', 'time', '服务时间段', '选择服务时间段', config('forenoon')+config('afternoon')+config('night')],
+                ['text', 'time_num', '每个时间段可接单数', '指一个时间段用户可以下单的数量', "2"],
                 // ['switch', 'is_coin', '金币支付', '', 1, '', 'disabled'],
             ])
             ->setExtraJs($js)
@@ -267,6 +268,7 @@ EOF;
                 ['checkbox', 'doctor', '医生', '选择负责该项服务的医生', $doctor],
                 ['checkbox', 'coupon', '商家优惠', '选择该项服务支持的优惠（只显示启用的未过期的优惠）', $coupon],
                 ['checkbox', 'time', '服务时间段', '选择服务时间段', config('forenoon')+config('afternoon')+config('night')],
+                ['text', 'time_num', '每个时间段可接单数', '指一个时间段用户可以下单的数量'],
                 // ['switch', 'is_coin', '金币支付', '', 1, '', 'disabled'],
             ])
             ->setExtraJs($js)

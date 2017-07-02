@@ -161,8 +161,10 @@ class Business extends Common
                     if(!in_array($k1, explode(',', $v['time']))){
                         $status = 0;
                     }
-                    // 如果已有用户预约该时间段，则排除
-                    if(BusinessTimeModel::where(array("bid"=>$v['bid'], "tid"=>$k1, "date"=>$date))->value("id")){
+                    // 如果已有用户预约该时间段超过规定数量，则排除
+                    $time_num = $v['time_num']?$v['time_num']:config("time_order_num");
+                    $time_count = BusinessTimeModel::where(array("bid"=>$v['bid'], "tid"=>$k1, "date"=>$date))->count("id");
+                    if($time_count > $time_num || $time_count == $time_num){
                         $status = 0;
                     }
                     // 设置时间段状态
@@ -319,8 +321,10 @@ class Business extends Common
             $return['info'] = "请选择时间段";
             echo json_encode($return);exit;
         }
-        // 如果已有用户预约该时间段，则排除
-        if(BusinessTimeModel::where(array("bid"=>$order['bid'], "tid"=>$time_id, "date"=>$order['date']))->value("id")){
+        // 如果已有用户预约该时间段超过规定数量，则排除
+        $time_num = $business_service->time_num?$business_service->time_num:config("time_order_num");
+        $time_count = BusinessTimeModel::where(array("bid"=>$order['bid'], "tid"=>$time_id, "date"=>$order['date']))->count("id");
+        if($time_count > $time_num || $time_count == $time_num){
             $return['code'] = 0;
             $return['info'] = "选择时间段不可用";
             echo json_encode($return);exit;
@@ -500,6 +504,103 @@ class Business extends Common
             }
         }
         	
+    }
+
+    /**
+     * 服务列表页
+     * @return mixed
+     */
+    public function lists()
+    {
+
+        // 创建SDK实例
+        $script = &  load_wechat('Script');
+        // 获取JsApi使用签名，通常这里只需要传 $ur l参数
+        $options = $script->getJsSign(get_url());
+        // 处理执行结果
+        if($options===FALSE){
+            // 接口失败的处理
+            $this->error($script->errMsg);
+        }
+
+        $location = 0;
+        if(session("?member_auth.member_id")){
+            if(session("?member_".session("member_auth.member_id")."_lng") || session("member_".session("member_auth.member_id")."_lat")){
+                $location = 1;
+            }
+        }
+
+        // 商家列表页滚动图
+        $slider = SliderModel::where(array("typeid"=>1, "status"=>1))->order("sort asc")->select();
+
+        // 获取最近用户的商家列表
+        $business = $this->getBusinessList();
+
+        $this->assign('tab', 2);
+        $this->assign('slider', $slider);
+        $this->assign('location', $location);
+        $this->assign('options', json_encode($options));
+        $this->assign('business', json_encode($business));
+        return $this->fetch(); // 渲染模板
+    }
+
+    // ajax关键字搜索商家
+    public function ajaxSearchKeyword(){
+        $keyword = input('get.keyword/s');
+        if($keyword){
+            // 用户经纬度
+            $lng = get_member_location("lng");
+            $lat = get_member_location("lat");
+            // 根据用户经纬度获取最接近用户的商家
+            $data = Db::query("SELECT id,name,score,thumb, ROUND(6378.138*2*ASIN(SQRT(POW(SIN((".$lat."*PI()/180-lat*PI()/180)/2),2)+COS(".$lat."*PI()/180)*COS(lat*PI()/180)*POW(SIN((".$lng."*PI()/180-lng*PI()/180)/2),2)))*1000) AS distance FROM ".config("database.prefix")."pet_business where status=1 and tag like '%".$keyword."%' or name like '%".$keyword."%' ORDER BY distance ASC,score desc");
+            if($data){
+                //获取缩略图url
+                foreach($data as $k=>$v){
+                    $data[$k]['thumb'] = get_file_path($v['thumb']);
+                    $data[$k]['distance'] = round($v['distance']/1000 ,2);
+                    $data[$k]['url'] = url("business/index",array('id'=>$v['id']));
+                    $data[$k]['coupon'] = BusinessCouponModel::where(array("status"=>1,'bid'=>$v['id'],'begin_time'=>['<',time()],'end_time'=>['>',time()]))->order("create_time asc")->value('title');
+                }
+            }
+            echo $data ? json_encode($data) : 1;
+        }
+    }
+
+    // ajax分页搜索商家
+    public function ajaxGetBusinessList(){
+        $page = input('get.page/d', 1);
+        $data = $this->getBusinessList($page);
+        echo $data ? json_encode($data) : 1;
+    }
+
+    /**
+     * 获取离用户最近的商家列表
+     * @param  number  $page     分页数
+     * @param  integer $pageSize 分页步长
+     * @return array             商家列表
+     */
+    private function getBusinessList($page = 1, $pageSize = 10, $cache = false){
+        // 用户经纬度
+        $lng = get_member_location("lng");
+        $lat = get_member_location("lat");
+        $business = array();
+        // 做session缓存，防止多次查询数据库，需在用户重新定位时清除该缓存
+        if(session('business'.$page) && $cache){
+            $business = session('business'.$page);
+        }else{
+            // 根据用户经纬度获取最接近用户的商家
+            $business = Db::query("SELECT id,name,score,thumb, ROUND(6378.138*2*ASIN(SQRT(POW(SIN((".$lat."*PI()/180-lat*PI()/180)/2),2)+COS(".$lat."*PI()/180)*COS(lat*PI()/180)*POW(SIN((".$lng."*PI()/180-lng*PI()/180)/2),2)))*1000) AS distance FROM ".config("database.prefix")."pet_business where status=1 ORDER BY distance ASC,score desc LIMIT ".($page-1)*$pageSize.",".$pageSize);
+            if($business){
+                foreach($business as $k=>$v){
+                    $business[$k]['thumb'] = get_file_path($v['thumb']);
+                    $business[$k]['distance'] = round($v['distance']/1000 ,2);
+                    $business[$k]['url'] = url("business/index",array('id'=>$v['id']));
+                    $business[$k]['coupon'] = BusinessCouponModel::where(array("status"=>1,'bid'=>$v['id'],'begin_time'=>['<',time()],'end_time'=>['>',time()]))->order("create_time asc")->value('title');
+                }
+                session('business'.$page, $business);
+            }
+        }
+        return $business;
     }
 
     /**

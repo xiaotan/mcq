@@ -45,6 +45,10 @@
             },
             methods: {
                 sendMsg: function(){
+                    if(!this.content){
+                        alert("内容不能为空");
+                        return false;
+                    }
                     var imgs = '';
                     $(".upload-images-box li").each(function(){
                         if($(this).attr("data-id")){

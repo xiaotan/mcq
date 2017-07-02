@@ -46,6 +46,12 @@ class Order extends Admin
             $business = BusinessModel::where(array('status'=>1))->column('id,name');
             $column[] = ['bid', '商家', $business];
         }
+        $btnType = [
+            'class' => 'btn btn-info',
+            'title' => '核销码',
+            'icon'  => 'fa fa-fw fa-sitemap',
+            'href'  => url('order/verify')
+        ];
         //基础表单
         $column_base = [ // 批量添加数据列
             ['order_no', '订单号', 'text'],
@@ -60,9 +66,10 @@ class Order extends Admin
         ];
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
-            ->setSearch(['order_no' => '订单号']) // 设置搜索框
+            ->setSearch(['order_no' => '订单号', 'verify_no' => '核销码']) // 设置搜索框
             ->addColumns(array_merge($column, $column_base))
             ->addRightButtons(['edit']) // 批量添加右侧按钮
+            ->addTopButton('custom', $btnType) // 添加顶部按钮
             ->addOrder('id,create_time')
             ->setRowList($data_list) // 设置表格数据
             ->fetch(); // 渲染模板
@@ -181,6 +188,41 @@ class Order extends Admin
             ->setFormData($info)
             ->layout(['title' => 6, 'order_no' => 6, 'uname' => 6, 'bname' => 6, 'dname' => 6, 'type' => 6, 'pet' => 6, 'breed' => 6, 'age' => 6, 'date' => 6, 'time' => 6, 'pay_type' => 6, 'is_pay' => 6, 'is_evaluate' => 6, 'coupon_amount' => 6, 'score' => 6, 'amount' => 6, 'price' => 6, 'name' => 6, 'mobile' => 6, 'address' => 6, 'street' => 6, 'business_rate' => 6, 'doctor_rate' => 6, 'refund_time' => 2, 'refund_reason' => 2])
             ->setTrigger('status', '2', 'refund_time,is_refund,refund_reason')
+            ->fetch();
+    }
+
+    public function verify(){
+
+        if(!defined('BID')) $this->error('您不是商家');
+
+        // 保存数据
+        if ($this->request->isPost()) {
+            // 表单数据
+            $data = $this->request->post();
+            $order = OrderModel::where(array("bid"=>BID, "verify_no"=>$data['verify_no']))->find();
+            if(!$order){
+                $this->error('查询不到相关订单，请确认核销码已填写正确');
+            }
+            if($order['status']==0 && $order['is_pay']==1){
+                //保存数据
+                $result = OrderModel::where(array("bid"=>BID, "verify_no"=>$data['verify_no']))->setField('status', 1);
+                if ($result) {
+                    // 记录行为
+                    action_log('order_verify', 'pet_order', $order['id'], UID, $order['title']);
+                    $this->success('核销成功', 'index');
+                } else {
+                    $this->error('核销失败');
+                }
+            }else{
+                $this->error('目前订单状态无法核销或订单已核销');
+            }
+        }
+        // 显示添加页面
+        return ZBuilder::make('form')
+            ->setPageTips('如果出现无法添加的情况，可能由于浏览器将本页面当成了广告，请尝试关闭浏览器的广告过滤功能再试。', 'warning')
+            ->addFormItems([
+                ['text', 'verify_no', '核销码'],
+            ])
             ->fetch();
     }
 }

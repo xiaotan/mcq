@@ -28,6 +28,20 @@ use \GatewayWorker\Lib\Gateway;
  */
 class Events
 {
+
+    /**
+     * 新建一个类的静态成员，用来保存数据库实例
+     */
+    public static $db = null;
+
+    /**
+     * 进程启动后初始化数据库连接
+     */
+    public static function onWorkerStart($worker)
+    {
+        self::$db = new Workerman\MySQL\Connection('127.0.0.1', '3306', 'root', 'root', 'mcq');
+    }
+
     /**
      * 当客户端连接时触发
      * 如果业务不需此回调可以删除onConnect
@@ -44,5 +58,33 @@ class Events
             'type'      => 'init',
             'client_id' => $client_id
         )));
+    }
+
+    /*public static function onMessage($client_id, $msg)
+    {
+        $msg = json_decode($msg, true);
+        switch($msg['type'])
+        {
+            case 'login':
+                // 记录session，表明认证成功
+                $_SESSION['login'] = true;
+                break;
+            // 30秒后客户端发来心跳回复时，仍然没认证，则关闭连接
+            case 'pong':
+                if(empty($_SESSION['login']))
+                {
+                     Gateway::closeClient($client_id);
+                }
+        }
+    }*/
+
+    /**
+     * 当用户断开连接时触发的方法
+     * @param integer $client_id 断开连接的客户端client_id
+     * @return void
+     */
+    public static function onClose($client_id)
+    {
+        self::$db->query("UPDATE `mc_pet_member` SET `online` = 0 WHERE client_id='".$client_id."'");
     }
 }

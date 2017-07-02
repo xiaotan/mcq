@@ -2,6 +2,7 @@
 
 {block name="style"}
     <link rel="stylesheet" href="__MODULE_CSS__/route.css">
+    <script src="//res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=OXUey0ZTSETucYQdC5OmvsKUIdrsiotT"></script>
 {/block}
 
@@ -26,16 +27,20 @@
                     </a>
                 </div>
             </header>
-
-            <div id="route">
-                <div id="allmap"></div>
+            
+            <div id="location">
+                <div id="route">
+                    <div id="allmap"></div>
+                </div>
+                <div class="route-button position" @click="MyLocation">
+                    <i class="icon my-icon-aim" style="font-size:1rem;"></i>我的位置
+                </div>
+                <div class="route-button route" @click="myRoute">
+                    <i class="icon my-icon-route" style="font-size:.8rem;"></i>我的路线
+                </div>
             </div>
-            <div class="route-button position">
-                <i class="icon my-icon-aim" style="font-size:1rem;"></i>我的位置
-            </div>
-            <div class="route-button route">
-                <i class="icon my-icon-route" style="font-size:.8rem;"></i>我的路线
-            </div>
+                
+                
 
             {include file="public/nav" /}
 
@@ -44,10 +49,18 @@
 {/block}
 {block name="script"}
     <script>
+
         var route = new Vue({
-            el: '#route',
+            el: '#location',
             data: {
                 points: {$points},
+                is_route: "{$is_route}",
+                lng: '',
+                lat: '',
+                b_lng: '',
+                b_lat: '',
+                e_lng: '',
+                e_lat: '',
             },
             methods: {
                 isEmptyObject: function(e){
@@ -56,25 +69,134 @@
                         return !1;  
                     return !0 
                 },
-                makePoint: function(){
+                makePoints: function(lng='', lat=''){
                     let Points = [];
-                    for (var i = 0; i < this.points.length; i++) {
-                        Points.push(new BMap.Point(this.points[i].lng, this.points[i].lat));
-                        // console.log(this.points[i].lng)
+                    if(lng && lat){
+                        this.b_lng = this.e_lng;
+                        this.b_lat = this.e_lat;
+                        this.e_lng = lng;
+                        this.e_lat = lat;
+                        Points.push(new BMap.Point(this.b_lng, this.b_lat));
+                        Points.push(new BMap.Point(this.e_lng, this.e_lat));
+                    }else{
+                        for (var i = 0; i < this.points.length; i++) {
+                            Points.push(new BMap.Point(this.points[i].lng, this.points[i].lat));
+                            //获取原点坐标
+                            if(i==0){
+                                this.b_lng = this.points[i].lng;
+                                this.b_lat = this.points[i].lat;
+                            }
+                            //获取终点坐标
+                            if(i==this.points.length-1){
+                                this.e_lng = this.points[i].lng;
+                                this.e_lat = this.points[i].lat;
+                            }
+                        }
                     }
+                    console.log(Points);
                     return Points;
+                },
+                MyLocation: function(){
+                    getMyLocation();
+                },
+                myRoute: function(){
+                    //判断是否开始记录路线
+                    if(this.is_route == 0){
+                        //发起记录路线操作
+                        $.post("{:url('route/ajaxBeginRoute')}", { lng:this.lng, lat:this.lat}, function(data){
+                            alert(data.info);
+                            location.reload();
+                        }, 'json');
+                    }
                 },
             },
         });
 
-        Points = route.makePoint();
+        // 注入JSSDK配置参数，默认开启所有接口权限
+        wx.config({$options});
 
-        // 百度地图API功能
+        //初始化地图
         var map = new BMap.Map("allmap");
-        map.centerAndZoom(new BMap.Point(116.404, 39.915), 15);
+        var myLocationMarker,petMarker;
+        var petIcon = new BMap.Icon("__MODULE_IMG__/pet1.png", new BMap.Size(30,30), {imageOffset: new BMap.Size(0, 0)});
+        map.centerAndZoom(new BMap.Point({:get_member_location("lng")}, {:get_member_location("lat")}), 18);
+        // map.centerAndZoom(new BMap.Point("116.399", "39.910"), 15);
         map.enableScrollWheelZoom();
 
-        var polyline = new BMap.Polyline(Points, {strokeColor:"blue", strokeWeight:2, strokeOpacity:0.5});   //创建折线
+        Points = route.makePoints();
+        // console.log(Points);
+        var polyline = new BMap.Polyline(Points, {strokeColor:"blue", strokeWeight:2, strokeOpacity:0.5});
         map.addOverlay(polyline);   //增加折线
+
+        getCurrentLocation = function (data){
+            wx.getLocation({
+                type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+                success: function (res) {
+                    var convertor = new BMap.Convertor();
+                    var pointArr = [];
+                    pointArr.push(new BMap.Point(res.longitude,res.latitude));
+                    convertor.translate(pointArr, 1, 5, getCurrentLocationCallback)
+                }
+            });
+        }
+        //坐标转换完之后的回调函数
+        getCurrentLocationCallback = function (data){
+            if(data.status === 0) {
+                //坐标入库
+                $.post("{:url('route/ajaxRecordRoute')}", { lng:data.points[0].lng, lat:data.points[0].lat}, function(){
+                    //删除宠物标记
+                    if(petMarker){  
+                        map.removeOverlay(petMarker);
+                    }
+                    //根据新的坐标生成标记
+                    petMarker = new BMap.Marker(data.points[0], {icon:petIcon});
+                    map.addOverlay(petMarker);
+                    map.setCenter(data.points[0]);
+                    //增加折线
+                    Points = route.makePoints(data.points[0].lng, data.points[0].lat);
+                    var polyline = new BMap.Polyline(Points, {strokeColor:"blue", strokeWeight:2, strokeOpacity:0.5});
+                    map.addOverlay(polyline);
+                });
+            }
+        }
+
+        if(route.is_route==1){
+            //10秒获取一次定位
+            setInterval("getCurrentLocation()",10000);
+        }
+
+        //定位我的位置
+        getMyLocation = function (data){
+            wx.getLocation({
+                type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+                success: function (res) {
+                    var convertor = new BMap.Convertor();
+                    var pointArr = [];
+                    pointArr.push(new BMap.Point(res.longitude,res.latitude));
+                    convertor.translate(pointArr, 1, 5, getMyLocationCallback)
+                }
+            });
+        }
+        //坐标转换完之后的回调函数
+        getMyLocationCallback = function (data){
+            if(data.status === 0) {
+                route.lng = data.points[0].lng;
+                route.lat = data.points[0].lat;
+                $.post("{:url('index/ajaxUpdateLocation')}", { lng:data.points[0].lng, lat:data.points[0].lat});
+                if(myLocationMarker){  
+                    map.removeOverlay(myLocationMarker);
+                } 
+                myLocationMarker = new BMap.Marker(data.points[0]);
+                map.addOverlay(myLocationMarker);
+                map.setCenter(data.points[0]);
+                route.myRoute();
+            }
+        }
+
+        // 下面是 javascript 代码
+        wx.ready(function () {
+            //默认进入页面先定位到当前位置
+            getMyLocation();
+        });
     </script>
 {/block}

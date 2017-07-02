@@ -14,6 +14,41 @@ use think\Config;
 use Wechat\Loader;
 // 应用公共文件
 
+
+if (!function_exists('get_service_time')) {
+    function get_service_time($order_no){
+        $order = Db::name("pet_order")->where(array("order_no"=>$order_no))->find();
+        $time = explode("：",$order['time']);
+        return strtotime($order['date'])+$time['0']*60*60;
+    }
+}
+
+if (!function_exists('get_member_location')) {
+    function get_member_location($type='lat'){
+        if(session("?member_auth.member_id")){
+            if($type=='lng'){
+                if(session("?member_".session("member_auth.member_id")."_lng")){
+                    return session("member_".session("member_auth.member_id")."_lng");
+                }else{
+                    return config("lng");
+                }
+            }else{
+                if(session("?member_".session("member_auth.member_id")."_lat")){
+                    return session("member_".session("member_auth.member_id")."_lat");
+                }else{
+                    return config("lat");
+                }
+            }
+        }else{
+            if($type=='lng'){
+                return config("lng");
+            }else{
+                return config("lat");
+            }
+        }
+    }
+}
+
 if (!function_exists('number_rewrite')) {
     function number_rewrite($str, $split='-'){
         //4的意思就是每4个为一组
@@ -23,12 +58,12 @@ if (!function_exists('number_rewrite')) {
     }
 }
 
-if (!function_exists('get_avatar')) {
+if (!function_exists('get_member_avatar')) {
     /**
      * 获取用户头像
      * @param $mid
      */
-    function get_avatar($mid) {
+    function get_member_avatar($mid) {
         //优先返回avatar
         $member = Db::name("pet_member")->where(array("id"=>$mid))->find();
         if($member['avatar']){
@@ -144,7 +179,7 @@ if (!function_exists('time_tran')) {
     function time_tran($the_time) {
         $dur = time() - $the_time;  
         if ($dur < 0) {  
-            return "未知";
+            return date("m-d H:i");
         } else {
             if ($dur < 60) {
                 return $dur . '秒前';
@@ -158,7 +193,7 @@ if (!function_exists('time_tran')) {
                         if ($dur < 259200) {//3天内
                             return floor($dur / 86400) . '天前';
                         } else {
-                            return "未知";
+                            return date("m-d H:i");
                         }
                     }
                 }

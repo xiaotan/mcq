@@ -9,7 +9,7 @@ body, .page, .page-group, .page-group.page-current, .page.page-current{
 }
 .my-info{
     width:100%;
-    height:9rem;   
+    height:7rem;   
     background:#f7b216;
     background:-moz-linear-gradient(top, #f7b216, #e69400);  
     background:-webkit-gradient(linear, 0 0, 0 bottom, from(#f7b216), to(#e69400)); 
@@ -19,7 +19,7 @@ body, .page, .page-group, .page-group.page-current, .page.page-current{
   color:#fff;
 }
 .info-box{
-    padding:2.5rem 2rem 0 2rem;
+    padding:1.5rem 2rem 0 2rem;
 }
 .my-info .avatar{
     width:4rem;

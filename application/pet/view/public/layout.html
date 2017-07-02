@@ -23,7 +23,14 @@
     <link rel="stylesheet" href="__MODULE_CSS__/base.css">
     <link rel="stylesheet" href="__MODULE_CSS__/common.css">
     <link rel="stylesheet" href="__MODULE_CSS__/fonts.css">
-
+    
+    <script src="//res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=OXUey0ZTSETucYQdC5OmvsKUIdrsiotT"></script>
+    
+    <script>
+        //消息类型
+        var msg_type = '';
+    </script>
     {block name="style"}{/block}
 
 </head>
@@ -51,6 +58,69 @@
     <script type='text/javascript' src='__MODULE_JS__/vue.js' charset='utf-8'></script>
     <script>
         $.init();
+
+        /**
+         * 与GatewayWorker建立websocket连接，域名和端口改为你实际的域名端口，
+         * 其中端口为Gateway端口，即start_gateway.php指定的端口。
+         * start_gateway.php 中需要指定websocket协议，像这样
+         * $gateway = new Gateway(websocket://0.0.0.0:7272);
+         */
+        ws = new WebSocket("ws://www.youchongme.com:7272");
+        // 服务端主动推送消息时会触发这里的onmessage
+        ws.onmessage = function(e){
+            console.log(e.data)
+            // json数据转换成js对象
+            var data = eval("("+e.data+")");
+            var type = data.type || '';
+            switch(type){
+                // Events.php中返回的init类型的消息，将client_id发给后台进行uid绑定
+                case 'init':
+                    // 利用jquery发起ajax请求，将client_id发给后端进行uid绑定
+                    $.post("{:url('im/bind')}", {client_id: data.client_id}, function(data){}, 'json');
+                    break;
+                // 当mvc框架调用GatewayClient发消息时直接alert出来
+                case 'sendMessage':
+                    //正在对话页面
+                    if(msg_type=='sendMessage'){
+                        im.showMessage(data.msg);
+                        resetHeight();
+                    }else{
+                        $.closeNotification();
+                        $.notification({
+                            title: '未读消息',
+                            text: '用户： 给你发送了一条消息，请点击阅读',
+                            media: "<img src='__MODULE_IMG__/message.png'>",
+                            data: data.msg[0],
+                            onClick: function(data) {
+                                window.location.href = "{:url('im/index', '', '', true)}"+"/mid/"+data.from_mid;
+                            },
+                            onClose: function(data) {
+
+                            }
+                        });
+                    }
+                    break;
+                default :
+                    alert(data.msg);
+            }
+        };
+        //心跳检测，10秒钟发送一次
+        setInterval("pong()", 10000);
+        pong = function (data){
+            ws.send("pong");
+        }
+        /*$.notification({
+            title: '未读消息',
+            text: '用户： 给你发送了一条消息，请点击阅读',
+            media: "<img src='__MODULE_IMG__/message.png'>",
+            data: "123",
+            onClick: function(data) {
+                alert(1)
+            },
+            onClose: function(data) {
+
+            }
+        });*/
     </script>
     {block name="script"}{/block}
 </body>

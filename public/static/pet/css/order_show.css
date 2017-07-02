@@ -10,6 +10,10 @@ body, .page, .page-group, .page-group.page-current, .page.page-current{
 .order-show{
     margin-top:2.5rem;
 }
+.order-footer-box{
+    width:100%;
+    height:5rem;
+}
 .order-show img{
     display:block;
 }
@@ -32,9 +36,9 @@ body, .page, .page-group, .page-group.page-current, .page.page-current{
     right:.5rem;
     color:#00A1E9;
 }
-.order-show-box:last-child{
+/* .order-show-box:last-child{
     margin-bottom:5.5rem;
-}
+} */
 .order-footer{
     height:5rem;
     background: #fff;
