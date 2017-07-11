@@ -80,23 +80,6 @@ class Im extends Common
     	}
     }
 
-    private function sendMessage($mid=0, $msg=''){
-        if(empty($mid) || empty($msg)){
-            return false;
-        }
-        //判断用户是否在线
-        $member = MemberModel::where(array("id"=>$mid))->find();
-        $online = Gateway::isOnline($member['client_id']);
-        if(!$online){
-            return false;
-        }
-        Gateway::$registerAddress = '127.0.0.1:1238';
-        $return['type'] = 'sendMessage';
-        $return['msg'] = $msg;
-        // 向指定用户发送数据
-        Gateway::sendToUid($mid, json_encode($return));
-    }
-
     public function ajaxSendMessage($mid='', $message=''){
         if(empty($mid) || empty($message)){
             $return['code'] = 0;

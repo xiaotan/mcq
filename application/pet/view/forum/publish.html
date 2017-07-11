@@ -23,7 +23,10 @@
                         <li id="filePicker"></li>
                     </ul>
                 </div>
-                <p class="location"><i class="icon my-icon-location1"></i>所在位置</p>
+                <p class="location">
+                    <i class="icon my-icon-location1"></i>
+                    {{location?location:'所在位置'}}
+                </p>
                 
             </div>
             
@@ -70,6 +73,41 @@
                 },
             },
         })
+
+        // 注入JSSDK配置参数，默认开启所有接口权限
+        wx.config({$options});
+
+        wx.ready(function () {
+            updateLocation();
+        });
+
+        updateLocation = function(){
+            wx.getLocation({
+                type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+                success: function (res) {
+                    var convertor = new BMap.Convertor();
+                    var pointArr = [];
+                    pointArr.push(new BMap.Point(res.longitude,res.latitude));
+                    convertor.translate(pointArr, 1, 5, translateCallback);
+                }
+            });
+        };
+        translateCallback = function (data){
+            console.log(data);
+            if(data.status === 0) {
+                publish.lng = data.points[0].lng;
+                publish.lat = data.points[0].lat;
+                $.post("{:url('index/ajaxUpdateLocation')}", { lng:data.points[0].lng, lat:data.points[0].lat});
+                //转坐标为地址
+                var geoc = new BMap.Geocoder();
+                var pt = new BMap.Point(data.points[0].lng, data.points[0].lat);
+                geoc.getLocation(pt, function(rs){
+                    var addComp = rs.addressComponents;
+                    var address = addComp.province + " " + addComp.city + " " + addComp.district + " " + addComp.street + " " + addComp.streetNumber;
+                    publish.location = address;
+                });
+            } 
+        }
 
         //删除图片
         $(document).on('click', '.img-delete',function() {

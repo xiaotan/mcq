@@ -33,12 +33,15 @@ textarea:-ms-input-placeholder {
     margin-bottom:.5rem;
 }
 .base-top .name{
-    font-size:1.2rem;
+    font-size:.9rem;
     margin-left:2rem;
 }
 .base-top .stars{
-    font-size:1rem;
+    font-size:.8rem;
     margin-left:2rem;
+}
+.stars em{
+    font-size:.8rem;
 }
 .base-top .line{
     height:1px;

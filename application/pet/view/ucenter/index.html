@@ -10,9 +10,9 @@
 
             <header class="navbar">
                 <div class="nav-wrap nav-wrap-left">
-                    <a class="react" rel="nofollow" href="{:url('ucenter/message')}" external>
+                    <a class="react" rel="nofollow" href="{:url('ucenter/notice')}" external>
                         <span class="nav-btn">
-                            <i class="icon my-icon-news"></i>
+                            <i class="icon my-icon-news">{if condition="$notice"}<span class="badge">{$notice}</span>{/if}</i>
                         </span>
                     </a>
                 </div>
@@ -104,6 +104,22 @@
                                     <!-- <div class="item-after">杜蕾斯</div> -->
                                 </div>
 
+                            </li>
+                        </a>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="u-box pr" style="margin:.5rem 0;">
+                <div class="list-block" style="margin:0;">
+                    <ul>
+                        <a href="{:url('ucenter/follow')}" class="item-a" external>
+                            <li class="item-content item-link">
+                                <div class="item-media"><i class="icon my-icon-like"></i></div>
+                                <div class="item-inner">
+                                    <div class="item-title">我的关注</div>
+                                    <!-- <div class="item-after">杜蕾斯</div> -->
+                                </div>
                             </li>
                         </a>
                         <a href="{:url('ucenter/collect')}" class="item-a" external>

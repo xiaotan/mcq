@@ -1,0 +1,51 @@
+body, .page, .page-group, .page-group.page-current, .page.page-current{
+	background: #f5f3f2;
+}
+#nav-top{
+	background: #fff;
+}
+#nav-top .button-link{
+	color:#F8B82C;
+}
+
+.scroll-box{
+	position:relative;
+	height:100%;
+	top:2.2rem;
+	left:0;
+	bottom:0;
+	right:0;
+	border-top:8px solid #f5f3f2;
+	background: #F5F3F2;
+}
+.list-block{
+	margin-top:0;
+}
+
+.nav-wrap-left a{
+    width: 3.5rem;
+}
+.nav-wrap a:last-child{
+	margin-right:0;
+}
+.list-block ul{
+	border:none;
+}
+.item-after a{
+	width:2.5rem;
+	height:1.4rem;
+	line-height:1.4rem;
+	text-align:center;
+	color:#EB6669;
+	font-size:.6rem;
+	border:1px solid #EB6669;
+	border-radius: .5rem
+}
+
+.item-title a{
+	color:#3d4145;
+	margin-right:.2rem;
+}
+.item-title span{
+	font-size:.6rem;
+}

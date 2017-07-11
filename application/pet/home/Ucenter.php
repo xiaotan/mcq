@@ -3,6 +3,7 @@
 namespace app\pet\home;
 
 use app\pet\model\Task as TaskModel;
+use app\pet\model\Notice as NoticeModel;
 use app\pet\model\TaskDo as TaskDoModel;
 use app\pet\model\Order as OrderModel;
 use app\pet\model\Member as MemberModel;
@@ -11,6 +12,7 @@ use app\pet\model\MemberScore as MemberScoreModel;
 use app\pet\model\MemberCollect as MemberCollectModel;
 use app\pet\model\MemberAddress as MemberAddressModel;
 use app\pet\model\MemberFriend as MemberFriendModel;
+use app\pet\model\MemberFollow as MemberFollowModel;
 use app\pet\model\MemberFriendRequest as MemberFriendRequestModel;
 use app\pet\model\BusinessCoupon as BusinessCouponModel;
 use app\pet\model\BusinessDoctor as BusinessDoctorModel;
@@ -47,8 +49,10 @@ class Ucenter extends Common
     public function index()
     {
         $member = $this->MemberModel->where(array("id"=>$this->member_id))->find();
+        $notice = NoticeModel::where(array("to_mid"=>$this->member_id, "is_read"=>0))->count('id');
         // print_r($member);exit;
         $this->assign('tab', 4);
+        $this->assign('notice', $notice);
         $this->assign('member', $member);
         return $this->fetch(); // 渲染模板
     }
@@ -711,18 +715,17 @@ class Ucenter extends Common
     }
 
     public function friend(){
-
         $friend = MemberFriendModel::where(array("mid"=>$this->member_id))->select();
         $letter = config("letter");
         $friends = [];
         if($friend){
             foreach($friend as $k=>$v){
+                $head = Pinyin::getShortPinyin(get_member_name($v->fmid));
                 foreach($letter as $k1=>$v1){
-                    $head = Pinyin::getShortPinyin(get_member_name($v->fmid));
                     /*if(!isset($friends[$v1])){
                         $friends[$v1] = [];
                     }*/
-                    if(strtolower($v1) == substr($head,0,1)){
+                    if(strtolower($v1) == strtolower(substr($head,0,1))){
                         $friends[$v1][] = $v;
                     }
                 }
@@ -780,7 +783,7 @@ class Ucenter extends Common
                 $send['type'] = 'addFriend';
                 $send['title'] = '好友申请';
                 $send['text'] = '用户： '.get_member_name($this->member_id).' 已经通过你的好友申请';
-                $send['url'] = url('ucenter/message');
+                $send['url'] = url('ucenter/notice');
                 send_message($mid, $send);
 
                 //如果对方已经申请，则直接加为好友，并删除申请信息
@@ -804,11 +807,14 @@ class Ucenter extends Common
                 }
                 $result = MemberFriendRequestModel::create(array("mid"=>$this->member_id, "fmid"=>$mid, "create_time"=>time()));
                 if($result){
+                    //加入通知
+                    $title = '用户： '.get_member_name($this->member_id).' 请求加你为好友';
+                    NoticeModel::create(array("to_mid"=>$mid, "from_mid"=>$this->member_id, "title"=>$title, "notice"=>$title, "type"=>1));
                     //发送数据
                     $send['type'] = 'addFriend';
                     $send['title'] = '好友申请';
                     $send['text'] = '用户： '.get_member_name($mid).' 请求加你为好友';
-                    $send['url'] = url('ucenter/message');
+                    $send['url'] = url('ucenter/notice');
                     send_message($mid, $send);
 
                     $return['code'] = 1;
@@ -820,6 +826,136 @@ class Ucenter extends Common
                     echo json_encode($return);exit;
                 }
             }
+        }
+    }
+
+    /**
+     * 我的关注
+     * @return mixed
+     */
+    public function follow(){
+        if(request()->isAjax()){
+            if($id = input('get.id/d')){
+                $result = MemberFollowModel::where(array("mid"=>$this->member_id, "id"=>$id))->delete();
+                if($result){
+                    $return['code'] = 1;
+                    $return['info'] = "删除成功";
+                    echo json_encode($return);exit;
+                }else{
+                    $return['code'] = 0;
+                    $return['info'] = "删除失败";
+                    echo json_encode($return);exit;
+                }
+            }
+        }else{
+            $follow = $this->getFollowList();
+            // print_r($follow);exit;
+            $this->assign('follow', json_encode($follow));
+            return $this->fetch(); // 渲染模板
+        }
+    }
+
+    public function ajaxGetFollow(){
+        $page = input('get.page/d', 1);
+        $data = $this->getFollowList($page);
+        echo $data ? json_encode($data) : 1;
+    }
+
+    public function getFollowList($page = 1, $pageSize = 10, $cache = false){
+        $follow = array();
+        // 做session缓存，防止多次查询数据库
+        if(session('follow'.$page) && $cache){
+            $follow = session('follow'.$page);
+        }else{
+            $follow = Db::query("SELECT * FROM ".config("database.prefix")."pet_member_follow as f,".config("database.prefix")."pet_member as m where f.mid=".$this->member_id." and f.follow_mid=m.id order by f.id desc LIMIT ".($page-1)*$pageSize.",".$pageSize);
+            if($follow){
+                foreach($follow as $k=>$v){
+                    $follow[$k]['name'] = $v['nickname'];
+                    $follow[$k]['avatar'] = get_member_avatar($v['follow_mid']);
+                    $follow[$k]['space'] = url("forum/space",array('id'=>$v['follow_mid']));
+                    $follow[$k]['url'] = url("im/index",array('mid'=>$v['follow_mid']));
+                }
+                session('follow'.$page, $follow);
+            }
+        }
+        return $follow;
+    }
+
+    /**
+     * 我的关注
+     * @return mixed
+     */
+    public function notice(){
+        if(request()->isAjax()){
+            if($id = input('get.id/d')){
+                $result = NoticeModel::where(array("to_mid"=>$this->member_id, "id"=>$id))->delete();
+                if($result){
+                    $return['code'] = 1;
+                    $return['info'] = "删除成功";
+                    echo json_encode($return);exit;
+                }else{
+                    $return['code'] = 0;
+                    $return['info'] = "删除失败";
+                    echo json_encode($return);exit;
+                }
+            }
+        }else{
+            $notice = $this->getNoticeList();
+            // print_r($notice);exit;
+            $this->assign('notice', json_encode($notice));
+            return $this->fetch(); // 渲染模板
+        }
+    }
+
+    public function ajaxGetNotice(){
+        $page = input('get.page/d', 1);
+        $data = $this->getNoticeList($page);
+        echo $data ? json_encode($data) : 1;
+    }
+
+    public function getNoticeList($page = 1, $pageSize = 10, $cache = false){
+        $notice = array();
+        // 做session缓存，防止多次查询数据库
+        if(session('notice'.$page) && $cache){
+            $notice = session('notice'.$page);
+        }else{
+            $notice = Db::query("SELECT * FROM ".config("database.prefix")."pet_notice where to_mid=".$this->member_id." order by is_read asc,id desc LIMIT ".($page-1)*$pageSize.",".$pageSize);
+            if($notice){
+                foreach($notice as $k=>$v){
+                    if($v['type']==2){
+                        $notice[$k]['url'] = url("im/index",array('mid'=>$v['from_mid']));
+                    }else{
+                        $notice[$k]['url'] = url("ucenter/detail",array('id'=>$v['id']));
+                    }
+                    /*$follow[$k]['name'] = $v['nickname'];
+                    $follow[$k]['avatar'] = get_member_avatar($v['follow_mid']);
+                    $follow[$k]['space'] = url("forum/space",array('id'=>$v['follow_mid']));
+                    $follow[$k]['url'] = url("im/index",array('mid'=>$v['follow_mid']));*/
+                }
+                session('notice'.$page, $notice);
+            }
+        }
+        return $notice;
+    }
+
+    public function ajaxMessageNotice($mid){
+        //加入通知
+        $title = '用户： '.get_member_name($mid).' 给您发送了聊天消息';
+        NoticeModel::create(array("to_mid"=>$this->member_id, "from_mid"=>$mid, "title"=>$title, "notice"=>$title, "type"=>2));
+    }
+
+    //消息详情
+    public function detail($id){
+        $notice = NoticeModel::where(array("to_mid"=>$this->member_id, "id"=>$id))->find();
+        // print_r($notice);exit;
+        $this->assign('notice', $notice);
+        return $this->fetch(); // 渲染模板
+    }
+
+    //ajax修改阅读状态
+    public function ajaxNoticeRead(){
+        if($id = input('get.id/d')){
+            NoticeModel::where(array("to_mid"=>$this->member_id, "id"=>$id))->setField('is_read', '1');
         }
     }
 

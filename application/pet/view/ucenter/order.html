@@ -187,9 +187,9 @@
                 if(data==1){
                     order.noMore = 1
                 }else{
-                    order.concatData($.parseJSON( data ));
+                    order.concatData(data);
                 }
-            });
+            }, 'json');
         });
     </script>
 {/block}

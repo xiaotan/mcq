@@ -1,0 +1,52 @@
+{extend name="public:layout" /}
+
+{block name="style"}
+    <link rel="stylesheet" href="__MODULE_CSS__/noticedetail.css">
+{/block}
+
+{block name="main"}
+    <div class="page-group">
+        <div class="page">
+
+            <header class="bar bar-nav bn navbar" id="nav-top">
+                <a href="javascript:history.go(-1);" external style="display:block;">
+                    <button class="button button-link button-nav pull-left">
+                        <span class="icon icon-left"></span> 返回
+                    </button>
+                </a>
+                <div class="nav-wrap-title" id="typename">消息详情</div>
+                <div class="nav-wrap nav-wrap-right"><a class="react"></a></div>
+            </header>
+            
+            <div class="order-show">
+                <img width="100%" src="__MODULE_IMG__/img5.jpg" alt="">
+                <div class="order-show-box pr">
+                    <p style="text-align:center;">{$notice.title}</p>
+                    <p>{$notice.notice}</p>
+                </div>
+                {if condition="$notice['type']==1"}
+                    <div class="order-show-box pr">
+                        <p>申请用户：{:get_member_name($notice['from_mid'])} <span style="float:right;"><a style="color:#eb666a;" href="{:url('forum/space', array('id'=>$notice['from_mid']))}" external>个人空间</a></span></p>
+                    </div>
+                {/if}
+            </div>
+            {if condition="$notice['type']==1"}
+                <p class="friend"><a class="button button-fill">同意申请</a></p>
+            {/if}
+        </div>
+    </div>
+{/block}
+
+{block name="script"}
+    <script>
+        $(document).on('click', '.friend',function() {
+            var mid = "{$notice['from_mid']}";
+            $.get("{:url('ucenter/ajaxAddFriend')}", { mid: mid },function(data){
+                alert(data.info)
+                if(data.code==1){
+                    window.location.href = "{:url('ucenter/notice')}";
+                }
+            }, 'json');
+        });
+    </script>
+{/block}

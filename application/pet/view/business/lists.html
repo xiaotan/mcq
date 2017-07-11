@@ -20,7 +20,7 @@
                 <div class="box-search">
                     <a class="react" href="">
                         <i class="icon icon-search j-search"></i>
-                        <form><input type="search" class="single-line keyword" placeholder="大家都在搜：宠物洗护"></form>
+                        <form action="javascript:return true;"><input type="search" class="single-line keyword" placeholder="大家都在搜：宠物洗护"></form>
                     </a>
                 </div>
             </header>
@@ -114,7 +114,7 @@
         };
         translateCallback = function (data){
             if(data.status === 0) {
-                $.post("{:url('business/ajaxUpdateLocation')}", { lng:data.points[0].lng, lat:data.points[0].lat}, function(data){
+                $.post("{:url('index/ajaxUpdateLocation')}", { lng:data.points[0].lng, lat:data.points[0].lat}, function(data){
                     if(data==1){
                         location.reload();
                     }
@@ -122,11 +122,36 @@
             } 
         }
 
+        $('form').on('submit', function(e){
+            document.activeElement.blur();
+            var keyword = $(".keyword").val();
+            if(keyword){
+                // 显示loading
+                $.showIndicator();
+                // ajax获取信息
+                $.get("{:url('business/ajaxSearchKeyword')}", { keyword: keyword },function(data){
+                    // 隐藏loading
+                    $.hideIndicator();
+                    if(data==1){
+                        // alert("没有符合的信息...")
+                        $.toast("没有符合的信息...");
+                    }else{
+                        // alert("搜索完成...")
+                        $.toast("搜索完成...");
+                        business.items = data;
+                    }
+                }, 'json');
+            }else{
+                location.reload();
+            }
+            return false;
+        });
+
         $(document).on('click', '.my-location',function() {
             updateLocation();
         });
 
-        $(document).on('click', '.j-search',function() {
+        /*$(document).on('click', '.j-search',function() {
             var keyword = $(".keyword").val();
             if(keyword){
                 // 显示loading
@@ -144,7 +169,7 @@
             }else{
                 location.reload();
             }
-        });
+        });*/
 
         // 监听向上滑动事件，获取更多商家列表
         $(document).on('infinite', '.infinite-scroll',function() {

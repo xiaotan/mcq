@@ -167,6 +167,8 @@
 /*轮播图*/
 .banner{
     position: relative;
+    /*height:7rem;
+    overflow: hidden;*/
 }
 .swiper-container{
     padding-bottom:0;
@@ -174,6 +176,9 @@
 .swiper-pagination-bullet-active {
     background: #fff;
 }
+/* .swiper-slide img{
+    height:7rem;
+} */
 
 
 .bar-tab{
@@ -219,4 +224,8 @@
 
 .list-block ul{
     border-bottom: none;
+}
+
+.list-block .item-title{
+  font-size:.8rem;
 }

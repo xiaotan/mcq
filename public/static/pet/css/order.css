@@ -1,5 +1,5 @@
 body, .page, .page-group, .page-group.page-current, .page.page-current{
-    background: #efefef;
+    background: #F4F4F4;
 }
 #nav-top{
     background:#fff ;
@@ -96,7 +96,7 @@ body, .page, .page-group, .page-group.page-current, .page.page-current{
     margin:0;
 }
 .order-content{
-    background: #efefef;
+    background: #F4F4F4;
     margin-top:5rem;
     padding:0;
     font-size: .6rem;

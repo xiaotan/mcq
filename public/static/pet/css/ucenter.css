@@ -9,7 +9,7 @@ body, .page, .page-group, .page-group.page-current, .page.page-current{
 }
 .my-info{
     width:100%;
-    height:7rem;   
+    height:6rem;   
     background:#f7b216;
     background:-moz-linear-gradient(top, #f7b216, #e69400);  
     background:-webkit-gradient(linear, 0 0, 0 bottom, from(#f7b216), to(#e69400)); 
@@ -22,8 +22,8 @@ body, .page, .page-group, .page-group.page-current, .page.page-current{
     padding:1.5rem 2rem 0 2rem;
 }
 .my-info .avatar{
-    width:4rem;
-    height:4rem;
+    width:3rem;
+    height:3rem;
     border-radius: 2rem;
     float:left;
     margin-right:1rem;
@@ -32,7 +32,7 @@ body, .page, .page-group, .page-group.page-current, .page.page-current{
     margin:.1rem 0;
 }
 .info-box .info .name{
-    font-size:1.2rem;
+    font-size:.8rem;
     vertical-align: middle;
 }
 .info-box .info .level{
@@ -51,7 +51,7 @@ body, .page, .page-group, .page-group.page-current, .page.page-current{
 }
 .list-block .item-media i{
   color:#767676;
-  font-size:1.2rem;
+  font-size:1rem;
 }
 .order-type .col-33{
     text-align:center;
@@ -130,4 +130,23 @@ body, .page, .page-group, .page-group.page-current, .page.page-current{
 }
 .nav-btn .my-icon-system{
   font-size:1.2rem;
+}
+.my-icon-news{
+  position: relative;
+}
+.my-icon-news .badge {
+    position: absolute;
+    bottom: 50%;
+    left: 50%;
+    z-index: 100;
+    min-width: .8rem;
+    height: .8rem;
+    padding: 0 .2rem;
+    margin-left: .1rem;
+    font-size: .6rem;
+    line-height: .8rem;
+    color: white;
+    vertical-align: top;
+    background: red;
+    border-radius: .5rem;
 }

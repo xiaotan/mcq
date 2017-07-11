@@ -29,7 +29,7 @@
 }
 .item-top{
     position: relative;
-    height:2.5rem;
+    height:2rem;
 }
 .item-top .time{
     position: absolute;
@@ -39,14 +39,14 @@
     color:#888;
 }
 .item-top img{
-    width:2.5rem;
-    height:2.5rem;
+    width:2rem;
+    height:2rem;
     float:left;
     margin-right:.5rem;
     border-radius: .5rem;
 }
 .item-top-box .name{
-    font-size:1rem;
+    font-size:.8rem;
     color:#873520;
 }
 .item-top-box p{

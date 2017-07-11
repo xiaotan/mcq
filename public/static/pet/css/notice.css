@@ -1,0 +1,30 @@
+body, .page, .page-group, .page-group.page-current, .page.page-current{
+	background: #f5f3f2;
+}
+#nav-top{
+	background: #fff;
+}
+#nav-top .button-link{
+	color:#F8B82C;
+}
+
+.scroll-box{
+	position:relative;
+	height:100%;
+	top:2.2rem;
+	left:0;
+	bottom:0;
+	right:0;
+	border-top:8px solid #f5f3f2;
+	background: #F5F3F2;
+}
+.list-block{
+	margin-top:0;
+}
+.list-block ul{
+	border:none;
+}
+
+#notice .item-after{
+	font-size:.6rem;
+}

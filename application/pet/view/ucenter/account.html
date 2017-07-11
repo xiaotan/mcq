@@ -52,7 +52,7 @@
                                     <div class="item-inner">
                                         <div class="item-title">{$vo.title}</div>
                                         {if condition="$vo['status']==0"}
-                                            <div class="item-after">任务未完成</div>
+                                            <div class="item-after"><a href="{:url($vo['url'])}" external>任务未完成</a></div>
                                         {elseif condition="$vo['status']==2"/}
                                             <div class="item-after">已领取奖励</div>
                                         {else /}

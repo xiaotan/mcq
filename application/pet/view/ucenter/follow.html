@@ -1,0 +1,94 @@
+{extend name="public:layout" /}
+
+{block name="style"}
+    <link rel="stylesheet" href="__MODULE_CSS__/follow.css">
+{/block}
+
+{block name="main"}
+    <div class="page-group">
+        <div class="page">
+
+            <header class="bar bar-nav bn" id="nav-top">
+                <a href="javascript:history.go(-1);" external style="display:block;">
+                    <button class="button button-link button-nav pull-left">
+                        <span class="icon icon-left"></span> 关注
+                    </button>
+                </a>
+            </header>
+            
+            <!-- 添加 class infinite-scroll 和 data-distance -->
+            <div class="scroll-box">
+                <div class="content infinite-scroll" data-distance="0">
+                    <div class="list-block" id="follow">
+                        <div class="no-data" v-if="isEmptyObject(items)">
+                            <img src="__MODULE_IMG__/no-collect.jpg" alt="">
+                        </div>
+                        <ul class="list-container" v-else>
+                            <template v-for="item in items">
+                                <li class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title"><a style="display:block;" :href="item.space" external>{{item.name}} <span>（{{item.online==1?'在线':'不在线'}}）</span></a></div>
+                                        <div class="item-after"><a style="display:block;" :href="item.url" external>聊天</a></div>
+                                    </div>
+                                </li>
+                            </template>
+                        </ul>
+                        <p class="no-more" v-if="noMore==1 ? true : false">没有更多信息</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+{/block}
+
+{block name="script"}
+    <script>
+        var follow = new Vue({
+            el: '#follow', 
+            data: {
+                page: 1,
+                noMore: 0,
+                items: {$follow},
+            },
+            methods: {
+                concatData: function(data){
+                    console.log(this.items)
+                    this.items = this.items.concat(data);
+                    this.page++;
+                },
+                deleteCollect: function(id){
+                    // 显示loading
+                    $.showIndicator();
+                    $.get("{:url('ucenter/follow')}", { id: id },function(data){
+                        // 隐藏loading
+                        $.hideIndicator();
+                        if(data.code==1){
+                            location.reload();
+                        }else{
+                            alert(data.info)
+                        }
+                    }, "json");
+                },
+                isEmptyObject: function(e){
+                    var t;  
+                    for (t in e)  
+                        return !1;  
+                    return !0 
+                },
+            }
+        })
+
+        // 监听向上滑动事件，获取更多商家列表
+        $(document).on('infinite', '.infinite-scroll',function() {
+            // ajax获取信息
+            $.get("{:url('ucenter/ajaxGetFollow')}", { page: follow.page },function(data){
+                if(data==1){
+                    follow.noMore = 1;
+                }else{
+                    follow.concatData(data);
+                }
+            });
+        });
+    </script>
+{/block}

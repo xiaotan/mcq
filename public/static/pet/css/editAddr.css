@@ -40,7 +40,7 @@ textarea:-ms-input-placeholder {
 }
 .list-block{
     border-top:.5rem solid #F5F5F5;
-    margin:.5rem 0;
+    margin:0;
 }
 .list-block li:last-child .item-inner, .list-block li:last-child li:last-child .item-inner{
     border-bottom: 1px solid #e7e7e7;

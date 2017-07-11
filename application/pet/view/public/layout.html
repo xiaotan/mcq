@@ -68,9 +68,10 @@
         ws = new WebSocket("ws://www.youchongme.com:7272");
         // 服务端主动推送消息时会触发这里的onmessage
         ws.onmessage = function(e){
-            console.log(e.data)
+            // console.log(e.data)
             // json数据转换成js对象
             var data = eval("("+e.data+")");
+            // console.log(data.data)
             var type = data.type || '';
             switch(type){
                 // Events.php中返回的init类型的消息，将client_id发给后台进行uid绑定
@@ -95,7 +96,7 @@
                                 window.location.href = data.url;
                             },
                             onClose: function(data) {
-
+                                $.get("{:url('ucenter/ajaxMessageNotice')}", { mid: data.data[0].from_mid });
                             }
                         });
                     }

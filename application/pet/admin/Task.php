@@ -90,6 +90,7 @@ class Task extends Admin
                 ['datetime', 'end_time', '任务结束时间'],
                 ['text', 'icon', '任务图标'],
                 ['text', 'intro', '任务简介'],
+                ['text', 'url', '任务跳转链接'],
                 ['number', 'amount', '奖励积分'],
                 ['radio', 'status', '状态', '', ['禁用', '启用'], 1]
             ])
@@ -143,6 +144,7 @@ class Task extends Admin
                 ['datetime', 'end_time', '任务结束时间'],
                 ['text', 'icon', '任务图标'],
                 ['text', 'intro', '任务简介'],
+                ['text', 'url', '任务跳转链接'],
                 ['number', 'amount', '奖励积分'],
                 ['radio', 'status', '状态', '', ['禁用', '启用'], 1]
             ])

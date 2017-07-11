@@ -117,7 +117,7 @@
                             var item = "item"+i;
                             this.url = this.members[i].url;
                             //生成用户坐标
-                            icon = new BMap.Icon(this.members[i].avatar, new BMap.Size(50,50), {imageOffset: new BMap.Size(0, 0)});
+                            icon = new BMap.Icon(this.members[i].avatar, new BMap.Size(40,40), {imageOffset: new BMap.Size(0, 0)});
                             item = new BMap.Marker(new BMap.Point(this.members[i].lng,this.members[i].lat), {icon:icon});
                             map.addOverlay(item);
                             item.addEventListener("click", function(url){

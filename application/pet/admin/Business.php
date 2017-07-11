@@ -175,7 +175,7 @@ class Business extends Admin
                 ['tags', 'tag', '商家标签', '商家标签可以帮助用户更快搜索到您的店铺，最多添加'.config('business_tag_num').'个标签（添加方式：在方框里输入标签并回车）'],
                 ['jcrop', 'thumb', '缩略图', '缩略图规格为 250x180', '', ['minSize' => [250, 180], 'maxSize' => [250, 180]]],
                 ['images', 'banner', '商家banner（多图）','最多上传5张图,每张图最大4m,图片规格为：520x250 最佳，其他尺寸有可能会变形','','4096'],
-                ['bmap', 'map', '商家位置', config('baidu_map_ak'), '商家位置信息包括[位置定位]和[标签定位],为方便用户更快找到店铺，请务必填写正确地址'],
+                ['bmap', 'map', '商家位置', config('baidu_map_ak'), '商家位置信息包括[位置定位]和[标签定位],为方便用户更快找到店铺，请务必填写正确地址',$info['map'],$info['map_address']],
             ])
             ->setFormData($info)
             ->fetch();

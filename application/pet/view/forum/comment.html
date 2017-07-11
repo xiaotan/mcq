@@ -1,0 +1,140 @@
+{extend name="public:layout" /}
+
+{block name="style"}
+    <link rel="stylesheet" href="__MODULE_CSS__/comments.css">
+{/block}
+
+{block name="main"}
+    <div class="page-group">
+        <div class="page">
+
+            <header class="bar bar-nav bn" id="nav-top">
+                <a href="javascript:history.go(-1);" external style="display:block;">
+                    <button class="button button-link button-nav pull-left">
+                        <span class="icon icon-left"></span> 评论详情
+                    </button>
+                </a>
+            </header>
+            
+            <div id="detail">
+                <div class="detail">
+                    <div class="item-top">
+                        <a :href="detail.url" external><img :src="detail.avatar" alt=""></a>
+                        <div class="item-top-box">
+                            <p class="name">{{detail.nickname}}</p>
+                            <!-- <p><span>金毛犬</span> | <span>3个月</span></p> -->
+                        </div>
+                        <span class="time">{{detail.date}}</span>
+                    </div>
+                    <div class="con">{{detail.content}}</div>
+                    <div class="item-bottom">
+                        <span class="site" v-if="detail.location">{{detail.location}}</span>
+                        <p class="comment"><i class="icon my-icon-comment"></i><span>{{detail.comment}}</span></p>
+                        <p class="enjoy" @click="favorite(detail.id)"><i class="icon my-icon-heart" :class="detail.is_favorite ? 'is_favorite' : ''"></i><span>{{detail.favorite}}</span></p>
+                    </div>
+                </div>
+                <div class="comment-list">
+                    <ul>
+                        <template v-for="item in comment">
+                            <li>
+                                <div class="avatar"><img :src="item.avatar" alt=""></div>
+                                <div class="comment-box">
+                                    <p class="comment-name">{{item.nickname}}</p>
+                                    <p class="comment-time">{{item.date}}</p>
+                                    <p class="comment-content">{{item.content}}</p>
+                                </div>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+                <div class="comment-more" v-if="isEmptyObject(comment)?true:false">无评论信息</div>
+                <div class="comment-more" @click="getMore" v-else>{{More==1?'查看更多评论':'没有更多信息'}}</div>
+                <div class="do-comment">
+                    <div class="do-comment-box">
+                        <form action="javascript:return true;"><input name="comment" type="text" :placeholder="'回复 '+detail.nickname+' 的评论内容'"></form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+{/block}
+
+{block name="script"}
+    <script>
+        var detail = new Vue({
+            el: '#detail', 
+            data: {
+                page: 2,
+                More: 1,
+                detail: {$detail},
+                comment: {$comment},
+            },
+            methods: {
+                isEmptyObject: function(e){
+                    var t;  
+                    for (t in e)  
+                        return !1;  
+                    return !0 
+                },
+                getMore: function(){
+                    // ajax获取信息
+                    $.get("{:url('forum/ajaxGetCommentList')}", { page: this.page, id:this.detail.id, type:2  },function(data){
+                        if(data==1){
+                            detail.More = 0;
+                        }else{
+                            detail.comment = detail.comment.concat(data);
+                            detail.page++;
+                        }
+                    }, 'json');
+                },
+                favorite: function(id){
+                    $.get("{:url('forum/ajaxCommentFavorite')}", { id: id },function(data){
+                        if(data.code==1){
+                            detail.detail.is_favorite = data.info;
+                            if(data.info==0){
+                                detail.detail.favorite -= 1;
+                            }else{
+                                detail.detail.favorite += 1;
+                            }
+                        }else{
+                            alert(data.info);
+                        }
+                    }, 'json');
+                },
+            }
+        })
+
+        $('form').on('submit', function(e){
+            document.activeElement.blur();
+            var comment = $("input[name='comment']").val();
+            if(comment){
+                // 显示loading
+                $.showIndicator();
+                // ajax获取信息
+                $.post("{:url('forum/ajaxDoComment')}", { to_mid: detail.detail.mid, content: comment, parent_id: detail.detail.id, parent_type:2 },function(data){
+                    console.log(data.info)
+                    // 隐藏loading
+                    $.hideIndicator();
+                    if(data.code==1){
+                        $.toast("评论成功!");
+                        if(detail.isEmptyObject(detail.comment)){
+                            detail.comment = data.info;
+                        }else{
+                            detail.comment.reverse();
+                            detail.comment = detail.comment.concat(data.info);
+                            detail.comment.reverse();
+                        } 
+                        detail.detail.comment ++;
+                        $("input[name='comment']").val('');
+                    }else{
+                        $.toast(data.info);
+                    }
+                }, 'json');
+            }else{
+                $.toast("评论不能为空...");
+            }
+            return false;
+        });
+    </script>
+{/block}
